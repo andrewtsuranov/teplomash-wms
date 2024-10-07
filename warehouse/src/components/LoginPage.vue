@@ -6,19 +6,24 @@
     <div class="login-input">
       <my-input
           v-model="email"
-          type="text"
+          type="email"
+          size="64"
+          maxlength="64"
+          title="Пожалуйста, введите только корпоративный адрес почты"
+          pattern=".+@teplomash\.ru"
           placeholder="Введите email..."
+          required
       />
-      {{ email }}
       <my-input
           v-model="password"
-          type="text"
+          type="password"
+          minlength="8"
           placeholder="Введите пароль..."
+          required
       />
-      {{ password }}
     </div>
     <div>
-      <my-button class="login-btn" v-on:click="userStore.login(user())">Войти</my-button>
+      <my-button class="login-btn" v-on:click="userStore.login(user())" :disabled=isDisabled()>Войти</my-button>
       <my-button class="login-btn">Зарегистрироваться</my-button>
     </div>
   </div>
@@ -36,6 +41,7 @@ const user = () => ({
   "email": email.value,
   "password": password.value
 })
+const isDisabled = () => !(user().email.length !== 0 && user().password.length !== 0)
 </script>
 <style scoped>
 .login-wrapper {
@@ -55,5 +61,4 @@ const user = () => ({
 .login-btn {
   margin-top: 15px;
 }
-
 </style>

@@ -1,8 +1,13 @@
 <template>
-  <button class="btn">
+  <button class="btn" :disabled="props.disabled">
     <slot></slot>
   </button>
 </template>
+<script setup>
+const props = defineProps({
+  disabled: Boolean,
+})
+</script>
 <style scoped>
 .btn {
   padding: 10px 20px;
@@ -20,5 +25,15 @@
   cursor: pointer;
   transition: background-color 0.5s;
   color: black;
+}
+
+.btn:disabled {
+  color: grey;
+  border: 1px solid grey;
+  cursor: default;
+}
+
+.btn:disabled:hover {
+  background: none;
 }
 </style>

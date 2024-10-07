@@ -16,7 +16,6 @@
 <script setup>
 import {RouterLink, RouterView} from 'vue-router'
 import HomePage from "@/components/HomePage.vue";
-
 </script>
 <style scoped>
 .grid-container {
@@ -24,7 +23,6 @@ import HomePage from "@/components/HomePage.vue";
   grid-template-columns: 1fr 1fr;
   grid-template-rows: auto 1fr;
   row-gap: 5rem;
-
 }
 
 .grid-item {
@@ -33,7 +31,6 @@ import HomePage from "@/components/HomePage.vue";
 
 .header {
   grid-column: 1 / -1;
-
   display: flex;
   justify-content: center;
   align-items: center;
@@ -44,14 +41,12 @@ import HomePage from "@/components/HomePage.vue";
 }
 
 .left-column {
-
   display: flex;
   flex-direction: column;
   align-items: start;
 }
 
 .right-column {
-
   overflow-y: auto;
 }
 

@@ -1,15 +1,20 @@
 <template>
-  <input :value="props.modelValue" @input="emit('update:modelValue', $event.target.value)" class="input" type="text">
+  <input v-model="model"
+         class="input"
+  >
 </template>
 <script setup>
-const props = defineProps(['modelValue'])
-const emit = defineEmits(['update:modelValue'])
+const model = defineModel()
 </script>
 <style scoped>
 .input {
   width: 100%;
-  border: 1px solid teal;
+  border: 1px solid blanchedalmond;
+  border-radius: 10px;
+  color: blanchedalmond;
   padding: 10px 15px;
+  font-size: 1rem;
   margin-top: 15px;
+  background: none;
 }
 </style>
