@@ -1,7 +1,7 @@
 <template>
   <div class="login-wrapper">
     <div class="login-head">
-      Войдите, чтобы продолжить
+      Авторизируйтесь, чтобы продолжить...
     </div>
     <div class="login-input">
       <my-input
@@ -24,10 +24,10 @@
   </div>
 </template>
 <script setup>
-import {ref, watch} from 'vue'
+import {ref} from 'vue'
 import {useUserStore} from "@/stores/UserStore.js";
-import myButton from "@/components/UI/MyButton.vue"
-import myInput from "@/components/UI/MyInput.vue"
+import myButton from "@/components/UI/MyButton.vue";
+import myInput from "@/components/UI/MyInput.vue";
 
 const email = ref('')
 const password = ref('')
@@ -36,36 +36,6 @@ const user = () => ({
   "email": email.value,
   "password": password.value
 })
-// const user = {
-//   "email": email,
-//   "password": password
-// }
-// console.log(user)
-// export default {
-// props: {
-//   user: {
-//     type: Object,
-//     required: true,
-//     default: () => {
-//     }
-//   }
-// },
-// data() {
-//   return {
-//     email: '',
-//     password: '',
-//   }
-// },
-// methods: {
-//   login() {
-//     const logDataUser = {
-//       email: this.email,
-//       password: this.password
-//     }
-//     console.log(logDataUser)
-//   }
-// }
-// }
 </script>
 <style scoped>
 .login-wrapper {
@@ -75,8 +45,8 @@ const user = () => ({
 }
 
 .login-head {
-  color: aquamarine;
-  font-size: 30px;
+  color: blanchedalmond;
+  font-size: 1.5rem;
 }
 
 .login-input {
@@ -85,4 +55,5 @@ const user = () => ({
 .login-btn {
   margin-top: 15px;
 }
+
 </style>

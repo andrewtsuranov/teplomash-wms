@@ -11,9 +11,7 @@ defineProps({
   <div class="greetings">
     <h1 class="green">{{ msg }}</h1>
     <h3>
-      You’ve successfully created a project with
-      <a href="https://vitejs.dev/" target="_blank" rel="noopener">Vite21</a> +
-      <a href="https://vuejs.org/" target="_blank" rel="noopener">Vue 3</a>.
+      <p>Адресная система хранения складом Тепломаш&reg;<br/></p>Разработана для сотрудников складских помещений Тепломаш&reg; с целью оптимизации процессов поиска, комплектации и хранения товарной номенклатуры.
     </h3>
   </div>
 </template>
@@ -27,9 +25,12 @@ h1 {
 }
 
 h3 {
-  font-size: 1.2rem;
+  font-size: 1.3rem;
+  color: #9B9482;
 }
-
+p {
+  margin-bottom: 1rem;
+}
 .greetings h1,
 .greetings h3 {
   text-align: center;

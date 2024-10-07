@@ -27,6 +27,7 @@
   --color-background-soft: var(--vt-c-white-soft);
   --color-background-mute: var(--vt-c-white-mute);
 
+
   --color-border: var(--vt-c-divider-light-2);
   --color-border-hover: var(--vt-c-divider-light-1);
 
@@ -83,4 +84,35 @@ body {
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
 }
+body {
+  /*display: flex;*/
+  /*min-height: 100vh;*/
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(
+          160deg,
+          rgb(140, 32, 41) 0%,
+          black 50%,
+          black 50%,
+          rgb(45, 66, 120) 100%
+
+  );
+background-size: 200% 200%;
+  animation: gradientShift 15s ease infinite;
+
+}
+
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
