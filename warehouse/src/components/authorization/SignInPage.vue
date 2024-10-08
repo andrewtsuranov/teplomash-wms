@@ -1,7 +1,7 @@
 <template>
   <div class="login-wrapper">
     <div class="login-head">
-      Авторизируйтесь, чтобы продолжить...
+      Вход в систему:
     </div>
     <my-input
         v-model="email"
@@ -10,7 +10,6 @@
         placeholder="Введите email..."
         required
         size="64"
-        title="Пожалуйста, введите только корпоративный адрес почты"
         type="email"
     />
     <my-input
@@ -26,15 +25,18 @@
           v-on:click="userStore.login(user())"
       >Войти
       </my-button>
-      <my-button>Зарегистрироваться</my-button>
+      <my-button @click="router.push({ name: 'signup' })">
+        Зарегистрироваться
+      </my-button>
     </div>
   </div>
 </template>
 <script setup>
 import {ref} from 'vue'
 import {useUserStore} from "@/stores/UserStore.js";
-import myButton from "@/components/UI/MyButton.vue";
-import myInput from "@/components/UI/MyInput.vue";
+import MyButton from "@/components/UI/MyButton.vue";
+import MyInput from "@/components/UI/MyInput.vue";
+import router from "@/router/index.js";
 
 const email = ref('')
 const password = ref('')
@@ -51,7 +53,6 @@ const isDisabled = () => !(user().email.length !== 0 && user().password.length !
   flex-wrap: wrap;
   flex-direction: column;
   gap: 15px;
-
   /*max-height: 100vh;*/
   /*justify-content: center;*/
 }

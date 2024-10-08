@@ -1,11 +1,11 @@
 <template>
   <div class="grid-container">
     <header class="grid-item header">
-      <img alt="Vue logo" class="logo" src="@/assets/logo.svg"/>
+      <logo-general class="logo-general"/>
     </header>
     <nav class="grid-item left-column">
-      <HomePage msg="Добро пожаловать!"/>
-      <RouterLink to="/">Home</RouterLink>
+      <greetings-page msg="Добро пожаловать!"/>
+      <RouterLink to="/">Вход</RouterLink>
       <RouterLink to="/listUsers">Список пользователей</RouterLink>
     </nav>
     <main class="grid-item right-column">
@@ -15,7 +15,8 @@
 </template>
 <script setup>
 import {RouterLink, RouterView} from 'vue-router'
-import HomePage from "@/components/HomePage.vue";
+import GreetingsPage from "@/components/GreetingsPage.vue";
+import LogoGeneral from "@/components/UI/LogoGeneral.vue"
 </script>
 <style scoped>
 .grid-container {
@@ -36,7 +37,7 @@ import HomePage from "@/components/HomePage.vue";
   align-items: center;
 }
 
-.logo {
+.logo-general {
   height: 100px;
 }
 
@@ -46,18 +47,13 @@ import HomePage from "@/components/HomePage.vue";
   flex-wrap: wrap;
   gap: 1rem;
   align-items: end;
-
-
-
 }
 
 .right-column {
   overflow-y: auto;
-
 }
 
 nav {
-
 }
 
 nav a {

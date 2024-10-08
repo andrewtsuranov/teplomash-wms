@@ -1,8 +1,8 @@
 <script setup>
-import LoginPage from '../components/LoginPage.vue'
+import SignInPage from '../components/authorization/SignInPage.vue'
 </script>
 <template>
   <main>
-    <login-page/>
+    <sign-in-page/>
   </main>
 </template>
