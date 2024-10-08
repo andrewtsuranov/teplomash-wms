@@ -6,17 +6,16 @@ defineProps({
   }
 })
 </script>
-
 <template>
   <div class="greetings">
     <h1 class="green">{{ msg }}</h1>
-    <h3>
-      <p>Адресная система хранения складом Тепломаш&reg;<br/></p>Разработана для сотрудников складских помещений Тепломаш&reg; с целью оптимизации процессов поиска, комплектации и хранения товарной номенклатуры.
-    </h3>
+    <p>Адресная система хранения складом Тепломаш&reg;</p>
+    <span>Разработана для сотрудников складских помещений Тепломаш&reg; с целью оптимизации процессов поиска, комплектации
+        и хранения товарной номенклатуры</span>
   </div>
 </template>
-
 <style scoped>
+
 h1 {
   font-weight: 500;
   font-size: 2.6rem;
@@ -24,21 +23,28 @@ h1 {
   top: -10px;
 }
 
-h3 {
+p {
+  font-size: 1.3rem;
+  margin-bottom: 1rem;
+}
+
+span {
   font-size: 1.3rem;
   color: #9B9482;
 }
-p {
-  margin-bottom: 1rem;
-}
+
 .greetings h1,
-.greetings h3 {
+.greetings span,
+.greetings p {
   text-align: center;
+
+
 }
 
 @media (min-width: 1024px) {
   .greetings h1,
-  .greetings h3 {
+  .greetings span,
+  .greetings p {
     text-align: left;
   }
 }

@@ -13,8 +13,10 @@ const model = defineModel()
   border-radius: 10px;
   color: blanchedalmond;
   padding: 10px 15px;
-  font-size: 1rem;
-  margin-top: 15px;
+  font-size: 1.1rem;
   background: none;
+  outline: none;
 }
+
+
 </style>

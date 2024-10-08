@@ -1,5 +1,5 @@
 <template>
-  <div class="grid-container smooth-gradient-background">
+  <div class="grid-container">
     <header class="grid-item header">
       <img alt="Vue logo" class="logo" src="@/assets/logo.svg"/>
     </header>
@@ -43,17 +43,21 @@ import HomePage from "@/components/HomePage.vue";
 .left-column {
   display: flex;
   flex-direction: column;
-  align-items: start;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: end;
+
+
+
 }
 
 .right-column {
   overflow-y: auto;
+
 }
 
 nav {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
+
 }
 
 nav a {

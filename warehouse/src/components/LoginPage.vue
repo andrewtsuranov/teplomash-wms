@@ -3,28 +3,30 @@
     <div class="login-head">
       Авторизируйтесь, чтобы продолжить...
     </div>
-    <div class="login-input">
-      <my-input
-          v-model="email"
-          type="email"
-          size="64"
-          maxlength="64"
-          title="Пожалуйста, введите только корпоративный адрес почты"
-          pattern=".+@teplomash\.ru"
-          placeholder="Введите email..."
-          required
-      />
-      <my-input
-          v-model="password"
-          type="password"
-          minlength="8"
-          placeholder="Введите пароль..."
-          required
-      />
-    </div>
-    <div>
-      <my-button class="login-btn" v-on:click="userStore.login(user())" :disabled=isDisabled()>Войти</my-button>
-      <my-button class="login-btn">Зарегистрироваться</my-button>
+    <my-input
+        v-model="email"
+        maxlength="50"
+        pattern=".+@teplomash\.ru"
+        placeholder="Введите email..."
+        required
+        size="64"
+        title="Пожалуйста, введите только корпоративный адрес почты"
+        type="email"
+    />
+    <my-input
+        v-model="password"
+        minlength="8"
+        placeholder="Введите пароль..."
+        required
+        type="password"
+    />
+    <div class="btn__login">
+      <my-button
+          :disabled=isDisabled()
+          v-on:click="userStore.login(user())"
+      >Войти
+      </my-button>
+      <my-button>Зарегистрироваться</my-button>
     </div>
   </div>
 </template>
@@ -45,9 +47,13 @@ const isDisabled = () => !(user().email.length !== 0 && user().password.length !
 </script>
 <style scoped>
 .login-wrapper {
-  display: grid;
-  gap: 10px;
-  max-height: 100vh;
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: column;
+  gap: 15px;
+
+  /*max-height: 100vh;*/
+  /*justify-content: center;*/
 }
 
 .login-head {
@@ -56,9 +62,13 @@ const isDisabled = () => !(user().email.length !== 0 && user().password.length !
 }
 
 .login-input {
+  /*padding-right: 170px;*/
+  max-width: 400px;
 }
 
-.login-btn {
-  margin-top: 15px;
+.btn__login {
+  display: flex;
+  flex-direction: row;
+  gap: 15px
 }
 </style>

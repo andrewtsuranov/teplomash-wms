@@ -10,13 +10,17 @@ const props = defineProps({
 </script>
 <style scoped>
 .btn {
-  padding: 10px 20px;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  height: 40px;
+  padding-inline: 20px;
   background: none;
   color: blanchedalmond;
   border: 1px solid blanchedalmond;
   border-radius: 20px;
   font-size: 1rem;
-  margin-right: 15px;
+
 }
 
 .btn:hover {
