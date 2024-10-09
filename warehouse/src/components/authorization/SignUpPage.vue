@@ -29,9 +29,18 @@
         type="text"
     />
     <my-input
+        v-model="role"
+        maxlength="64"
+        placeholder="Role*"
+        required
+        size="64"
+        title="Введите отчество.."
+        type="text"
+    />
+    <my-input
         v-model="email"
         maxlength="50"
-        pattern=".+@teplomash\.ru"
+        pattern="@teplomash\.ru"
         placeholder="email* (example@teplomash.ru)"
         required
         size="64"
@@ -54,6 +63,7 @@
     />
     <my-button
         @click="router.push({path: '/confirmation'})"
+        v-on:click="userStore.REQ_SIGNUP(formDataUser())"
         :disabled=isDisabled()
     >Регистрация
     </my-button>
@@ -64,22 +74,26 @@ import MyInput from "@/components/UI/MyInput.vue";
 import MyButton from "@/components/UI/MyButton.vue"
 import router from "@/router/index.js";
 import {ref} from "vue";
+import {useUserStore} from "@/stores/UserStore.js";
 
+const userStore = useUserStore()
 const username = ref('')
 const usersurname = ref('')
 const usermidname = ref('')
+const role = ref('')
 const email = ref('')
 const password = ref('')
 const repassword = ref('')
-const regUser = () => ({
+const formDataUser = () => ({
   "username": username.value,
   "usersurname": usersurname.value,
   "usermidname": usermidname.value,
+  "role": role.value,
   "email": email.value,
   "password": password.value,
   "repassword": repassword.value
 })
-const isDisabled = () => !(regUser().username.length !== 0 && regUser().usersurname.length !== 0 && regUser().usermidname.length !== 0 && regUser().email.length !== 0 && regUser().password.length !== 0 && regUser().repassword.length !== 0)
+const isDisabled = () => !(formDataUser().username.length !== 0 && formDataUser().usersurname.length !== 0 && formDataUser().usermidname.length !== 0 && formDataUser().email.length !== 0 && formDataUser().password.length !== 0 && formDataUser().repassword.length !== 0)
 </script>
 <style scoped>
 .login-wrapper {

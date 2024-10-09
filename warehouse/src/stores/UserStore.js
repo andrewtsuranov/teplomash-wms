@@ -1,6 +1,17 @@
 import {defineStore} from 'pinia'
+import ky from "ky";
 
-const url = 'http://38.180.192.229/api/auth/login/'
+const api = ky.create({
+    // prefixUrl: 'http://38.180.192.229/api/auth/'
+    prefixUrl: 'http://lab:8080/api/auth/'
+
+})
+
+
+const secureApi = api.extend({
+    Authorization: 'token'
+})
+
 export const useUserStore = defineStore('userStore', {
     state: () => ({
         users: [
@@ -39,23 +50,36 @@ export const useUserStore = defineStore('userStore', {
         },
     },
     actions: {
-        async login(user) {
+       async login(logDataUser) {
+           try {
+               const response = await secureApi
+                   .post('login/', {json: logDataUser})
+                   .json()
+               console.log(response)
+           } catch (err) {
+               console.log(err.message)
+           }
+       },
+        async REQ_SIGNUP(formDataUser) {
+            console.log(formDataUser)
             try {
-                const response = await fetch(url, {
-                    method: 'POST',
-                    headers: {
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(user)
-                });
-                if (!response.ok) {
-                    throw new Error(`Response status: ${response.status}`);
-                }
-                const json = await response.json();
-                console.log(json);
-            } catch (error) {
-                console.error(error.message);
+                const response = await api
+                    .post('register/', {json: formDataUser})
+                    .json()
+                console.log(response)
+            } catch (err) {
+                console.log(err.message)
+            }
+        },
+        async REQ_CONFIRM(confirmData) {
+            console.log(confirmData)
+            try {
+                const response = await api
+                    .post('activate/', {json: confirmData})
+                    .json()
+                console.log(response)
+            } catch (err) {
+                console.log(err.message)
             }
         }
     }
