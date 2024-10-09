@@ -2,16 +2,7 @@
   <div class="login-wrapper">
     <h2>Заполните регистрационную форму</h2>
     <my-input
-        v-model="username"
-        maxlength="64"
-        placeholder="Имя*"
-        required
-        size="64"
-        title="Введите имя.."
-        type="text"
-    />
-    <my-input
-        v-model="usersurname"
+        v-model="surname"
         maxlength="64"
         placeholder="Фамилия*"
         required
@@ -20,7 +11,16 @@
         type="text"
     />
     <my-input
-        v-model="usermidname"
+        v-model="usrname"
+        maxlength="64"
+        placeholder="Имя*"
+        required
+        size="64"
+        title="Введите имя.."
+        type="text"
+    />
+    <my-input
+        v-model="middlename"
         maxlength="64"
         placeholder="Отчество*"
         required
@@ -77,23 +77,20 @@ import {ref} from "vue";
 import {useUserStore} from "@/stores/UserStore.js";
 
 const userStore = useUserStore()
-const username = ref('')
-const usersurname = ref('')
-const usermidname = ref('')
+const usrname = ref('')
+const surname = ref('')
+const middlename = ref('')
 const role = ref('')
 const email = ref('')
 const password = ref('')
 const repassword = ref('')
 const formDataUser = () => ({
-  "username": username.value,
-  "usersurname": usersurname.value,
-  "usermidname": usermidname.value,
+  "username": surname.value + '_' + usrname.value + '_' + middlename.value,
   "role": role.value,
   "email": email.value,
   "password": password.value,
-  "repassword": repassword.value
 })
-const isDisabled = () => !(formDataUser().username.length !== 0 && formDataUser().usersurname.length !== 0 && formDataUser().usermidname.length !== 0 && formDataUser().email.length !== 0 && formDataUser().password.length !== 0 && formDataUser().repassword.length !== 0)
+const isDisabled = () => !(usrname.value.length !== 0 && surname.value.length !== 0 && middlename.value.length !== 0 && email.value.length !== 0 && password.value.length !== 0 && repassword.value.length !== 0)
 </script>
 <style scoped>
 .login-wrapper {
