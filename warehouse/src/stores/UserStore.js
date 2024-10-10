@@ -2,8 +2,8 @@ import {defineStore} from 'pinia'
 import ky from "ky";
 
 const api = ky.create({
-    // prefixUrl: 'http://38.180.192.229/api/auth/'
-    prefixUrl: 'http://lab:8080/api/auth/'
+    prefixUrl: 'http://38.180.192.229/api/auth/'
+    // prefixUrl: 'http://lab:8080/api/auth/'
 })
 const secureApi = api.extend({
     Authorization: 'token'
@@ -30,10 +30,13 @@ export const useUserStore = defineStore('userStore', {
     actions: {
         async login(logDataUser) {
             try {
-                const response = await secureApi
-                    .post('login/', {json: logDataUser})
+                this.userData = await secureApi
+                    .post('login/', {
+                        json: logDataUser
+                    })
                     .json()
-                console.log(response)
+                window.localStorage.setItem("userData", JSON.stringify(this.userData))
+                console.log(this.userData)
             } catch (err) {
                 console.log(err.message)
             }
@@ -42,15 +45,19 @@ export const useUserStore = defineStore('userStore', {
             console.log(formDataUser)
             try {
                 this.userData = await api
-                    .post('register/', {json: formDataUser})
+                    .post('register/', {
+                        json: formDataUser
+                    })
                     .json()
-                console.log(this.userData)
-            } catch (err) {
+                window.localStorage.setItem("userData", JSON.stringify(this.userData))
+            } catch
+                (err) {
                 console.log(err.message)
             }
-        },
+        }
+        ,
         async REQ_CONFIRM(sixdigit) {
-            const  data = new Object({username: this.userData.email, code: sixdigit })
+            const data = new Object({username: this.userData.email, code: sixdigit})
             console.log(data)
             try {
                 const response = await api
