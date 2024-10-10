@@ -1,6 +1,7 @@
 <template>
   <div class="grid-container">
     <header class="grid-item header">
+<!--      <div class="bgicon"></div>-->
       <logo-general class="logo-general"/>
     </header>
     <nav class="grid-item left-column">
@@ -36,9 +37,31 @@ import LogoGeneral from "@/components/UI/LogoGeneral.vue"
   justify-content: center;
   align-items: center;
 }
-
+/*.bgicon {*/
+/*    background-image: url( "@/assets/logo.svg");*/
+/*    background-repeat: no-repeat;*/
+/*    background-size: 100%;*/
+/*}*/
+/*.bgicon:after {*/
+/*  content: '';*/
+/*  width: 100%;*/
+/*  height: 100%;*/
+/*  top: 0;*/
+/*  left: 0;*/
+/*  position: absolute;*/
+/*  background: inherit;*/
+/*  filter: blur(15px);*/
+/*  z-index: -1;*/
+/*}*/
 .logo-general {
   height: 100px;
+}
+
+.logo-general:after {
+  content: url( "@/assets/logo.svg");
+
+  filter: blur(15px);
+  z-index: -1;
 }
 
 .left-column {
@@ -88,5 +111,7 @@ nav a.router-link-active {
     justify-content: center;
     flex-wrap: wrap;
   }
+
+
 }
 </style>

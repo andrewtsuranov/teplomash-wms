@@ -13,7 +13,10 @@
         :disabled=isDisabled()
     >Подтвердить
     </my-button>
-    <my-button>Получить код повторно</my-button>
+    <my-button
+        v-on:click="userStore.REQ_CONFIRM(digit())"
+        :disabled=isDisabled()
+    >Получить код повторно</my-button>
   </div>
 </template>
 <script setup>

@@ -2,8 +2,8 @@ import {defineStore} from 'pinia'
 import ky from "ky";
 
 const api = ky.create({
-    prefixUrl: 'http://38.180.192.229/api/auth/'
-    // prefixUrl: 'http://l/zab:8080/api/auth/'
+    // prefixUrl: 'http://38.180.192.229/api/auth/'
+    prefixUrl: 'http://lab:8080/api/auth/'
 })
 const secureApi = api.extend({
     Authorization: 'token'
@@ -49,8 +49,9 @@ export const useUserStore = defineStore('userStore', {
                 console.log(err.message)
             }
         },
-        async REQ_CONFIRM(confirmData) {
-            console.log(this.userData.email, confirmData)
+        async REQ_CONFIRM(sixdigit) {
+            const  data = new Object({username: this.userData.email, code: sixdigit })
+            console.log(data)
             try {
                 const response = await api
                     .post('activate/', {json: this.userData.email})
