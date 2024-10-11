@@ -11,10 +11,10 @@
     />
     <my-button
         :disabled=isDisabled()
+        v-on:click="userStore.REQ_CONFIRM(sixdigit)"
     >Подтвердить
     </my-button>
     <my-button
-        v-on:click="userStore.REQ_CONFIRM(digit())"
         :disabled=isDisabled()
     >Получить код повторно</my-button>
   </div>
@@ -23,12 +23,12 @@
 import MyInput from "@/components/UI/MyInput.vue";
 import MyButton from "@/components/UI/MyButton.vue"
 import {ref} from "vue";
+import {useUserStore} from "@/stores/UserStore.js";
 
-const digit = () => ({
-  "sixdigit": sixdigit.value,
-})
+const userStore = useUserStore()
+
 const sixdigit = ref('')
-const isDisabled = () => !(digit().sixdigit.length === 6)
+const isDisabled = () => !(sixdigit.value.length === 6)
 </script>
 <style scoped>
 .confirm-wrapper {

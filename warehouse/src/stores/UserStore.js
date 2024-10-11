@@ -26,6 +26,9 @@ export const useUserStore = defineStore('userStore', {
         activeUsers() {
             return this.userData.filter((el) => el.isActive === true)
         },
+        setUserDataLocalStorage() {
+            return localStorage.setItem("userData", this.userData)
+        }
     },
     actions: {
         async login(logDataUser) {
@@ -49,21 +52,24 @@ export const useUserStore = defineStore('userStore', {
                         json: formDataUser
                     })
                     .json()
-                window.localStorage.setItem("userData", JSON.stringify(this.userData))
+                localStorage.setItem("userData", JSON.stringify(this.userData))
             } catch
                 (err) {
                 console.log(err.message)
             }
-        }
-        ,
+        },
         async REQ_CONFIRM(sixdigit) {
-            const data = new Object({username: this.userData.email, code: sixdigit})
-            console.log(data)
+            const digit = () => ({
+                "activation_code": sixdigit,
+                "email": this.userData.email
+            })
+            console.log(sixdigit)
             try {
-                const response = await api
-                    .post('activate/', {json: this.userData.email})
+                this.userData = await api
+                    .post('activate/', {json: digit()})
                     .json()
-                console.log(response)
+                localStorage.setItem("userData", JSON.stringify(this.userData))
+
             } catch (err) {
                 console.log(err.message)
             }
