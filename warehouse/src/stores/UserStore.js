@@ -5,9 +5,9 @@ const api = ky.create({
     prefixUrl: 'http://38.180.192.229/api/auth/'
     // prefixUrl: 'http://lab:8080/api/auth/'
 })
-const secureApi = api.extend({
-    Authorization: 'token'
-})
+// const secureApi = api.extend({
+//     Authorization: 'token'
+// })
 // const response = await ky('https://example.com', {
 //     hooks: {
 //         beforeRetry: [
@@ -26,30 +26,34 @@ export const useUserStore = defineStore('userStore', {
         activeUsers() {
             return this.userData.filter((el) => el.isActive === true)
         },
-        setUserDataLocalStorage() {
-            return localStorage.setItem("userData", this.userData)
-        }
     },
     actions: {
-        async login(logDataUser) {
+        async LOGIN(email, password) {
+            const data = {email: email, password: password}
             try {
-                this.userData = await secureApi
+                this.userData = await api
                     .post('login/', {
-                        json: logDataUser
+                        json: data
                     })
                     .json()
-                window.localStorage.setItem("userData", JSON.stringify(this.userData))
-                console.log(this.userData)
+                localStorage.setItem("userData", JSON.stringify(this.userData))
+                console.log(this.userData.access)
             } catch (err) {
                 console.log(err.message)
             }
         },
-        async REQ_SIGNUP(formDataUser) {
-            console.log(formDataUser)
+        async REQ_SIGNUP(username, role, email, password) {
+            const data = {
+                username: username,
+                role: role,
+                email: email,
+                password: password
+            }
+            console.log(data)
             try {
                 this.userData = await api
                     .post('register/', {
-                        json: formDataUser
+                        json: data
                     })
                     .json()
                 localStorage.setItem("userData", JSON.stringify(this.userData))
@@ -69,7 +73,6 @@ export const useUserStore = defineStore('userStore', {
                     .post('activate/', {json: digit()})
                     .json()
                 localStorage.setItem("userData", JSON.stringify(this.userData))
-
             } catch (err) {
                 console.log(err.message)
             }

@@ -22,7 +22,9 @@
     <div class="btn__login">
       <my-button
           :disabled=isDisabled()
-          v-on:click="userStore.login(user())"
+          v-on:click="userStore.LOGIN(email, password)"
+          id="show-modal"
+          @click="showModal = true"
       >Войти
       </my-button>
       <my-button @click="router.push({ name: 'signup' })">
@@ -30,6 +32,7 @@
       </my-button>
     </div>
   </div>
+  <!--  <ModalView/>-->
 </template>
 <script setup>
 import {ref} from 'vue'
@@ -41,11 +44,7 @@ import router from "@/router/index.js";
 const email = ref('')
 const password = ref('')
 const userStore = useUserStore()
-const user = () => ({
-  "email": email.value,
-  "password": password.value
-})
-const isDisabled = () => !(user().email.length !== 0 && user().password.length !== 0)
+const isDisabled = () => !(email.value.length !== 0 && password.value.length !== 0)
 </script>
 <style scoped>
 .login-wrapper {
@@ -53,18 +52,11 @@ const isDisabled = () => !(user().email.length !== 0 && user().password.length !
   flex-wrap: wrap;
   flex-direction: column;
   gap: 15px;
-  /*max-height: 100vh;*/
-  /*justify-content: center;*/
 }
 
 .login-head {
   color: blanchedalmond;
   font-size: 1.5rem;
-}
-
-.login-input {
-  /*padding-right: 170px;*/
-  max-width: 400px;
 }
 
 .btn__login {

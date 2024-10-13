@@ -2,7 +2,7 @@
   <div class="login-wrapper">
     <h2>Заполните регистрационную форму</h2>
     <my-input
-        v-model="surname"
+        v-model="uSurname"
         maxlength="64"
         placeholder="Фамилия*"
         required
@@ -11,7 +11,7 @@
         type="text"
     />
     <my-input
-        v-model="usrname"
+        v-model="uName"
         maxlength="64"
         placeholder="Имя*"
         required
@@ -20,7 +20,7 @@
         type="text"
     />
     <my-input
-        v-model="middlename"
+        v-model="uMidname"
         maxlength="64"
         placeholder="Отчество*"
         required
@@ -28,14 +28,9 @@
         title="Введите отчество.."
         type="text"
     />
-    <my-input
-        v-model="role"
-        maxlength="64"
-        placeholder="Role*"
-        required
-        size="64"
-        title="Введите отчество.."
-        type="text"
+    <my-select
+        :options="options"
+        v-model="parentSelectedOption"
     />
     <my-input
         v-model="email"
@@ -63,10 +58,11 @@
     />
     <my-button
         @click="router.push({path: '/confirmation'})"
-        v-on:click="userStore.REQ_SIGNUP(formDataUser())"
+        v-on:click="userStore.REQ_SIGNUP(uSurname + '_' + uName + '_' + uMidname, parentSelectedOption, email, password)"
         :disabled=isDisabled()
-    >Регистрация
+    >Регистрация<i class="bi bi-xbox"></i>
     </my-button>
+    <button type="button" class="btn btn-outline-success">Регистрация</button>
   </div>
 </template>
 <script setup>
@@ -75,22 +71,33 @@ import MyButton from "@/components/UI/MyButton.vue"
 import router from "@/router/index.js";
 import {ref} from "vue";
 import {useUserStore} from "@/stores/UserStore.js";
+import MySelect from "@/components/UI/MySelect.vue"
 
 const userStore = useUserStore()
-const usrname = ref('')
-const surname = ref('')
-const middlename = ref('')
-const role = ref('')
+const uName = ref('')
+const uSurname = ref('')
+const uMidname = ref('')
+const parentSelectedOption = ref('')
 const email = ref('')
 const password = ref('')
 const repassword = ref('')
-const formDataUser = () => ({
-  "username": surname.value + '_' + usrname.value + '_' + middlename.value,
-  "role": role.value,
-  "email": email.value,
-  "password": password.value,
-})
-const isDisabled = () => !(usrname.value.length !== 0 && surname.value.length !== 0 && middlename.value.length !== 0 && email.value.length !== 0 && password.value.length !== 0 && repassword.value.length !== 0)
+const options = ref([
+  {
+    name: 'Грузчик',
+    value: "LOADER",
+  },
+  {
+    name: 'Диспетчер',
+    value: "MANAGER",
+  }
+])
+// const formDataUser = () => ({
+//   "username": surname.value + '_' + usrname.value + '_' + middlename.value,
+//   "role": parentSelectedOption.value.value,
+//   "email": email.value,
+//   "password": password.value,
+// })
+const isDisabled = () => !(uName.value.length !== 0 && uSurname.value.length !== 0 && uMidname.value.length !== 0 && email.value.length !== 0 && password.value.length !== 0 && repassword.value.length !== 0)
 </script>
 <style scoped>
 .login-wrapper {

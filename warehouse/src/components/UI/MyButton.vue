@@ -1,5 +1,7 @@
 <template>
-  <button class="btn" :disabled="props.disabled">
+  <button class="btn"
+          :disabled="props.disabled"
+  >
     <slot></slot>
   </button>
 </template>
@@ -20,7 +22,6 @@ const props = defineProps({
   border: 1px solid blanchedalmond;
   border-radius: 20px;
   font-size: 1rem;
-
 }
 
 .btn:hover {
