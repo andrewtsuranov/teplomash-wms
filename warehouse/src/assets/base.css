@@ -29,18 +29,17 @@
     --section-gap: 160px;
 }
 
-@media (prefers-color-scheme: dark) {
-    :root {
-        --color-background: var(--vt-c-black);
-        --color-background-soft: var(--vt-c-black-soft);
-        --color-background-mute: var(--vt-c-black-mute);
-        --color-border: var(--vt-c-divider-dark-2);
-        --color-border-hover: var(--vt-c-divider-dark-1);
-        --color-heading: var(--vt-c-text-dark-1);
-        --color-text: var(--vt-c-text-dark-2);
-    }
-}
-
+/*@media (prefers-color-scheme: dark) {*/
+/*    :root {*/
+/*        --color-background: var(--vt-c-black);*/
+/*        --color-background-soft: var(--vt-c-black-soft);*/
+/*        --color-background-mute: var(--vt-c-black-mute);*/
+/*        --color-border: var(--vt-c-divider-dark-2);*/
+/*        --color-border-hover: var(--vt-c-divider-dark-1);*/
+/*        --color-heading: var(--vt-c-text-dark-1);*/
+/*        --color-text: var(--vt-c-text-dark-2);*/
+/*    }*/
+/*}*/
 *,
 *::before,
 *::after {
@@ -48,14 +47,21 @@
     margin: 0;
     font-weight: normal;
 }
-/*html {*/
-/*    background: white;*/
-/*    width: 600px;*/
-/*}*/
-body {
+
+html, body {
     min-height: 100vh;
+    font-size: 16px;
     color: var(--color-text);
-    background: var(--color-background);
+    /*background: var(--color-background);*/
+    background: linear-gradient(
+            160deg,
+            rgb(140, 32, 41) 0%,
+            black 50%,
+            black 50%,
+            rgb(45, 66, 120) 100%
+    );
+    background-size: 200% 200%;
+    animation: gradientShift 15s ease infinite;
     transition: color 0.5s,
     background-color 0.5s;
     line-height: 1.6;
@@ -71,27 +77,12 @@ body {
     'Droid Sans',
     'Helvetica Neue',
     sans-serif;
-    font-size: 15px;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
 
 body {
-    /*width: 500px;*/
-    /*display: flex;*/
-    /*min-height: 100vh;*/
-    /*justify-content: center;*/
-    /*align-items: center;*/
-    background: linear-gradient(
-            160deg,
-            rgb(140, 32, 41) 0%,
-            black 50%,
-            black 50%,
-            rgb(45, 66, 120) 100%
-    );
-    background-size: 200% 200%;
-    animation: gradientShift 15s ease infinite;
 }
 
 @keyframes gradientShift {

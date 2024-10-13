@@ -60,9 +60,8 @@
         @click="router.push({path: '/confirmation'})"
         v-on:click="userStore.REQ_SIGNUP(uSurname + '_' + uName + '_' + uMidname, parentSelectedOption, email, password)"
         :disabled=isDisabled()
-    >Регистрация<i class="bi bi-xbox"></i>
+    >Регистрация
     </my-button>
-    <button type="button" class="btn btn-outline-success">Регистрация</button>
   </div>
 </template>
 <script setup>
