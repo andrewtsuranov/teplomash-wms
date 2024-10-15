@@ -27,7 +27,7 @@
           @click="showModal = true"
       >Войти
       </my-button>
-      <my-button @click="router.push({ name: 'signup' })">
+      <my-button @click="router.push({path : '/signup'})">
         Зарегистрироваться
       </my-button>
     </div>

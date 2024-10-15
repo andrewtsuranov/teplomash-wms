@@ -57,7 +57,7 @@
         type="password"
     />
     <my-button
-        @click="router.push({path: '/confirmation'})"
+        @click="router.push({name: 'Confirmation'})"
         v-on:click="userStore.REQ_SIGNUP(uSurname + '_' + uName + '_' + uMidname, parentSelectedOption, email, password)"
         :disabled=isDisabled()
     >Регистрация
@@ -90,12 +90,6 @@ const options = ref([
     value: "MANAGER",
   }
 ])
-// const formDataUser = () => ({
-//   "username": surname.value + '_' + usrname.value + '_' + middlename.value,
-//   "role": parentSelectedOption.value.value,
-//   "email": email.value,
-//   "password": password.value,
-// })
 const isDisabled = () => !(uName.value.length !== 0 && uSurname.value.length !== 0 && uMidname.value.length !== 0 && email.value.length !== 0 && password.value.length !== 0 && repassword.value.length !== 0)
 </script>
 <style scoped>

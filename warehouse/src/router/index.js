@@ -1,30 +1,68 @@
 import {createRouter, createWebHistory} from 'vue-router'
-import HomeView from '@/views/MainView/HomeView.vue'
+
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
     routes: [
         {
+            name: 'LoginPage',
+            path: '/login',
+            component: () => import('@/layouts/AuthorizationLayout.vue'),
+            children: [
+                {
+                    name: 'Login',
+                    path: '',
+                    component: () => import('@/views/AuthorizationView/SignInView.vue'),
+                },
+                {
+                    name: 'Signup',
+                    path: '/signup',
+                    component: () => import('@/views/AuthorizationView/SignUpView.vue'),
+                },
+                {
+                    name: 'Confirmation',
+                    path: '/signup/confirm',
+                    component: () => import('@/views/AuthorizationView/ConfirmSignUpView.vue'),
+                },
+            ],
+            meta: {}
+        },
+        {
+            name: 'HomeView',
             path: '/',
-            name: 'home',
-            component: HomeView
-        },
-        {
-            path: '/signin',
-            name: 'signin',
-            component: () => import('../views/AuthorizationView/SignInView.vue')
-        },
-        {
-            path: '/signup',
-            name: 'signup',
-            component: () => import('../views/AuthorizationView/SignUpView.vue'),
-        },
-        {
-            path: '/confirmation',
-            name: 'confirmation',
-            component: () => import('../views/AuthorizationView/ConfirmSignUpView.vue'),
+            component: () => import('@/layouts/HomeLayout.vue'),
+            meta: {
+                needAuth: true,
+            },
+            children: [
+                {
+                    name: 'General',
+                    path: '',
+                    component: () => import('@/views/HomeView/GeneralView.vue'),
+                },
+                {
+                    name: 'Profile',
+                    path: 'profile',
+                    component: () => import('@/views/HomeView/ProfileView.vue'),
+                    meta: {
+                        isPersonalPage: true,
+                    },
+                },
+                {
+                    name: 'Users',
+                    path: 'users',
+                    component: () => import('@/views/HomeView/UsersView.vue')
+                },
+            ]
         },
     ],
     linkExactActiveClass: 'teplomash-active-exact-link'
+});
+router.beforeEach((to) => {
+if(to.meta.needAuth) {
+    return {name: 'Login'}
+}
 })
 export default router
+
+

@@ -2,8 +2,8 @@ import {defineStore} from 'pinia'
 import ky from "ky";
 
 const api = ky.create({
-    prefixUrl: 'http://38.180.192.229/api/auth/'
-    // prefixUrl: 'http://lab:8080/api/auth/'
+    // prefixUrl: 'http://38.180.192.229/api/auth/'
+    prefixUrl: 'http://lab:8080/api/auth/'
 })
 // const secureApi = api.extend({
 //     Authorization: 'token'
@@ -20,7 +20,8 @@ const api = ky.create({
 // });
 export const useUserStore = defineStore('userStore', {
     state: () => ({
-        userData: null
+        userData: [],
+        isAuthenticated: false
     }),
     getters: {
         activeUsers() {
@@ -37,7 +38,7 @@ export const useUserStore = defineStore('userStore', {
                     })
                     .json()
                 localStorage.setItem("userData", JSON.stringify(this.userData))
-                console.log(this.userData.access)
+                console.log(this.userData)
             } catch (err) {
                 console.log(err.message)
             }
@@ -67,7 +68,6 @@ export const useUserStore = defineStore('userStore', {
                 "activation_code": sixdigit,
                 "email": this.userData.email
             })
-            console.log(sixdigit)
             try {
                 this.userData = await api
                     .post('activate/', {json: digit()})
