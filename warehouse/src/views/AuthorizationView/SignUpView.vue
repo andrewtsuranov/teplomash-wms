@@ -58,21 +58,20 @@
     />
     <my-button
         @click="router.push({name: 'Confirmation'})"
-        v-on:click="userStore.REQ_SIGNUP(uSurname + '_' + uName + '_' + uMidname, parentSelectedOption, email, password)"
+        v-on:click="UserStore.REQ_SIGNUP(uSurname + '_' + uName + '_' + uMidname, parentSelectedOption, email, password)"
         :disabled=isDisabled()
     >Регистрация
     </my-button>
   </div>
 </template>
 <script setup>
+import {useUserStore} from "@/stores/UserStore.js";
 import MyInput from "@/components/UI/MyInput.vue";
 import MyButton from "@/components/UI/MyButton.vue"
 import router from "@/router/index.js";
 import {ref} from "vue";
-import {useUserStore} from "@/stores/UserStore.js";
 import MySelect from "@/components/UI/MySelect.vue"
 
-const userStore = useUserStore()
 const uName = ref('')
 const uSurname = ref('')
 const uMidname = ref('')
@@ -91,6 +90,7 @@ const options = ref([
   }
 ])
 const isDisabled = () => !(uName.value.length !== 0 && uSurname.value.length !== 0 && uMidname.value.length !== 0 && email.value.length !== 0 && password.value.length !== 0 && repassword.value.length !== 0)
+const UserStore = useUserStore()
 </script>
 <style scoped>
 .login-wrapper {

@@ -1,5 +1,5 @@
 import {createRouter, createWebHistory} from 'vue-router'
-
+import {useUserStore} from "@/stores/UserStore.js";
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -59,9 +59,10 @@ const router = createRouter({
     linkExactActiveClass: 'teplomash-active-exact-link'
 });
 router.beforeEach((to) => {
-if(to.meta.needAuth) {
-    return {name: 'Login'}
-}
+    const UserStore = useUserStore()
+    if (to.meta.needAuth && !UserStore.isAuthenticated) {
+        return {name: 'Login'}
+    }
 })
 export default router
 

@@ -22,9 +22,8 @@
     <div class="btn__login">
       <my-button
           :disabled=isDisabled()
-          v-on:click="userStore.LOGIN(email, password)"
+          v-on:click="clickLogin()"
           id="show-modal"
-          @click="showModal = true"
       >Войти
       </my-button>
       <my-button @click="router.push({path : '/signup'})">
@@ -41,10 +40,17 @@ import MyButton from "@/components/UI/MyButton.vue";
 import MyInput from "@/components/UI/MyInput.vue";
 import router from "@/router/index.js";
 
+const UserStore = useUserStore()
 const email = ref('')
 const password = ref('')
-const userStore = useUserStore()
 const isDisabled = () => !(email.value.length !== 0 && password.value.length !== 0)
+const clickLogin = () => {
+  UserStore.LOGIN(email, password)
+  UserStore.isAuthenticated = true
+  if (UserStore.isAuthenticated) {
+    router.push({name: 'HomeView'})
+  }
+}
 </script>
 <style scoped>
 .login-wrapper {

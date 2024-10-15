@@ -1,7 +1,7 @@
 <template>
   <div class="footer-container">
     <div class="footer-copyright">
-      <i class="bi bi-c-circle"></i><span>2024 Тепломаш &mdash; warehouse management.</span>
+      <i class="bi bi-c-circle"></i><span>{{ yearNow }} Тепломаш &mdash; warehouse management.</span>
     </div>
     <div class="footer-main">
       <span>Адресная система хранения складом Тепломаш&reg;</span>
@@ -12,6 +12,9 @@
   </div>
 </template>
 <script setup>
+import {ref} from "vue";
+
+const yearNow = ref(new Date().getFullYear())
 </script>
 <style scoped>
 .footer-container {
