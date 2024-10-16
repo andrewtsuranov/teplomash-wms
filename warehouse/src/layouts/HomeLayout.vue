@@ -1,9 +1,7 @@
 <template>
   <div class="main">
     <header>
-      <nav>
-        MENU
-      </nav>
+      <header-menu-view/>
     </header>
     <main>
       <RouterView/>
@@ -11,7 +9,7 @@
   </div>
 </template>
 <script setup>
-
+import HeaderMenuView from "@/views/HeaderMenuView.vue";
 </script>
 <style scoped>
 .main {

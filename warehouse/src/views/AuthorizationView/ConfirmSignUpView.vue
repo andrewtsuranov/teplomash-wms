@@ -11,7 +11,7 @@
     />
     <my-button
         :disabled=isDisabled()
-        @click="[userStore.REQ_CONFIRM(sixdigit), router.push('/')]"
+        @click="[userStore.REQ_CONFIRM(sixdigit), router.push({path: '/'})]"
 
     >Подтвердить
     </my-button>

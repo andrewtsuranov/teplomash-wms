@@ -21,9 +21,9 @@
     />
     <div class="btn__login">
       <my-button
+          id="show-modal"
           :disabled=isDisabled()
           v-on:click="clickLogin()"
-          id="show-modal"
       >Войти
       </my-button>
       <my-button @click="router.push({path : '/signup'})">
@@ -44,9 +44,8 @@ const UserStore = useUserStore()
 const email = ref('')
 const password = ref('')
 const isDisabled = () => !(email.value.length !== 0 && password.value.length !== 0)
-const clickLogin = () => {
-  UserStore.LOGIN(email, password)
-  UserStore.isAuthenticated = true
+const clickLogin = async () => {
+ await UserStore.REQ_LOGIN(email.value, password.value)
   if (UserStore.isAuthenticated) {
     router.push({name: 'HomeView'})
   }

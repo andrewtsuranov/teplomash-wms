@@ -1,17 +1,10 @@
 <template>
   <div class="header-container">
-    <nav class="nav">
-      <RouterLink to="/"><i class="bi bi-house-door-fill"></i>Войти</RouterLink>
-    </nav>
-    <nav class="nav">
-      <!--      <RouterLink to="/"><i class="bi bi-house-door-fill"></i></RouterLink>-->
-    </nav>
-    <nav class="nav">
-      <!--      <RouterLink to="/"><i class="bi bi-house-door-fill"></i></RouterLink>-->
-    </nav>
+    <header-menu/>
   </div>
 </template>
 <script setup>
+import HeaderMenu from "@/components/HeaderMenu.vue";
 </script>
 <style scoped>
 .header-container {
@@ -22,20 +15,5 @@
   padding: 0 50px;
 }
 
-nav a {
-  color: dimgray;
-  text-decoration: none;
-}
 
-nav .teplomash-active-exact-link {
-  background-color: rgba(255, 255, 255, 0.1);
-}
-
-a:hover {
-  /*background: none;*/
-}
-
-i {
-  font-size: 1.3rem;
-}
 </style>

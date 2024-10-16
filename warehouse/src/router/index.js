@@ -46,6 +46,7 @@ const router = createRouter({
                     component: () => import('@/views/HomeView/ProfileView.vue'),
                     meta: {
                         isPersonalPage: true,
+                        needAuth: true,
                     },
                 },
                 {
@@ -63,6 +64,10 @@ router.beforeEach((to) => {
     if (to.meta.needAuth && !UserStore.isAuthenticated) {
         return {name: 'Login'}
     }
+   // throw new Error('Вы не авторизованы')
+})
+router.onError((e) => {
+    console.log('Ошибка роутинга:', e)
 })
 export default router
 

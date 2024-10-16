@@ -29,8 +29,8 @@
         type="text"
     />
     <my-select
-        :options="options"
-        v-model="parentSelectedOption"
+        v-model="role"
+        :options="UserStore.role"
     />
     <my-input
         v-model="email"
@@ -57,9 +57,9 @@
         type="password"
     />
     <my-button
-        @click="router.push({name: 'Confirmation'})"
-        v-on:click="UserStore.REQ_SIGNUP(uSurname + '_' + uName + '_' + uMidname, parentSelectedOption, email, password)"
         :disabled=isDisabled()
+        @click="router.push({name: 'Confirmation'})"
+        v-on:click="UserStore.REQ_SIGNUP(uSurname + '_' + uName + '_' + uMidname, role, email, password)"
     >Регистрация
     </my-button>
   </div>
@@ -72,25 +72,15 @@ import router from "@/router/index.js";
 import {ref} from "vue";
 import MySelect from "@/components/UI/MySelect.vue"
 
+const UserStore = useUserStore()
 const uName = ref('')
 const uSurname = ref('')
 const uMidname = ref('')
-const parentSelectedOption = ref('')
+const role = ref('')
 const email = ref('')
 const password = ref('')
 const repassword = ref('')
-const options = ref([
-  {
-    name: 'Грузчик',
-    value: "LOADER",
-  },
-  {
-    name: 'Диспетчер',
-    value: "MANAGER",
-  }
-])
 const isDisabled = () => !(uName.value.length !== 0 && uSurname.value.length !== 0 && uMidname.value.length !== 0 && email.value.length !== 0 && password.value.length !== 0 && repassword.value.length !== 0)
-const UserStore = useUserStore()
 </script>
 <style scoped>
 .login-wrapper {

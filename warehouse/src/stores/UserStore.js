@@ -2,8 +2,8 @@ import {defineStore} from 'pinia'
 import ky from "ky";
 
 const api = ky.create({
-    prefixUrl: 'http://38.180.192.229/api/auth/'
-    // prefixUrl: 'http://lab:8080/api/auth/'
+    // prefixUrl: 'http://38.180.192.229/api/auth/'
+    prefixUrl: 'http://lab:8080/api/auth/'
 })
 // const secureApi = api.extend({
 //     Authorization: 'token'
@@ -20,26 +20,35 @@ const api = ky.create({
 // });
 export const useUserStore = defineStore('UserStore', {
     state: () => ({
-        userData: [],
-        isAuthenticated: null
-    }), getters: {
-        activeUsers() {
-            return this.userData.filter((el) => el.isActive === true)
-        },
-    }, actions: {
-        async LOGIN(email, password) {
-            const data = {
-                email: email,
-                password: password
+        user: [],
+        token_access: null,
+        loading: false,
+        error: null,
+        role: [
+            {
+                name: 'Грузчик',
+                value: "LOADER",
+            },
+            {
+                name: 'Диспетчер',
+                value: "MANAGER",
             }
+        ]
+    }),
+    getters: {
+        isAuthenticated: (state) => !!state.token_access
+    },
+    actions: {
+        async REQ_LOGIN(email, password) {
             try {
-                this.userData = await api
-                    .post('login/', {json: data})
+                this.user = await api
+                    .post('login/', {json: {email: email, password: password}})
                     .json()
-                localStorage.setItem("userData", JSON.stringify(this.userData))
-                await this.REQ_VERIFY(this.userData.access)
+                this.setUser(this.user)
             } catch (err) {
-                console.log(err.message)
+                this.error = err.message
+            } finally {
+                this.loading = false
             }
         }, async REQ_SIGNUP(username, role, email, password) {
             const data = {
@@ -48,25 +57,27 @@ export const useUserStore = defineStore('UserStore', {
                 email: email,
                 password: password
             }
-            console.log(data)
             try {
-                this.userData = await api
+                this.user = await api
                     .post('register/', {json: data})
                     .json()
-                localStorage.setItem("userData", JSON.stringify(this.userData))
+                this.setUser(this.user)
             } catch (err) {
                 console.log(err.message)
             }
-        }, async REQ_CONFIRM(sixdigit) {
+        }, async REQ_CONFIRM(code) {
             const digit = {
-                "activation_code": sixdigit,
-                "email": this.userData.email
+                "activation_code": code,
+                "email": this.user.email
             }
             try {
-                this.userData = await api
+                this.user = await api
                     .post('activate/', {json: digit})
                     .json()
-                localStorage.setItem("userData", JSON.stringify(this.userData))
+                if (this.user.message) {
+                    this.loadUser()
+                    await this.REQ_LOGIN(this.user.email, this.user.password)
+                }
             } catch (err) {
                 console.log(err.message)
             }
@@ -74,16 +85,38 @@ export const useUserStore = defineStore('UserStore', {
             const token = {
                 "token": data
             }
-            console.log(token)
             try {
                 const response = await api
                     .post('token/verify/', {json: token})
                 if (response.ok) {
-                    response.isAuthenticated = true
+                    this.isAuthenticated = true
                 }
+                return response
             } catch (err) {
                 console.log(err.message)
             }
+        },
+        setUser(user) {
+            localStorage.setItem('userData', JSON.stringify(user))
+        },
+        getToken() {
+            return this.token_access
+        },
+        loadToken() {
+            const token = localStorage.getItem('userData')
+            if (token.access) {
+                this.token_access = token.access
+            }
+        },
+        loadUser() {
+            const user = localStorage.getItem(JSON.parse('userData'))
+            if (user) {
+                this.user = user
+            }
+        },
+        clearUserData() {
+            this.user = null;
+            localStorage.removeItem('userData');
         }
     }
 })
