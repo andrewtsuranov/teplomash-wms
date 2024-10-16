@@ -2,8 +2,8 @@ import {defineStore} from 'pinia'
 import ky from "ky";
 
 const api = ky.create({
-    // prefixUrl: 'http://38.180.192.229/api/auth/'
-    prefixUrl: 'http://lab:8080/api/auth/'
+    prefixUrl: 'http://38.180.192.229/api/auth/'
+    // prefixUrl: 'http://lab:8080/api/auth/'
 })
 // const secureApi = api.extend({
 //     Authorization: 'token'
@@ -20,7 +20,7 @@ const api = ky.create({
 // });
 export const useUserStore = defineStore('UserStore', {
     state: () => ({
-        user: [],
+        user: null,
         token_access: null,
         loading: false,
         error: null,
@@ -41,10 +41,11 @@ export const useUserStore = defineStore('UserStore', {
     actions: {
         async REQ_LOGIN(email, password) {
             try {
-                this.user = await api
+                const response = await api
                     .post('login/', {json: {email: email, password: password}})
                     .json()
-                this.setUser(this.user)
+                this.setUser(response)
+                this.loadToken()
             } catch (err) {
                 this.error = err.message
             } finally {
@@ -99,23 +100,21 @@ export const useUserStore = defineStore('UserStore', {
         setUser(user) {
             localStorage.setItem('userData', JSON.stringify(user))
         },
-        getToken() {
-            return this.token_access
-        },
         loadToken() {
-            const token = localStorage.getItem('userData')
+            const token = JSON.parse(localStorage.getItem('userData'))
             if (token.access) {
                 this.token_access = token.access
             }
         },
         loadUser() {
-            const user = localStorage.getItem(JSON.parse('userData'))
+            const user = JSON.parse(localStorage.getItem('userData'))
             if (user) {
-                this.user = user
+                this.user = (user)
             }
         },
         clearUserData() {
             this.user = null;
+            this.token_access = null
             localStorage.removeItem('userData');
         }
     }

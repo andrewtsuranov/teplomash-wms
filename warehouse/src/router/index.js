@@ -61,10 +61,12 @@ const router = createRouter({
 });
 router.beforeEach((to) => {
     const UserStore = useUserStore()
-    if (to.meta.needAuth && !UserStore.isAuthenticated) {
+    if (localStorage.getItem('userData')) {
+        UserStore.loadUser()
+        UserStore.loadToken()
+    } else if (to.meta.needAuth && !UserStore.isAuthenticated) {
         return {name: 'Login'}
     }
-   // throw new Error('Вы не авторизованы')
 })
 router.onError((e) => {
     console.log('Ошибка роутинга:', e)

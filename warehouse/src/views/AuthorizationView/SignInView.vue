@@ -45,7 +45,8 @@ const email = ref('')
 const password = ref('')
 const isDisabled = () => !(email.value.length !== 0 && password.value.length !== 0)
 const clickLogin = async () => {
- await UserStore.REQ_LOGIN(email.value, password.value)
+  await UserStore.REQ_LOGIN(email.value, password.value)
+  console.log(UserStore.isAuthenticated)
   if (UserStore.isAuthenticated) {
     router.push({name: 'HomeView'})
   }

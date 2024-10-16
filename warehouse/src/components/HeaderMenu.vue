@@ -4,14 +4,16 @@
     <router-link to="/profile">Профиль</router-link>
     <router-link to="/users">Пользователи</router-link>
     <my-button @click="logout()">Выход</my-button>
+    <div style="color: red;">Welcome, {{ dataUser.user.username }}</div>
   </nav>
 </template>
 <script setup>
-
 import MyButton from "@/components/UI/MyButton.vue";
 import {useUserStore} from "@/stores/UserStore.js";
 import router from "@/router/index.js";
+
 const UserStorage = useUserStore()
+const dataUser = UserStorage.user
 const logout = () => {
   UserStorage.clearUserData()
   router.push({path: '/'})
