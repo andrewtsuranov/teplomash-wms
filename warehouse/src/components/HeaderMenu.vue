@@ -14,9 +14,9 @@ import router from "@/router/index.js";
 
 const UserStorage = useUserStore()
 const dataUser = UserStorage.user
-const logout = () => {
+const logout = async () => {
   UserStorage.clearUserData()
-  router.push({path: '/'})
+  await router.push({path: '/'})
 }
 </script>
 <style scoped>

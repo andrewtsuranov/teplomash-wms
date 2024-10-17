@@ -25,14 +25,14 @@ const router = createRouter({
                     component: () => import('@/views/AuthorizationView/ConfirmSignUpView.vue'),
                 },
             ],
-            meta: {}
+            meta: {guestOnly: true}
         },
         {
             name: 'HomeView',
             path: '/',
             component: () => import('@/layouts/HomeLayout.vue'),
             meta: {
-                needAuth: true,
+                requiresAuth: true,
             },
             children: [
                 {
@@ -59,18 +59,39 @@ const router = createRouter({
     ],
     linkExactActiveClass: 'teplomash-active-exact-link'
 });
-router.beforeEach((to) => {
-    const UserStore = useUserStore()
+router.beforeEach(async (to, from, next) => {
+    const userStore = useUserStore()
+    // Проверяем, есть ли сохраненные данные пользователя
     if (localStorage.getItem('userData')) {
-        UserStore.loadUser()
-        UserStore.loadToken()
-    } else if (to.meta.needAuth && !UserStore.isAuthenticated) {
-        return {name: 'Login'}
+        // Загружаем данные пользователя, если они еще не загружены
+        if (!userStore.user) {
+            userStore.loadUser()
+        }
+        // Проверяем валидность токена, если пользователь считается аутентифицированным
+        // if (userStore.isAuthenticated) {
+        //     try {
+        //         await userStore.REQ_VERIFY(userStore.token_access)
+        //     } catch (error) {
+        //         console.error('Токен недействителен:', error)
+        //         userStore.clearUserData()
+        //     }
+        // }
+    }
+    // Проверяем, требует ли маршрут аутентификации
+
+    if (!!to.meta.requiresAuth && !userStore.isAuthenticated) {
+        // Сохраняем целевой маршрут для перенаправления после входа
+        next({name: 'Login', query: {redirect: to.fullPath}})
+    }
+    // Проверяем, доступен ли маршрут только для гостей
+    else if (!!to.meta.guestOnly && userStore.isAuthenticated) {
+        // Перенаправляем на домашнюю страницу, если пользователь уже аутентифицирован
+        next({name: 'HomeView'})
+    } else {
+        next()
     }
 })
-router.onError((e) => {
-    console.log('Ошибка роутинга:', e)
+router.onError((error) => {
+    console.error('Ошибка роутинга:', error)
 })
 export default router
-
-

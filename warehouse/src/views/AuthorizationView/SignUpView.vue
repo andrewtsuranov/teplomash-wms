@@ -30,7 +30,7 @@
     />
     <my-select
         v-model="role"
-        :options="UserStore.role"
+        :options="role_options"
     />
     <my-input
         v-model="email"
@@ -58,8 +58,10 @@
     />
     <my-button
         :disabled=isDisabled()
-        @click="router.push({name: 'Confirmation'})"
-        v-on:click="UserStore.REQ_SIGNUP(uSurname + '_' + uName + '_' + uMidname, role, email, password)"
+        @click="[
+            UserStore.REQ_SIGNUP(uSurname + '_' + uName + '_' + uMidname, role, email, password),
+            router.push({name: 'Confirmation'})
+            ]"
     >Регистрация
     </my-button>
   </div>
@@ -80,6 +82,10 @@ const role = ref('')
 const email = ref('')
 const password = ref('')
 const repassword = ref('')
+const role_options = [
+  {name: 'Грузчик', value: "LOADER"},
+  {name: 'Диспетчер', value: "MANAGER"}
+]
 const isDisabled = () => !(uName.value.length !== 0 && uSurname.value.length !== 0 && uMidname.value.length !== 0 && email.value.length !== 0 && password.value.length !== 0 && repassword.value.length !== 0)
 </script>
 <style scoped>
