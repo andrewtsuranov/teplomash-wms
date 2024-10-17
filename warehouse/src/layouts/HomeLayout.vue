@@ -1,20 +1,32 @@
 <template>
-  <div class="main">
-    <header>
-      <header-menu-view/>
+  <div class="home-page-container">
+    <header class="home-page-header">
+      <header-view/>
     </header>
-    <main>
+    <main class="home-page-main">
       <RouterView/>
     </main>
   </div>
 </template>
 <script setup>
-import HeaderMenuView from "@/views/HeaderMenuView.vue";
+import HeaderView from "@/views/HeaderView.vue";
 </script>
 <style scoped>
-.main {
+.home-page-container {
   display: grid;
-  min-width: 1280px;
+  grid: "homeHeader"
+        "homeMain";
   overflow: hidden;
+  grid-template-rows: auto 1fr;
+}
+
+.home-page-header {
+  grid-area: homeHeader;
+  background-color: rgba(0, 0, 0, 0.3);
+  margin-bottom: 50px;
+}
+
+.home-page-main {
+  grid-area: homeMain;
 }
 </style>

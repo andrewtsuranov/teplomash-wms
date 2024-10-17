@@ -38,7 +38,7 @@ const router = createRouter({
                 {
                     name: 'General',
                     path: '',
-                    component: () => import('@/views/HomeView/GeneralView.vue'),
+                    component: () => import('@/views/HomeView/HomeView.vue'),
                 },
                 {
                     name: 'Profile',
@@ -70,15 +70,21 @@ router.beforeEach(async (to, from, next) => {
         // Проверяем валидность токена, если пользователь считается аутентифицированным
         // if (userStore.isAuthenticated) {
         //     try {
-        //         await userStore.REQ_VERIFY(userStore.token_access)
+        //         return await userStore.REQ_VERIFY(userStore.token_access)
         //     } catch (error) {
-        //         console.error('Токен недействителен:', error)
-        //         userStore.clearUserData()
+        //         try {
+        //             console.log(userStore.user.refresh)
+        //             await userStore.REQ_REFRESH(userStore.user.refresh)
+        //             return await userStore.REQ_VERIFY(userStore.token_access)
+        //         } catch (error) {
+        //             console.error('Требуется авторизация:', error)
+        //             userStore.clearUserData()
+        //             next({name: 'Login'})
+        //         }
         //     }
         // }
     }
     // Проверяем, требует ли маршрут аутентификации
-
     if (!!to.meta.requiresAuth && !userStore.isAuthenticated) {
         // Сохраняем целевой маршрут для перенаправления после входа
         next({name: 'Login', query: {redirect: to.fullPath}})

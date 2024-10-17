@@ -2,8 +2,8 @@ import {defineStore} from 'pinia'
 import ky from "ky";
 
 const api = ky.create({
-    // prefixUrl: 'http://38.180.192.229/api/auth/'
-    prefixUrl: 'http://lab:8080/api/auth/'
+    prefixUrl: 'http://38.180.192.229/api/auth/'
+    // prefixUrl: 'http://lab:8080/api/auth/'
 })
 // const secureApi = api.extend({
 //     Authorization: 'token'
@@ -98,7 +98,23 @@ export const useUserStore = defineStore('UserStore', {
                 return response
             } catch (err) {
                 this.error = err.message
-                this.isAuthenticated = false
+                this.isAuthenticated()
+                throw err;
+            } finally {
+                this.loading = false
+            }
+        },
+        async REQ_REFRESH(refresh) {
+            this.loading = true;
+            this.error = null;
+            try {
+                const response = await api
+                    .post('token/refresh/', {json: refresh})
+                console.log(response.access)
+                this.token_access = response.access
+                return response
+            } catch (err) {
+                this.error = err.message
                 throw err;
             } finally {
                 this.loading = false
@@ -112,7 +128,6 @@ export const useUserStore = defineStore('UserStore', {
             this.userUP = user;
             localStorage.setItem('userUP', JSON.stringify(user))
         },
-
         loadUser() {
             const userData = JSON.parse(localStorage.getItem('userData') || '{}');
             this.user = userData || null;
@@ -123,6 +138,5 @@ export const useUserStore = defineStore('UserStore', {
             this.token_access = null;
             localStorage.removeItem('userData');
         },
-
     }
 })
