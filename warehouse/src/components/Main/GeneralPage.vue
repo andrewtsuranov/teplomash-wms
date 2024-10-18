@@ -113,10 +113,8 @@
     </div>
   </div>
 </template>
-<script>
-export default {
-  name: "GeneralPage"
-}
+<script setup>
+
 </script>
 <style scoped>
 .general-page-container {
