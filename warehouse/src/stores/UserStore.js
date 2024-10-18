@@ -5,15 +5,28 @@ const api = ky.create({
     prefixUrl: 'http://38.180.192.229/api/auth/'
     // prefixUrl: 'http://lab:8080/api/auth/'
 })
-// const secureApi = api.extend({
-//     Authorization: 'token'
-// })
 // const response = await ky('https://example.com', {
 //     hooks: {
-//         beforeRetry: [
-//             async ({request, options, error, retryCount}) => {
-//                 const token = await ky('https://example.com/refresh-token');
-//                 request.headers.set('Authorization', `token ${token}`);
+//         afterResponse: [
+//             (_request, _options, response) => {
+//                 // You could do something with the response, for example, logging.
+//                 log(response);
+//
+//                 // Or return a `Response` instance to overwrite the response.
+//                 return new Response('A different response', {status: 200});
+//             },
+//
+//             // Or retry with a fresh token on a 403 error
+//             async (request, options, response) => {
+//                 if (response.status === 403) {
+//                     // Get a fresh token
+//                     const token = await ky('https://example.com/token').text();
+//
+//                     // Retry with the token
+//                     request.headers.set('Authorization', `token ${token}`);
+//
+//                     return ky(request);
+//                 }
 //             }
 //         ]
 //     }
