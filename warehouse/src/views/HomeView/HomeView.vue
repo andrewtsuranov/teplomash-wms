@@ -1,12 +1,10 @@
 <template>
   <div class="general-page">
     <general-page/>
-    <q-r-code-gen/>
   </div>
 </template>
 <script setup>
 import GeneralPage from "@/components/Main/GeneralPage.vue";
-import QRCodeGen from "@/components/Main/QRCodeGen.vue";
 </script>
 <style scoped>
 .general-page {

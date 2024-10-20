@@ -1,11 +1,11 @@
-import { defineStore } from 'pinia'
-import { useUserStore } from '@/stores/UserStore.js'
+import {defineStore} from 'pinia'
+import {useUserStore} from '@/stores/UserStore.js'
 
 export const useWebSocketStore = defineStore('websocket', {
     state: () => ({
         socket: null,
         isConnected: false,
-        message: '',
+        message: 'Нет сообщений или нет соединения',
         reconnectError: false,
         heartBeatInterval: null,
         heartBeatTimer: 0,
@@ -14,15 +14,14 @@ export const useWebSocketStore = defineStore('websocket', {
         maxReconnectAttempts: 5,
         reconnectDelay: 3000,
         onlineUsers: 0,
+        testMessage: null,
     }),
     actions: {
         initWebSocket() {
             const userStore = useUserStore()
             // const wsUrl = `ws://lab:8081/ws/wms/?token=${userStore.token_access}`
             const wsUrl = `ws://38.180.192.229/ws/wms/?token=${userStore.token_access}`
-
             this.socket = new WebSocket(wsUrl)
-
             this.socket.onopen = this.onOpen.bind(this)
             this.socket.onclose = this.onClose.bind(this)
             this.socket.onmessage = this.onMessage.bind(this)
@@ -41,7 +40,7 @@ export const useWebSocketStore = defineStore('websocket', {
             this.stopHeartBeat()
             console.log(`WebSocket disconnected. Code: ${event.code}, reason: ${event.reason}`)
             if (!event.wasClean) {
-                this.error = 'WebSocket connection closed unexpectedly'
+                this.error = 'Соединение было разорвано'
                 this.reconnect()
             }
         },
@@ -50,10 +49,9 @@ export const useWebSocketStore = defineStore('websocket', {
                 const data = JSON.parse(event.data)
                 this.message = data
                 console.log('Received message:', this.message)
-
                 // Обрабатываем различные типы сообщений
-                if (data.type === 'users_online') {
-                    this.onlineUsers = data.count
+                if (data.type === 'online_users') {
+                    this.onlineUsers = data.users.length
                 }
                 // Здесь можно добавить обработку других типов сообщений
             } catch (e) {
@@ -66,9 +64,14 @@ export const useWebSocketStore = defineStore('websocket', {
             this.error = 'WebSocket error occurred'
             this.reconnectError = true
         },
-        sendMessage(message) {
+        sendMessage(message, id) {
+            const data = {
+                action: 'private_message',
+                to: id,
+                message: message
+            }
             if (this.isConnected && this.socket && this.socket.readyState === WebSocket.OPEN) {
-                this.socket.send(JSON.stringify(message))
+                this.socket.send(JSON.stringify(data))
             } else {
                 console.error('Cannot send message: WebSocket is not connected')
                 this.error = 'Cannot send message: WebSocket is not connected'
@@ -76,7 +79,7 @@ export const useWebSocketStore = defineStore('websocket', {
         },
         startHeartBeat() {
             this.heartBeatInterval = setInterval(() => {
-                this.sendMessage({ type: 'heartbeat', data: 'ping' })
+                this.sendMessage(JSON.stringify({type: 'heartbeat', data: 'ping'}))
                 this.heartBeatTimer++
             }, 30000)
         },
@@ -107,7 +110,7 @@ export const useWebSocketStore = defineStore('websocket', {
     },
     getters: {
         lastMessage: (state) => state.message,
-        connectionStatus: (state) => state.isConnected ? 'Connected' : 'Disconnected',
+        connectionStatus: (state) => state.isConnected ? 'В сети' : 'Не в сети',
         onlineUsersCount: (state) => state.onlineUsers,
     },
 })

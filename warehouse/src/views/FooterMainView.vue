@@ -1,7 +1,7 @@
 <template>
   <div class="footer-container">
     <div class="footer-copyright">
-      <i class="bi bi-c-circle"></i><span>{{ yearNow }} Тепломаш &mdash; warehouse management.</span>
+      <i class="bi bi-c-circle"></i><span>{{ yearNow }} Тепломаш&reg; &mdash; warehouse management.</span>
     </div>
     <div class="footer-main">
       <span>Адресная система хранения складом Тепломаш&reg;</span>
