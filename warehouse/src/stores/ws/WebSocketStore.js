@@ -19,8 +19,8 @@ export const useWebSocketStore = defineStore('websocket', {
     actions: {
         initWebSocket() {
             const userStore = useUserStore()
-            // const wsUrl = `ws://lab:8081/ws/wms/?token=${userStore.token_access}`
-            const wsUrl = `ws://38.180.192.229/ws/wms/?token=${userStore.token_access}`
+            const wsUrl = `ws://lab:8081/ws/inventory/?token=${userStore.token_access}`
+            // const wsUrl = `ws://38.180.192.229/ws/wms/?token=${userStore.token_access}`
             this.socket = new WebSocket(wsUrl)
             this.socket.onopen = this.onOpen.bind(this)
             this.socket.onclose = this.onClose.bind(this)
@@ -64,6 +64,7 @@ export const useWebSocketStore = defineStore('websocket', {
             this.error = 'WebSocket error occurred'
             this.reconnectError = true
         },
+
         sendMessage(message, id) {
             const data = {
                 action: 'private_message',
@@ -77,9 +78,38 @@ export const useWebSocketStore = defineStore('websocket', {
                 this.error = 'Cannot send message: WebSocket is not connected'
             }
         },
+        createWarehouse() {
+            const data = {
+                action: 'create_warehouse',
+                number: 4,
+                name: 'Екатеринбург'
+            }
+            if (this.isConnected && this.socket && this.socket.readyState === WebSocket.OPEN) {
+                this.socket.send(JSON.stringify(data))
+            } else {
+                console.error('Cannot send message: WebSocket is not connected')
+                this.error = 'Cannot send message: WebSocket is not connected'
+            }
+        },
+        createPallete() {
+            // Создание паллеты
+            this.socket.send(JSON.stringify({
+                action: 'create_pallet',
+                length: 120,
+                abc_class: 'A',
+                xyz_class: 'X',
+                barcode: '1234567890'
+            }));
+        },
+        getWarehouse() {
+            this.socket.send(JSON.stringify({
+                action: 'get_warehouse',
+                warehouse_id: 1
+            }));
+        },
         startHeartBeat() {
             this.heartBeatInterval = setInterval(() => {
-                this.sendMessage(JSON.stringify({type: 'heartbeat', data: 'ping'}))
+                this.socket.send(JSON.stringify({action: 'heartbeat', data: 'ping'}))
                 this.heartBeatTimer++
             }, 30000)
         },

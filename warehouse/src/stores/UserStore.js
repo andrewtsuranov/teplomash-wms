@@ -2,8 +2,8 @@ import {defineStore} from 'pinia'
 import ky from "ky";
 
 const api = ky.create({
-    prefixUrl: 'http://38.180.192.229/api/auth/'
-    // prefixUrl: 'http://lab:8080/api/auth/'
+    // prefixUrl: 'http://38.180.192.229/api/auth/'
+    prefixUrl: 'http://lab:8080/api/auth/'
 })
 // const response = await ky('https://example.com', {
 //     hooks: {
@@ -41,7 +41,7 @@ export const useUserStore = defineStore('UserStore', {
         tempPassword: null,
     }),
     getters: {
-        isAuthenticated: (state) => !!state.token_access
+        isAuthenticated: (state) => !!state.token_access && !!state.user
     },
     actions: {
         async REQ_LOGIN(email, password) {
@@ -52,7 +52,7 @@ export const useUserStore = defineStore('UserStore', {
                     .post('login/', {json: {email, password}})
                     .json()
                 this.setUser(response)
-                this.loadUser()
+               this.loadUser()
                 return response;
             } catch (err) {
                 this.error = err.message
@@ -111,7 +111,7 @@ export const useUserStore = defineStore('UserStore', {
                 return response
             } catch (err) {
                 this.error = err.message
-                this.isAuthenticated()
+                this.clearUserData()
                 throw err;
             } finally {
                 this.loading = false
@@ -122,12 +122,14 @@ export const useUserStore = defineStore('UserStore', {
             this.error = null;
             try {
                 const response = await api
-                    .post('token/refresh/', {json: refresh})
+                    .post('token/refresh/', {json: {refresh}})
+                    .json()
                 console.log(response.access)
                 this.token_access = response.access
                 return response
             } catch (err) {
                 this.error = err.message
+                this.clearUserData()
                 throw err;
             } finally {
                 this.loading = false
@@ -141,10 +143,18 @@ export const useUserStore = defineStore('UserStore', {
             this.userUP = user;
             localStorage.setItem('userUP', JSON.stringify(user))
         },
-        loadUser() {
+       async loadUser() {
             const userData = JSON.parse(localStorage.getItem('userData') || '{}');
             this.user = userData || null;
             this.token_access = userData.access || null;
+           if (!this.token_access) {
+               try {
+                   await this.REQ_VERIFY(this.token_access);
+               } catch (error) {
+                   console.error('Failed to verify token:', error);
+                   this.clearUserData();
+               }
+           }
         },
         clearUserData() {
             this.user = null;

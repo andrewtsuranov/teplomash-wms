@@ -62,12 +62,8 @@ const router = createRouter({
 router.beforeEach(async (to, from, next) => {
     const userStore = useUserStore()
     // Проверяем, есть ли сохраненные данные пользователя
-    if (localStorage.getItem('userData')) {
-        // Загружаем данные пользователя, если они еще не загружены
-        if (!userStore.user) {
-            userStore.loadUser()
-        }
-        // Проверяем валидность токена, если пользователь считается аутентифицированным
+    if (!userStore.user && localStorage.getItem('userData')) {
+        await userStore.loadUser()
         // if (userStore.isAuthenticated) {
         //     try {
         //         return await userStore.REQ_VERIFY(userStore.token_access)

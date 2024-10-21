@@ -3,6 +3,7 @@
     <header class="home-page-header">
       <header-view/>
     </header>
+<!--    <div v-if="userStore.loading">Loading...</div>-->
     <main class="home-page-main">
       <RouterView/>
     </main>
@@ -10,6 +11,8 @@
 </template>
 <script setup>
 import HeaderView from "@/views/HeaderView.vue";
+// import {useUserStore} from "@/stores/UserStore.js";
+// const userStore = useUserStore()
 </script>
 <style scoped>
 .home-page-container {

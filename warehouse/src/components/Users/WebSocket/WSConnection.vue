@@ -24,6 +24,9 @@
         <div class="button-group">
           <my-button @click="webSocketStore.initWebSocket" :disabled="webSocketStore.isConnected">Connect</my-button>
           <my-button @click="webSocketStore.disconnect" :disabled="!webSocketStore.isConnected">Disconnect</my-button>
+          <my-button @click="webSocketStore.createWarehouse" :disabled="!webSocketStore.isConnected">Создать склад</my-button>
+          <my-button @click="webSocketStore.getWarehouse" :disabled="!webSocketStore.isConnected">Получить склад</my-button>
+          <my-button @click="webSocketStore.createPallete" :disabled="!webSocketStore.isConnected">Создать паллету</my-button>
         </div>
       </div>
       <div class="wsChat">
@@ -42,7 +45,7 @@
           <button class="btn btn-outline-success"
                   type="button"
                   id="button-addon2"
-                  @click="webSocketStore.sendMessage(wsMessage, 3)"
+                  @click="webSocketStore.sendMessage(wsMessage, 4)"
           >Отправить
           </button>
         </div>
