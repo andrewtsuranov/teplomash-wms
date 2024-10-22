@@ -19,8 +19,8 @@ export const useWebSocketStore = defineStore('websocket', {
     actions: {
         initWebSocket() {
             const userStore = useUserStore()
-            const wsUrl = `ws://lab:8081/ws/inventory/?token=${userStore.token_access}`
-            // const wsUrl = `ws://38.180.192.229/ws/wms/?token=${userStore.token_access}`
+            // const wsUrl = `ws://lab:8081/ws/inventory/?token=${userStore.token_access}`
+            const wsUrl = `ws://38.180.192.229/ws/wms/?token=${userStore.token_access}`
             this.socket = new WebSocket(wsUrl)
             this.socket.onopen = this.onOpen.bind(this)
             this.socket.onclose = this.onClose.bind(this)
@@ -64,7 +64,6 @@ export const useWebSocketStore = defineStore('websocket', {
             this.error = 'WebSocket error occurred'
             this.reconnectError = true
         },
-
         sendMessage(message, id) {
             const data = {
                 action: 'private_message',

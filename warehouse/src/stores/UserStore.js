@@ -2,8 +2,8 @@ import {defineStore} from 'pinia'
 import ky from "ky";
 
 const api = ky.create({
-    // prefixUrl: 'http://38.180.192.229/api/auth/'
-    prefixUrl: 'http://lab:8080/api/auth/'
+    prefixUrl: 'http://38.180.192.229/api/auth/'
+    // prefixUrl: 'http://lab:8080/api/auth/'
 })
 // const response = await ky('https://example.com', {
 //     hooks: {
@@ -52,7 +52,7 @@ export const useUserStore = defineStore('UserStore', {
                     .post('login/', {json: {email, password}})
                     .json()
                 this.setUser(response)
-               this.loadUser()
+                this.loadUser()
                 return response;
             } catch (err) {
                 this.error = err.message
@@ -143,23 +143,23 @@ export const useUserStore = defineStore('UserStore', {
             this.userUP = user;
             localStorage.setItem('userUP', JSON.stringify(user))
         },
-       async loadUser() {
+        async loadUser() {
             const userData = JSON.parse(localStorage.getItem('userData') || '{}');
             this.user = userData || null;
             this.token_access = userData.access || null;
-           if (!this.token_access) {
-               try {
-                   await this.REQ_VERIFY(this.token_access);
-               } catch (error) {
-                   console.error('Failed to verify token:', error);
-                   this.clearUserData();
-               }
-           }
+            if (!this.token_access) {
+                try {
+                    await this.REQ_VERIFY(this.token_access);
+                } catch (error) {
+                    console.error('Failed to verify token:', error);
+                   await this.clearUserData();
+                }
+            }
         },
-        clearUserData() {
+        async clearUserData() {
             this.user = null;
             this.token_access = null;
-            localStorage.removeItem('userData');
+             localStorage.removeItem('userData');
         },
     }
 })

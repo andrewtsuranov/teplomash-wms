@@ -1,6 +1,6 @@
 <template>
   <div class="header-profile-container">
-    <div class="profile-name">{{ dataUser.user.username }} ({{ dataUser.user.role}})</div>
+    <div class="profile-name">{{ dataUser.user.username }} ({{ dataUser.user.role }})</div>
     <div class="dropdown">
       <BAvatar aria-expanded="false"
                bg-variant="warning"
@@ -27,9 +27,9 @@ import router from "@/router/index.js";
 
 const UserStorage = useUserStore()
 const dataUser = UserStorage.user
-const logout = async () => {
+const logout =  () => {
   UserStorage.clearUserData()
-  await router.push({path: '/'})
+router.push({path: '/'})
 }
 </script>
 <style scoped>

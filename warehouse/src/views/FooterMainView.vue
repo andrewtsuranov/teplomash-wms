@@ -1,10 +1,10 @@
 <template>
   <div class="footer-container">
     <div class="footer-copyright">
-      <span>&copy; 2024 &mdash; {{ yearNow }} Тепломаш&reg; warehouse management system</span>
+      <span>&copy; 2024 &mdash; {{ yearNow }} Тепломаш&reg; warehouse management system.</span>
     </div>
     <div class="footer-about">
-      <span>Адресная система хранения складом Тепломаш&reg;</span>
+      <span>Адресная система хранения складом Тепломаш&reg;.</span>
     </div>
     <div class="footer-support">
       Поддержка: team@teplomash.ru
@@ -30,7 +30,6 @@ const yearNow = ref(new Date().getFullYear())
 }
 
 .footer-copyright {
-
   grid-area: copyright;
   display: grid;
   grid-template-columns: 1fr;

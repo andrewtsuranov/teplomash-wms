@@ -15,7 +15,7 @@ import {RouterView} from 'vue-router'
 import LogoMain from "@/components/UI/LogoTeplomash.vue"
 import {ref} from "vue";
 
-const valuePX = ref('150px')
+const valuePX = ref('140px')
 </script>
 <style scoped>
 .authorization-container {
@@ -29,7 +29,6 @@ const valuePX = ref('150px')
 }
 
 .logo {
-
 }
 
 .logo-main {
@@ -80,21 +79,22 @@ p, span {
     grid-template-columns: 1fr;
     grid-auto-rows: min-content;
     /*grid-template-columns: 520px;*/
-
     grid-template-areas:
       "logo"
       "greetings"
       "authorization";
     gap: 2rem;
   }
+
   .greetings span {
     text-align: center;
   }
-  .logo-main {
 
+  .logo-main {
     padding: 0 20px;
     /*height: 115px;*/
   }
+
   /*.greetings h1,*/
   /*.greetings span,*/
   /*.greetings p {*/

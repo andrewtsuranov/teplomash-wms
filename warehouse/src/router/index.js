@@ -1,5 +1,6 @@
 import {createRouter, createWebHistory} from 'vue-router'
 import {useUserStore} from "@/stores/UserStore.js";
+import {inject} from "vue";
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -31,9 +32,7 @@ const router = createRouter({
             name: 'HomeView',
             path: '/',
             component: () => import('@/layouts/HomeLayout.vue'),
-            meta: {
-                requiresAuth: true,
-            },
+            meta: {requiresAuth: true},
             children: [
                 {
                     name: 'General',
@@ -46,7 +45,7 @@ const router = createRouter({
                     component: () => import('@/views/HomeView/ProfileView.vue'),
                     meta: {
                         isPersonalPage: true,
-                        needAuth: true,
+                        requiresAuth: true,
                     },
                 },
                 {
