@@ -3,30 +3,46 @@
 #app {
     width: 100%;
     margin: 0 auto;
-    /*padding: 2rem;*/
+    padding: 0;
     font-weight: normal;
     color: blanchedalmond;
 }
 
-a {
+/*a {*/
+/*    text-decoration: none;*/
+/*    color: blanchedalmond;*/
+/*    transition: 0.4s;*/
+/*    padding: 0;*/
+/*    margin: 0;*/
+/*}*/
+.router-link,
+.router-link:link,
+.router-link:visited,
+.router-link:hover,
+.router-link:active {
     text-decoration: none;
-    color: blanchedalmond;
-    transition: 0.4s;
-    padding: 3px;
+    color: inherit;
+    cursor: pointer;
+    padding: 0;
+    margin: 0;
+    background: none;
+    border: none;
+    font: inherit;
 }
 
-@media (hover: hover) {
-    a:hover {
-        background: none;
-    }
-}
 
-@media (max-width: 1024px) {
-    body {
-    }
+/*@media (hover: hover) {*/
+/*    a:hover {*/
+/*        background: none;*/
+/*    }*/
+/*}*/
+
+/*@media (max-width: 1024px) {*/
+/*    body {*/
+/*    }*/
 
 
 
-    #app {
-    }
-}
+/*    #app {*/
+/*    }*/
+/*}*/

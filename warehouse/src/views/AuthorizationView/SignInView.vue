@@ -1,8 +1,6 @@
 <template>
-  <div class="login-wrapper">
-    <div class="login-head">
-      Вход в систему:
-    </div>
+  <div class="sign-in-container">
+    <span style="font-size: 1.5rem">Вход в систему:</span>
     <my-input
         v-model="email"
         maxlength="50"
@@ -19,7 +17,7 @@
         required
         type="password"
     />
-    <div class="btn__login">
+    <div class="group-btn-login">
       <my-button
           id="show-modal"
           :disabled=isDisabled()
@@ -31,7 +29,6 @@
       </my-button>
     </div>
   </div>
-  <!--  <ModalView/>-->
 </template>
 <script setup>
 import {ref} from 'vue'
@@ -52,21 +49,23 @@ const clickLogin = async () => {
 }
 </script>
 <style scoped>
-.login-wrapper {
-  display: flex;
-  flex-wrap: wrap;
-  flex-direction: column;
-  gap: 15px;
+.sign-in-container {
+  display: grid;
+  row-gap: 20px;
+  align-content: start;
+  justify-content: center;
 }
 
-.login-head {
-  color: blanchedalmond;
-  font-size: 1.5rem;
+.group-btn-login {
+  display: grid;
+  grid-template-columns: max-content max-content;
+  column-gap: 20px;
 }
 
-.btn__login {
-  display: flex;
-  flex-direction: row;
-  gap: 15px
+@media (max-width: 1024px) {
+  .group-btn-login {
+    grid-template-columns: 1fr;
+    row-gap: 20px;
+  }
 }
 </style>

@@ -1,12 +1,12 @@
 <template>
   <div class="footer-container">
     <div class="footer-copyright">
-      <i class="bi bi-c-circle"></i><span>{{ yearNow }} Тепломаш&reg; &mdash; warehouse management.</span>
+      <span>&copy; 2024 &mdash; {{ yearNow }} Тепломаш&reg; warehouse management system</span>
     </div>
-    <div class="footer-main">
+    <div class="footer-about">
       <span>Адресная система хранения складом Тепломаш&reg;</span>
     </div>
-    <div class="footer-info">
+    <div class="footer-support">
       Поддержка: team@teplomash.ru
     </div>
   </div>
@@ -19,20 +19,45 @@ const yearNow = ref(new Date().getFullYear())
 <style scoped>
 .footer-container {
   display: grid;
-  column-gap: 10px;
+  grid-template-areas:
+        "copyright about support";
   grid-template-columns: auto 1fr auto;
-  grid-template-rows: 50px auto;
-  align-items: center;
+  grid-template-rows: minmax(50px, auto) auto;
+  column-gap: 20px;
+  padding: 0 20px;
   color: dimgray;
-  padding: 0 50px;
+  align-items: center;
 }
 
 .footer-copyright {
+
+  grid-area: copyright;
+  display: grid;
+  grid-template-columns: 1fr;
 }
 
-.footer-main {
+.footer-about {
+  grid-area: about;
+  display: grid;
+  grid-template-columns: 1fr;
 }
 
-.footer-info {
+.footer-support {
+  grid-area: support;
+  display: grid;
+  grid-template-columns: 1fr;
+}
+
+@media (max-width: 1024px) {
+  .footer-container {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+        'about'
+        'support'
+        'copyright';
+    row-gap: 20px;
+    grid-template-rows: max-content;
+    padding: 20px;
+  }
 }
 </style>

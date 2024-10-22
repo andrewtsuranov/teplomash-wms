@@ -21,15 +21,14 @@ import FooterMainView from "@/views/FooterMainView.vue";
 }
 
 .app-main {
-  display: grid;
   grid-area: main;
-  justify-content: center;
+  display: grid;
 }
 
 .footer {
   grid-area: footer;
+  display: grid;
   background-color: rgba(0, 0, 0, 0.3);
   margin-top: auto;
-  align-content: center;
 }
 </style>

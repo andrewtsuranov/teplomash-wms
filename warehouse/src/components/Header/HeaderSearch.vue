@@ -1,12 +1,24 @@
 <template>
-  <div>
-    <form class="d-flex">
-      <input class="form-control me-2" type="search" placeholder="Поиск Тепломаш..." aria-label="Search">
-      <!--      <button class="btn btn-outline-success" type="submit">Поиск</button>-->
-    </form>
+  <div class="header-search-container">
+    <BFormInput class="me-2" placeholder="Поиск Тепломаш..." />
+    <my-button>Найти</my-button>
+<!--    <BButton type="submit" variant="outline-success">Search</BButton>-->
   </div>
 </template>
 <script setup>
+import MyButton from "@/components/UI/MyButton.vue";
 </script>
 <style scoped>
+.header-search-container {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  column-gap: 10px;
+}
+@media (max-width: 1024px) {
+  .header-search-container {
+
+    grid-template-columns: 1fr auto;
+
+  }
+}
 </style>

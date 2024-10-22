@@ -1,10 +1,10 @@
 <template>
-  <div class="home-page-container">
-    <header class="home-page-header">
+  <div class="home-layout-container">
+    <header class="home-layout-header">
       <header-view/>
     </header>
 <!--    <div v-if="userStore.loading">Loading...</div>-->
-    <main class="home-page-main">
+    <main class="home-layout-main">
       <RouterView/>
     </main>
   </div>
@@ -15,21 +15,25 @@ import HeaderView from "@/views/HeaderView.vue";
 // const userStore = useUserStore()
 </script>
 <style scoped>
-.home-page-container {
+.home-layout-container {
   display: grid;
   grid: "homeHeader"
         "homeMain";
-  overflow: hidden;
+
   grid-template-rows: auto 1fr;
+  row-gap: 50px;
+
 }
 
-.home-page-header {
+.home-layout-header {
   grid-area: homeHeader;
   background-color: rgba(0, 0, 0, 0.3);
-  margin-bottom: 50px;
+  display: grid;
+  grid-template-columns: 1fr;
 }
 
-.home-page-main {
+.home-layout-main {
   grid-area: homeMain;
 }
+
 </style>
