@@ -3,9 +3,10 @@
     <logo-main class="logo-main" :height="valuePX"/>
     <div class="greetings">
       <span style="font-size: 2.5rem">Добро пожаловать!</span>
-      <span style="font-size: 1.5rem">Адресная система хранения складом Тепломаш&reg;</span>
+      <span style="font-size: 1.5rem">Система управления складом Тепломаш&reg; с адресным хранением </span>
       <span style="font-size: 1.1rem; text-align: start">Разработана для сотрудников складских помещений Тепломаш&reg; с целью оптимизации процессов поиска, комплектации
         и хранения товарной номенклатуры.</span>
+      <span style="font-size: 1.1rem; text-align: start">Поддерживает основные бизнес-процессы:<br>- Приёмка<br>- Размещение в зонах хранения<br>- Отбор<br>- Отгрузка<br> - Инвентаризация</span>
     </div>
     <RouterView class="authorization"/>
   </div>

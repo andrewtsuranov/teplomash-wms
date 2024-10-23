@@ -1,6 +1,6 @@
 <template>
   <div class="header-profile-container">
-<!--    <div class="profile-name">{{ dataUser.user.username }} ({{ dataUser.user.role }})</div>-->
+    <div class="profile-name">{{ dataUser.username }} ({{ dataUser.role }})</div>
     <div class="dropdown">
       <BAvatar aria-expanded="false"
                bg-variant="warning"
@@ -23,13 +23,15 @@
 </template>
 <script setup>
 import {useUserStore} from "@/stores/http/UserStore.js";
-import router from "@/router/index.js";
+import {useRouter} from 'vue-router'
 
+const router = useRouter()
 const UserStorage = useUserStore()
 const dataUser = UserStorage.user
-const logout =  () => {
-  UserStorage.clearUserData()
-router.push({path: '/'})
+const logout = () => {
+  if (UserStorage.clearUserData()) {
+    router.push({name: 'Login'})
+  }
 }
 </script>
 <style scoped>

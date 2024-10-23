@@ -19,41 +19,39 @@
         :disabled="loading"
         type="password"
     />
+    <div v-if="error" class="alert alert-danger" role="alert">
+      {{ error.message }}
+    </div>
     <div class="group-btn-login">
       <my-button
           type="submit"
           id="show-modal"
           :disabled="loading"
-      >{{ loading ? 'Logging in...' : 'Login' }}
-
-
+      >{{ loading ? 'Обработка...' : 'Вход' }}
       </my-button>
-      <my-button>
+      <my-button form="" @clicks="router.push('/signup')">
         Зарегистрироваться
       </my-button>
-    </div>
-    <div v-if="error" class="error-message">
-      {{ error }}
     </div>
   </form>
 </template>
 <script setup>
-import {ref, computed, unref} from 'vue'
+import {ref, computed} from 'vue'
 import {useUserStore} from "@/stores/http/UserStore.js";
+import {useErrorStore} from "@/stores/error/ErrorStore.js";
 import MyButton from "@/components/UI/MyButton.vue";
 import MyInput from "@/components/UI/MyInput.vue";
 import {useRouter} from 'vue-router'
+
 const router = useRouter()
 const userStore = useUserStore()
-
-
+const errorStore = useErrorStore()
 const form = ref({
   email: '',
   password: ''
 })
-
 const loading = computed(() => userStore.loading)
-const error = computed(() => userStore.error)
+const error = computed(() => errorStore.error)
 const handleLogin = async () => {
   const success = await userStore.LOGIN(form.value)
   if (success) {
@@ -74,6 +72,11 @@ const handleLogin = async () => {
   display: grid;
   grid-template-columns: max-content max-content;
   column-gap: 20px;
+}
+
+.error-message {
+  color: #E32029;
+  color: #E32029;
 }
 
 @media (max-width: 1024px) {

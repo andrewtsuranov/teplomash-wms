@@ -25,7 +25,6 @@ const router = createRouter({
                     component: () => import('@/views/AuthorizationView/ConfirmSignUpView.vue'),
                 },
             ],
-            meta: {guestOnly: true}
         },
         {
             name: 'HomeView',
@@ -43,8 +42,7 @@ const router = createRouter({
                     path: 'profile',
                     component: () => import('@/views/HomeView/ProfileView.vue'),
                     meta: {
-                        isPersonalPage: true,
-                        requiresAuth: true,
+                        isPersonalPage: true
                     },
                 },
                 {
@@ -57,24 +55,17 @@ const router = createRouter({
     ],
     linkExactActiveClass: 'teplomash-active-exact-link'
 });
-router.beforeEach(async (to, from) => {
+router.beforeEach(async (to) => {
     const userStore = useUserStore()
-    // 1. Проверяем, требует ли маршрут аутентификации
-    if (!!to.meta.requiresAuth && !userStore.isAuthenticated &&  to.name !== 'Login') {
-        // Сохраняем целевой маршрут для перенаправления после входа
-        return {name: 'Login'}
-    }
+
 // 2. Проверяем, есть ли сохраненные данные пользователя
-    if (!userStore.token_access && localStorage.getItem('userData')) {
-        //В том случае, если в LocalStorage есть данные о пользователе, необходимо их загрузить в Pinia
-        userStore.loadUserFromLocalStorage()
-
-
-    }
-        if (!userStore.isAuthenticated && to.name !== 'Login') {
-            console.log('Проверка пользователя: Пользователь отсутствует')
-            return {name: 'Login'}
-        }
+//     if (!userStore.token_access) {
+    //В том случае, если в LocalStorage есть данные о пользователе, необходимо их загрузить в Pinia
+    // }
+    // if (!userStore.isAuthenticated && to.name !== 'Login') {
+    //     console.log('Проверка пользователя: Пользователь отсутствует')
+    //     return {name: 'Login'}
+    // }
     // Проверяем, есть ли сохраненные данные пользователя
     // if (!userStore.user && localStorage.getItem('userData')) {
     //     await userStore.loadUserFromLocalStorage()
@@ -95,10 +86,10 @@ router.beforeEach(async (to, from) => {
     // }
     // }
     // Проверяем, требует ли маршрут аутентификации
-    // if (!!to.meta.requiresAuth && !userStore.isAuthenticated) {
-    //     // Сохраняем целевой маршрут для перенаправления после входа
-    //     next({name: 'Login', query: {redirect: to.fullPath}})
-    // }
+    if (!!to.meta.requiresAuth && !userStore.isAuthenticated) {
+        // Сохраняем целевой маршрут для перенаправления после входа
+        return ({name: 'Login', query: {redirect: to.fullPath}})
+    }
     // // Проверяем, доступен ли маршрут только для гостей
     // else if (!!to.meta.guestOnly && userStore.isAuthenticated) {
     //     // Перенаправляем на домашнюю страницу, если пользователь уже аутентифицирован

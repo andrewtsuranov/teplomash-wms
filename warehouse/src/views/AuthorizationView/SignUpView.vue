@@ -1,5 +1,5 @@
 <template>
-  <div class="login-wrapper">
+  <form @submit.prevent="handleSignup" class="login-wrapper">
     <h2>Заполните регистрационную форму</h2>
     <my-input
         v-model="uSurname"
@@ -29,11 +29,11 @@
         type="text"
     />
     <my-select
-        v-model="role"
+        v-model="form.role"
         :options="role_options"
     />
     <my-input
-        v-model="email"
+        v-model="form.email"
         maxlength="50"
         pattern="@teplomash\.ru"
         placeholder="email* (example@teplomash.ru)"
@@ -43,7 +43,7 @@
         type="email"
     />
     <my-input
-        v-model="password"
+        v-model="form.password"
         minlength="8"
         placeholder="пароль*"
         required
@@ -57,14 +57,10 @@
         type="password"
     />
     <my-button
-        :disabled=isDisabled()
-        @click="[
-            UserStore.REQ_SIGNUP(uSurname + '_' + uName + '_' + uMidname, role, email, password),
-            router.push({name: 'Confirmation'})
-            ]"
+        type="submit"
     >Регистрация
     </my-button>
-  </div>
+  </form>
 </template>
 <script setup>
 import {useUserStore} from "@/stores/http/UserStore.js";
@@ -74,7 +70,7 @@ import router from "@/router/index.js";
 import {ref} from "vue";
 import MySelect from "@/components/UI/MySelect.vue"
 
-const UserStore = useUserStore()
+const userStore = useUserStore()
 const uName = ref('')
 const uSurname = ref('')
 const uMidname = ref('')
@@ -86,7 +82,19 @@ const role_options = [
   {name: 'Грузчик', value: "LOADER"},
   {name: 'Диспетчер', value: "MANAGER"}
 ]
-const isDisabled = () => !(uName.value.length !== 0 && uSurname.value.length !== 0 && uMidname.value.length !== 0 && email.value.length !== 0 && password.value.length !== 0 && repassword.value.length !== 0)
+const form = ref({
+  username: uSurname.value + '_' + uName.value + '_' + uMidname.value,
+  email: '',
+  role: '',
+  password: (password.value === repassword.value) ? password.value : ''
+})
+const handleSignup = async () => {
+  const success = await userStore.SIGNUP(form.value)
+  if (success) {
+    router.push('/')
+  }
+}
+// const isDisabled = () => !(uName.value.length !== 0 && uSurname.value.length !== 0 && uMidname.value.length !== 0 && email.value.length !== 0 && password.value.length !== 0 && repassword.value.length !== 0)
 </script>
 <style scoped>
 .login-wrapper {

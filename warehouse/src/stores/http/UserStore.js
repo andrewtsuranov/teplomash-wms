@@ -1,14 +1,16 @@
 import {defineStore} from 'pinia'
 import router from "@/router/index.js";
 import ky from "ky";
+import {useErrorStore} from "@/stores/error/ErrorStore.js";
 
 const api = ky.create({
-    // prefixUrl: 'http://38.180.192.229/api/auth/'
-    prefixUrl: 'http://lab:8080/api/auth/',
+    prefixUrl: 'http://38.180.192.229/api/auth/'
+    // prefixUrl: 'http://lab:8080/api/auth/',
 })
 const kyStandard = ky.create({
-    // prefixUrl: 'http://38.180.192.229/api/auth/'
-    prefixUrl: 'http://lab:8080/api/auth/',
+    prefixUrl: 'http://38.180.192.229/api/auth/',
+    // prefixUrl: 'http://lab:8080/api/auth/',
+    retry: 0,
     hooks: {
         beforeRequest: [
             (request, options) => {
@@ -17,15 +19,19 @@ const kyStandard = ky.create({
             },
         ],
         afterResponse: [
-            (request, options, response) => {
-                // console.log(request)
-                // console.log(options)
-                // console.log(response)
-                if (response.status === 401 && response.statusText === 'Unauthorized') {
-                    console.log('Вы не авторизованы. Пройдите регистрацию')
-                    // // Get a fresh token
+            async (request, options, response) => {
+                console.log(request)
+                console.log(options)
+                console.log(response)
+                if (response.status === 401) {
+                    const errorStore = useErrorStore()
+                    errorStore.setError({
+                        status: response.status,
+                        message: 'Ошибка авторизации! Пользователь не авторизован, требуется регистрация!'
+                    })
+                    // Get a fresh token
                     // const token = await ky('https://example.com/token').text();
-                    // // Retry with the token
+                    // Retry with the token
                     // request.headers.set('Authorization', `token ${token}`);
                     // return ky(request);
                 }
@@ -53,7 +59,7 @@ const kyStandard = ky.create({
 })
 export const useUserStore = defineStore('UserStore', {
     state: () => ({
-        user: localStorage.getItem('userData') || null,
+        user: JSON.parse(localStorage.getItem('userData')) || null,
         userUP: null,
         token_access: localStorage.getItem('token_access') || null,
         token_refresh: localStorage.getItem('token_refresh') || null,
@@ -63,36 +69,51 @@ export const useUserStore = defineStore('UserStore', {
         statusResponseCode: Number
     }),
     getters: {
-        isAuthenticated: (state) => !!state.token_access && !!state.user
+        isAuthenticated: (state) => !!state.token_access && !!state.user && !!state.token_refresh
     },
     actions: {
-        async TEST_REQUEST(email, password) {
-            try {
-                const response = await kyStandard
-                    .post('login/', {json: {email, password}})
-                    .json()
-                console.log(response)
-                // console.log(response)
-            } catch (err) {
-                console.log(err)
-                // this.error = err.message
-            }
-        },
         async LOGIN(credentials) {
-            console.log(credentials)
             this.loading = true;
             this.error = null;
+            const errorStore = useErrorStore()
             try {
-                const response = await api
+                const response = await kyStandard
                     .post('login/', {json: credentials})
                     .json()
                 this.user = response.user
-                this.token_access = response.token_access
-                this.token_refresh = response.token_refresh
-                localStorage.setItem('userData', this.user)
+                this.token_access = response.access
+                this.token_refresh = response.refresh
+                localStorage.setItem('userData', JSON.stringify(this.user))
                 localStorage.setItem('token_access', this.token_access)
                 localStorage.setItem('token_refresh', this.token_refresh)
-                return true;
+                return true
+            } catch (err) {
+                if (err.response?.status === 401) {
+                    errorStore.setError({
+                        status: err.response?.status,
+                        message: 'Ошибка авторизации! Пользователь не авторизован, требуется регистрация'
+                    })
+                } else {
+                    errorStore.setError({
+                        status: err.response?.status || 500,
+                        message: 'Ошибка авторизации! Произошла ошибка при загрузке данных!'
+                    })
+                }
+                throw err
+            } finally {
+                this.loading = false
+            }
+        },
+        async SIGNUP(userData) {
+            this.loading = true;
+            this.error = null;
+            try {
+                const response = await kyStandard
+                    .post('register/', {json: userData})
+                    .json()
+                console.log(response)
+                this.tempPassword = response.password
+                return response;
             } catch (err) {
                 this.error = err.message
                 throw err;
@@ -100,24 +121,6 @@ export const useUserStore = defineStore('UserStore', {
                 this.loading = false
             }
         },
-        // async REQ_SIGNUP(username, role, email, password) {
-        //     this.loading = true;
-        //     this.error = null;
-        //     this.setUserUP(password)
-        //     try {
-        //         const response = await api
-        //             .post('register/', {json: {username, role, email, password}})
-        //             .json()
-        //         this.setUserUP(response)
-        //         this.tempPassword = password
-        //         return response;
-        //     } catch (err) {
-        //         this.error = err.message
-        //         throw err;
-        //     } finally {
-        //         this.loading = false
-        //     }
-        // },
         // async REQ_CONFIRM(activation_code) {
         //     try {
         //         const email = this.userUP.email || JSON.parse(localStorage.getItem('userUP')).email || '{}'
@@ -182,24 +185,14 @@ export const useUserStore = defineStore('UserStore', {
         //     this.userUP = user;
         //     localStorage.setItem('userUP', JSON.stringify(user))
         // },
-        loadUserFromLocalStorage() {
-            const userData = JSON.parse(localStorage.getItem('userData') || '{}');
-            this.user = userData || null;
-            this.token_access = userData.access || null;
-            this.token_refresh = userData.refresh || null;
-            // if (this.token_access) {
-            //     try {
-            //         await this.REQ_VERIFY(this.token_access);
-            //     } catch (error) {
-            //         console.error('Ошибка проверки токена:', error);
-            //         await this.clearUserData();
-            //     }
-            // }
-        },
-        async clearUserData() {
-            this.user = null;
-            this.token_access = null;
-            localStorage.removeItem('userData');
+        clearUserData() {
+            this.user = null
+            this.token_access = null
+            this.token_refresh = null
+            let keysToRemove = ['userData', 'token_access', 'token_refresh']
+            keysToRemove.forEach(k =>
+                localStorage.removeItem(k))
+            return true
         },
     }
 })

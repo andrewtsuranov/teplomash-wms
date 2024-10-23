@@ -55,8 +55,8 @@ export const useWebSocketStore = defineStore('websocket', {
                 }
                 // Здесь можно добавить обработку других типов сообщений
             } catch (e) {
-                console.error('Error parsing WebSocket message:', e)
-                this.error = 'Error parsing WebSocket message'
+                console.error('error parsing WebSocket message:', e)
+                this.error = 'error parsing WebSocket message'
             }
         },
         onError(error) {
