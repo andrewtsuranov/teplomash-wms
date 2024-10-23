@@ -1,6 +1,6 @@
 <template>
   <div class="header-profile-container">
-    <div class="profile-name">{{ dataUser.user.username }} ({{ dataUser.user.role }})</div>
+<!--    <div class="profile-name">{{ dataUser.user.username }} ({{ dataUser.user.role }})</div>-->
     <div class="dropdown">
       <BAvatar aria-expanded="false"
                bg-variant="warning"
@@ -22,7 +22,7 @@
   </div>
 </template>
 <script setup>
-import {useUserStore} from "@/stores/UserStore.js";
+import {useUserStore} from "@/stores/http/UserStore.js";
 import router from "@/router/index.js";
 
 const UserStorage = useUserStore()

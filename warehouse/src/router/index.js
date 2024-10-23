@@ -1,6 +1,5 @@
 import {createRouter, createWebHistory} from 'vue-router'
-import {useUserStore} from "@/stores/UserStore.js";
-import {inject} from "vue";
+import {useUserStore} from "@/stores/http/UserStore.js";
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -50,7 +49,7 @@ const router = createRouter({
                 },
                 {
                     name: 'Users',
-                    path: 'users',
+                    path: 'users/:id',
                     component: () => import('@/views/HomeView/UsersView.vue')
                 },
             ]
@@ -58,39 +57,55 @@ const router = createRouter({
     ],
     linkExactActiveClass: 'teplomash-active-exact-link'
 });
-router.beforeEach(async (to, from, next) => {
+router.beforeEach(async (to, from) => {
     const userStore = useUserStore()
-    // Проверяем, есть ли сохраненные данные пользователя
-    if (!userStore.user && localStorage.getItem('userData')) {
-        await userStore.loadUser()
-        // if (userStore.isAuthenticated) {
-        //     try {
-        //         return await userStore.REQ_VERIFY(userStore.token_access)
-        //     } catch (error) {
-        //         try {
-        //             console.log(userStore.user.refresh)
-        //             await userStore.REQ_REFRESH(userStore.user.refresh)
-        //             return await userStore.REQ_VERIFY(userStore.token_access)
-        //         } catch (error) {
-        //             console.error('Требуется авторизация:', error)
-        //             userStore.clearUserData()
-        //             next({name: 'Login'})
-        //         }
-        //     }
-        // }
-    }
-    // Проверяем, требует ли маршрут аутентификации
-    if (!!to.meta.requiresAuth && !userStore.isAuthenticated) {
+    // 1. Проверяем, требует ли маршрут аутентификации
+    if (!!to.meta.requiresAuth && !userStore.isAuthenticated &&  to.name !== 'Login') {
         // Сохраняем целевой маршрут для перенаправления после входа
-        next({name: 'Login', query: {redirect: to.fullPath}})
+        return {name: 'Login'}
     }
-    // Проверяем, доступен ли маршрут только для гостей
-    else if (!!to.meta.guestOnly && userStore.isAuthenticated) {
-        // Перенаправляем на домашнюю страницу, если пользователь уже аутентифицирован
-        next({name: 'HomeView'})
-    } else {
-        next()
+// 2. Проверяем, есть ли сохраненные данные пользователя
+    if (!userStore.token_access && localStorage.getItem('userData')) {
+        //В том случае, если в LocalStorage есть данные о пользователе, необходимо их загрузить в Pinia
+        userStore.loadUserFromLocalStorage()
+
+
     }
+        if (!userStore.isAuthenticated && to.name !== 'Login') {
+            console.log('Проверка пользователя: Пользователь отсутствует')
+            return {name: 'Login'}
+        }
+    // Проверяем, есть ли сохраненные данные пользователя
+    // if (!userStore.user && localStorage.getItem('userData')) {
+    //     await userStore.loadUserFromLocalStorage()
+    // if (userStore.isAuthenticated) {
+    //     try {
+    //         return await userStore.REQ_VERIFY(userStore.token_access)
+    //     } catch (error) {
+    //         try {
+    //             console.log(userStore.user.refresh)
+    //             await userStore.REQ_REFRESH(userStore.user.refresh)
+    //             return await userStore.REQ_VERIFY(userStore.token_access)
+    //         } catch (error) {
+    //             console.error('Требуется авторизация:', error)
+    //             userStore.clearUserData()
+    //             next({name: 'Login'})
+    //         }
+    //     }
+    // }
+    // }
+    // Проверяем, требует ли маршрут аутентификации
+    // if (!!to.meta.requiresAuth && !userStore.isAuthenticated) {
+    //     // Сохраняем целевой маршрут для перенаправления после входа
+    //     next({name: 'Login', query: {redirect: to.fullPath}})
+    // }
+    // // Проверяем, доступен ли маршрут только для гостей
+    // else if (!!to.meta.guestOnly && userStore.isAuthenticated) {
+    //     // Перенаправляем на домашнюю страницу, если пользователь уже аутентифицирован
+    //     next({name: 'HomeView'})
+    // } else {
+    //     next()
+    // }
 })
 router.onError((error) => {
     console.error('Ошибка роутинга:', error)

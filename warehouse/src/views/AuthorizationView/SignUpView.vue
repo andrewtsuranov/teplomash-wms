@@ -67,7 +67,7 @@
   </div>
 </template>
 <script setup>
-import {useUserStore} from "@/stores/UserStore.js";
+import {useUserStore} from "@/stores/http/UserStore.js";
 import MyInput from "@/components/UI/MyInput.vue";
 import MyButton from "@/components/UI/MyButton.vue"
 import router from "@/router/index.js";

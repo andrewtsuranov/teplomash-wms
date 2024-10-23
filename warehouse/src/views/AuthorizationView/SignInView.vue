@@ -1,52 +1,66 @@
 <template>
-  <div class="sign-in-container">
+  <form @submit.prevent="handleLogin" class="sign-in-container">
     <span style="font-size: 1.5rem">Вход в систему:</span>
     <my-input
-        v-model="email"
+        v-model="form.email"
         maxlength="50"
         pattern=".+@teplomash\.ru"
         placeholder="Введите email..."
         required
+        :disabled="loading"
         size="64"
         type="email"
     />
     <my-input
-        v-model="password"
+        v-model="form.password"
         minlength="8"
         placeholder="Введите пароль..."
         required
+        :disabled="loading"
         type="password"
     />
     <div class="group-btn-login">
       <my-button
+          type="submit"
           id="show-modal"
-          :disabled=isDisabled()
-          v-on:click="clickLogin()"
-      >Войти
+          :disabled="loading"
+      >{{ loading ? 'Logging in...' : 'Login' }}
+
+
       </my-button>
-      <my-button @click="router.push({path : '/signup'})">
+      <my-button>
         Зарегистрироваться
       </my-button>
     </div>
-  </div>
+    <div v-if="error" class="error-message">
+      {{ error }}
+    </div>
+  </form>
 </template>
 <script setup>
-import {ref} from 'vue'
-import {useUserStore} from "@/stores/UserStore.js";
+import {ref, computed, unref} from 'vue'
+import {useUserStore} from "@/stores/http/UserStore.js";
 import MyButton from "@/components/UI/MyButton.vue";
 import MyInput from "@/components/UI/MyInput.vue";
-import router from "@/router/index.js";
+import {useRouter} from 'vue-router'
+const router = useRouter()
+const userStore = useUserStore()
 
-const UserStore = useUserStore()
-const email = ref('')
-const password = ref('')
-const isDisabled = () => !(email.value.length !== 0 && password.value.length !== 0)
-const clickLogin = async () => {
-  await UserStore.REQ_LOGIN(email.value, password.value)
-  if (UserStore.isAuthenticated) {
-    router.push({name: 'HomeView'})
+
+const form = ref({
+  email: '',
+  password: ''
+})
+
+const loading = computed(() => userStore.loading)
+const error = computed(() => userStore.error)
+const handleLogin = async () => {
+  const success = await userStore.LOGIN(form.value)
+  if (success) {
+    router.push('/')
   }
 }
+// const isDisabled = () => !(form.email.length !== 0 && password.value.length !== 0)
 </script>
 <style scoped>
 .sign-in-container {
