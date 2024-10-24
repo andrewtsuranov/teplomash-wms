@@ -29,7 +29,7 @@
           :disabled="loading"
       >{{ loading ? 'Обработка...' : 'Вход' }}
       </my-button>
-      <my-button form="" @clicks="router.push('/signup')">
+      <my-button form="" @click="handleSignup">
         Зарегистрироваться
       </my-button>
     </div>
@@ -57,6 +57,10 @@ const handleLogin = async () => {
   if (success) {
     router.push('/')
   }
+}
+const handleSignup = async () => {
+  console.log('123')
+  router.push({name: 'Signup'})
 }
 // const isDisabled = () => !(form.email.length !== 0 && password.value.length !== 0)
 </script>

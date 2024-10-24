@@ -31,6 +31,7 @@
     <my-select
         v-model="form.role"
         :options="role_options"
+        required
     />
     <my-input
         v-model="form.email"
@@ -83,10 +84,10 @@ const role_options = [
   {name: 'Диспетчер', value: "MANAGER"}
 ]
 const form = ref({
-  username: uSurname.value + '_' + uName.value + '_' + uMidname.value,
-  email: '',
-  role: '',
-  password: (password.value === repassword.value) ? password.value : ''
+  username: uSurname.value,
+  email: email.value,
+  role: role.value,
+  password: (repassword.value === password.value) ? password.value : ''
 })
 const handleSignup = async () => {
   const success = await userStore.SIGNUP(form.value)

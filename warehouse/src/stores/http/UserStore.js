@@ -1,19 +1,31 @@
 import {defineStore} from 'pinia'
-import router from "@/router/index.js";
 import ky from "ky";
 import {useErrorStore} from "@/stores/error/ErrorStore.js";
 
-const api = ky.create({
-    prefixUrl: 'http://38.180.192.229/api/auth/'
-    // prefixUrl: 'http://lab:8080/api/auth/',
-})
-const kyStandard = ky.create({
+const kyStd = ky.create({
     prefixUrl: 'http://38.180.192.229/api/auth/',
     // prefixUrl: 'http://lab:8080/api/auth/',
     retry: 0,
+})
+const kyLogin = kyStd.extend({
+    hooks: {
+        afterResponse: [
+            async (request, options, response) => {
+                if (response.status === 401) {
+                    const errorStore = useErrorStore()
+                    errorStore.setError({
+                        status: response.status,
+                        message: 'Ошибка авторизации! Пользователь не авторизован, требуется регистрация!'
+                    })
+                }
+            }
+        ]
+    }
+})
+const kySignup = kyStd.extend({
     hooks: {
         beforeRequest: [
-            (request, options) => {
+            async (request, options) => {
                 console.log(request)
                 console.log(options)
             },
@@ -23,69 +35,55 @@ const kyStandard = ky.create({
                 console.log(request)
                 console.log(options)
                 console.log(response)
-                if (response.status === 401) {
-                    const errorStore = useErrorStore()
-                    errorStore.setError({
-                        status: response.status,
-                        message: 'Ошибка авторизации! Пользователь не авторизован, требуется регистрация!'
-                    })
-                    // Get a fresh token
-                    // const token = await ky('https://example.com/token').text();
-                    // Retry with the token
-                    // request.headers.set('Authorization', `token ${token}`);
-                    // return ky(request);
-                }
+                // Get a fresh token
+                // const token = await ky('https://example.com/token').text();
+                // Retry with the token
+                // request.headers.set('Authorization', `token ${token}`);
+                // return ky(request);
             }
-        ]
-        //     afterResponse: [
-        //         (_request, _options, response) => {
-        //             // You could do something with the response, for example, logging.
-        //             console.log(response)
-        //             // Or return a `Response` instance to overwrite the response.
-        //             return new Response('A different response', {status: 200});
-        //         },
-        //         // Or retry with a fresh token on a 403 error
-        //         async (request, options, response) => {
-        //             if (response.status === 403) {
-        //                 // Get a fresh token
-        //                 const token = await ky('https://example.com/token').text();
-        //                 // Retry with the token
-        //                 request.headers.set('Authorization', `token ${token}`);
-        //                 return ky(request);
-        //             }
-        //         }
-        //     ]
+        ],
     }
 })
-export const useUserStore = defineStore('UserStore', {
+//     afterResponse: [
+//         (_request, _options, response) => {
+//             // You could do something with the response, for example, logging.
+//             console.log(response)
+//             // Or return a `Response` instance to overwrite the response.
+//             return new Response('A different response', {status: 200});
+//         },
+//         // Or retry with a fresh token on a 403 error
+//         async (request, options, response) => {
+//             if (response.status === 403) {
+//                 // Get a fresh token
+//                 const token = await ky('https://example.com/token').text();
+//                 // Retry with the token
+//                 request.headers.set('Authorization', `token ${token}`);
+//                 return ky(request);
+//             }
+//         }
+//     ]
+export const useUserStore = defineStore('userStore', {
     state: () => ({
-        user: JSON.parse(localStorage.getItem('userData')) || null || undefined,
+        user: JSON.parse(localStorage.getItem('userData')) || null,
         userUP: null,
-        // token_access: localStorage.getItem('token_access') || null,
-        // token_refresh: localStorage.getItem('token_refresh') || null,
         loading: false,
         error: null,
         tempPassword: null,
-        statusResponseCode: Number
     }),
     getters: {
-        isAuthenticated: (state) => !!state.token_access && !!state.user && !!state.token_refresh
+        isAuthenticated: (state) => !!state.user
     },
     actions: {
         async LOGIN(credentials) {
-            this.loading = true;
-            this.error = null;
             const errorStore = useErrorStore()
+            this.loading = true;
+            errorStore.clearError();
             try {
-                const response = await kyStandard
+                const response = await kyLogin
                     .post('login/', {json: credentials})
                     .json()
                 this.user = response
-                // this.token_access = response.access
-                // this.token_refresh = response.refresh
                 localStorage.setItem('userData', JSON.stringify(response))
-                // localStorage.setItem('token_access', JSON.stringify(response.access))
-                // localStorage.setItem('token_refresh', JSON.stringify(response.refresh))
                 return true
             } catch (err) {
                 if (err.response?.status === 401) {
@@ -105,15 +103,16 @@ export const useUserStore = defineStore('UserStore', {
             }
         },
         async SIGNUP(userData) {
+            const errorStore = useErrorStore()
             this.loading = true;
-            this.error = null;
+            errorStore.clearError();
             try {
-                const response = await kyStandard
+                const response = await kySignup
                     .post('register/', {json: userData})
                     .json()
                 console.log(response)
-                this.tempPassword = response.password
-                return response;
+                // this.tempPassword = response.password
+                return true;
             } catch (err) {
                 this.error = err.message
                 throw err;
