@@ -58,6 +58,11 @@ const router = createRouter({
 router.beforeEach(async (to) => {
     const userStore = useUserStore()
 
+    if (!userStore.user && to.name  !== 'Login') {
+        return { name: 'Login' }
+    }
+
+
 // 2. Проверяем, есть ли сохраненные данные пользователя
 //     if (!userStore.token_access) {
     //В том случае, если в LocalStorage есть данные о пользователе, необходимо их загрузить в Pinia
@@ -86,10 +91,12 @@ router.beforeEach(async (to) => {
     // }
     // }
     // Проверяем, требует ли маршрут аутентификации
-    if (!!to.meta.requiresAuth && !userStore.isAuthenticated) {
-        // Сохраняем целевой маршрут для перенаправления после входа
-        return ({name: 'Login', query: {redirect: to.fullPath}})
-    }
+    console.log([!!to.meta.requiresAuth, !userStore.isAuthenticated])
+
+    // if (!!to.meta.requiresAuth) {
+    //     // Сохраняем целевой маршрут для перенаправления после входа
+    //     return {name: 'Login'}
+    // }
     // // Проверяем, доступен ли маршрут только для гостей
     // else if (!!to.meta.guestOnly && userStore.isAuthenticated) {
     //     // Перенаправляем на домашнюю страницу, если пользователь уже аутентифицирован
@@ -99,6 +106,18 @@ router.beforeEach(async (to) => {
     // }
 })
 router.onError((error) => {
+    const userStore = useUserStore()
+    console.log(userStore.user)
+    const rrr = localStorage.getItem('userData')
+    console.log(rrr)
+
+    if (!userStore.user) {
+        console.log(userStore.clearUserData())
+        // localStorage.removeItem('userData')
+        userStore.clearUserData()
+        return { name: 'Login' }
+    }
+
     console.error('Ошибка роутинга:', error)
 })
 export default router

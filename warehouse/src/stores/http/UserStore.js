@@ -59,10 +59,10 @@ const kyStandard = ky.create({
 })
 export const useUserStore = defineStore('UserStore', {
     state: () => ({
-        user: JSON.parse(localStorage.getItem('userData')) || null,
+        user: JSON.parse(localStorage.getItem('userData')) || null || undefined,
         userUP: null,
-        token_access: localStorage.getItem('token_access') || null,
-        token_refresh: localStorage.getItem('token_refresh') || null,
+        // token_access: localStorage.getItem('token_access') || null,
+        // token_refresh: localStorage.getItem('token_refresh') || null,
         loading: false,
         error: null,
         tempPassword: null,
@@ -80,12 +80,12 @@ export const useUserStore = defineStore('UserStore', {
                 const response = await kyStandard
                     .post('login/', {json: credentials})
                     .json()
-                this.user = response.user
-                this.token_access = response.access
-                this.token_refresh = response.refresh
-                localStorage.setItem('userData', JSON.stringify(this.user))
-                localStorage.setItem('token_access', this.token_access)
-                localStorage.setItem('token_refresh', this.token_refresh)
+                this.user = response
+                // this.token_access = response.access
+                // this.token_refresh = response.refresh
+                localStorage.setItem('userData', JSON.stringify(response))
+                // localStorage.setItem('token_access', JSON.stringify(response.access))
+                // localStorage.setItem('token_refresh', JSON.stringify(response.refresh))
                 return true
             } catch (err) {
                 if (err.response?.status === 401) {
@@ -187,11 +187,7 @@ export const useUserStore = defineStore('UserStore', {
         // },
         clearUserData() {
             this.user = null
-            this.token_access = null
-            this.token_refresh = null
-            let keysToRemove = ['userData', 'token_access', 'token_refresh']
-            keysToRemove.forEach(k =>
-                localStorage.removeItem(k))
+            localStorage.removeItem('userData')
             return true
         },
     }
