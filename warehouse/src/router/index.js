@@ -1,5 +1,7 @@
 import {createRouter, createWebHistory} from 'vue-router'
 import {useUserStore} from "@/stores/http/UserStore.js";
+// import {useLocalStorage} from "@/composables/useLocalStorage.js";
+// import {watch} from "vue";
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -57,57 +59,93 @@ const router = createRouter({
 });
 router.beforeEach(async (to) => {
     const userStore = useUserStore()
-    console.log([!userStore.isAuthenticated, !!to.meta.requiresAuth, to.name !== 'Login', to.fullPath])
-    if (!userStore.isAuthenticated && !!to.meta.requiresAuth && to.name !== 'Login') {
-        return {name: 'Login'}
+
+    // const userData = useLocalStorage('userData', null)
+    //
+    // // userData теперь реактивное и синхронизировано с localStorage
+    // watch(userData, (newValue) => {
+    //     console.log('Данные пользователя изменились:', newValue)
+    //     return { userData }
+    // })
+
+
+
+    // Если маршрут требует аутентификации
+    if (to.meta.requiresAuth) {
+        // Если пользователь не авторизован, сразу на логин
+        if (!userStore.isAuthenticated ) {
+            return { name: 'Login' }
+        }
+
+        try {
+            // Проверяем валидность токенов
+            await userStore.VERIFY(userStore.user.access, userStore.user.refresh)
+
+            // Если верификация не прошла, отправляем на логин
+            // if (!isValid) {
+            //     userStore.clearUserData() // Метод очистки данных пользователя
+            //     return { name: 'Login' }
+            // }
+        } catch (error) {
+            userStore.clearUserData()
+            return { name: 'Login' }
+        }
     }
-    // console.log(JSON.parse(localStorage.getItem('userData')).access)
-// 2. Проверяем, есть ли сохраненные данные пользователя
-//     if (!userStore.token_access) {
-    //В том случае, если в LocalStorage есть данные о пользователе, необходимо их загрузить в Pinia
-    // }
-    // if (!userStore.isAuthenticated && to.name !== 'Login') {
-    //     console.log('Проверка пользователя: Пользователь отсутствует')
-    //     return {name: 'Login'}
-    // }
-    // Проверяем, есть ли сохраненные данные пользователя
-    // if (!userStore.user && localStorage.getItem('userData')) {
-    //     await userStore.loadUserFromLocalStorage()
-    // if (userStore.isAuthenticated) {
-    //     try {
-    //         return await userStore.REQ_VERIFY(userStore.token_access)
-    //     } catch (error) {
-    //         try {
-    //             console.log(userStore.user.refresh)
-    //             await userStore.REQ_REFRESH(userStore.user.refresh)
-    //             return await userStore.REQ_VERIFY(userStore.token_access)
-    //         } catch (error) {
-    //             console.error('Требуется авторизация:', error)
-    //             userStore.clearUserData()
-    //             next({name: 'Login'})
-    //         }
-    //     }
-    // }
-    // }
-    // Проверяем, требует ли маршрут аутентификации
-    // if (!!to.meta.requiresAuth) {
-    //     // Сохраняем целевой маршрут для перенаправления после входа
-    //     return {name: 'Login'}
-    // }
-    // // Проверяем, доступен ли маршрут только для гостей
-    // else if (!!to.meta.guestOnly && userStore.isAuthenticated) {
-    //     // Перенаправляем на домашнюю страницу, если пользователь уже аутентифицирован
-    //     next({name: 'HomeView'})
-    // } else {
-    //     next()
-    // }
+
+    // Если маршрут не требует аутентификации или все проверки пройдены
+    return true
 })
 router.onError((error) => {
-    const userStore = useUserStore()
-    if (!userStore.user) {
-        userStore.clearUserData()
-        return {name: 'Login'}
-    }
     console.error('Ошибка роутинга:', error)
 })
 export default router
+// if (userStore.user?.access) {
+//     try {
+//         // Проверяем access token
+//         try {
+//             await kyVerifyandRefresh
+//                 .post('token/verify/', {json: {token: userStore.user.access}})
+//                 .json()
+//             // Access token валиден, разрешаем переход
+//             return true
+//         } catch {
+//             // Access token невалиден, пробуем refresh
+//             if (userStore.user?.refresh) {
+//                 try {
+//                     const refreshResponse = await kyVerifyandRefresh
+//                         .post('token/refresh/', {json: {refresh: userStore.user.refresh}})
+//                         .json()
+//
+//                     // Обновляем access token
+//                     const userData = JSON.parse(localStorage.getItem('userData'))
+//                     userData.access = refreshResponse.access
+//                     localStorage.setItem('userData', JSON.stringify(userData))
+//                     userStore.user = userData
+//
+//                     // Разрешаем переход с новым access token
+//                     return true
+//                 } catch {
+//                     // Refresh token тоже невалиден
+//                     userStore.clearUserData()
+//                     return { name: 'Login' }
+//                 }
+//             } else {
+//                 // Нет refresh token
+//                 userStore.clearUserData()
+//                 return { name: 'Login' }
+//             }
+//         }
+//     } catch (error) {
+//         // Общая ошибка верификации
+//         userStore.clearUserData()
+//         return { name: 'Login' }
+//     }
+// } else {
+//     // Если нет access token и маршрут требует аутентификации
+//     if (to.meta.requiresAuth) {
+//         return { name: 'Login' }
+//     }
+// }
+//
+// // Разрешаем переход если не требуется аутентификация
+// return true

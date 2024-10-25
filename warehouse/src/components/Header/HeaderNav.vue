@@ -1,6 +1,6 @@
 <template>
   <nav class="header-nav-container">
-    <router-link to="/users"><i class="bi bi-box-seam"></i> Управление складом</router-link>
+    <router-link to="/"><i class="bi bi-box-seam"></i> Управление складом</router-link>
     <router-link to="/">О нас</router-link>
     <router-link to="/">Контакты</router-link>
   </nav>

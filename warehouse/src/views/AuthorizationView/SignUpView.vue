@@ -36,8 +36,8 @@
     <my-input
         v-model="form.email"
         maxlength="50"
-        pattern="@teplomash\.ru"
-        placeholder="email* (example@teplomash.ru)"
+        pattern="^\S+@teplomash.ru"
+        placeholder="email* ___@teplomash.ru"
         required
         size="64"
         title="Пожалуйста, используйте корпоративный адрес почты"
@@ -67,8 +67,8 @@
 import {useUserStore} from "@/stores/http/UserStore.js";
 import MyInput from "@/components/UI/MyInput.vue";
 import MyButton from "@/components/UI/MyButton.vue"
-import router from "@/router/index.js";
-import {ref} from "vue";
+// import router from "@/router/index.js";
+import {computed, ref} from "vue";
 import MySelect from "@/components/UI/MySelect.vue"
 
 const userStore = useUserStore()
@@ -83,18 +83,25 @@ const role_options = [
   {name: 'Грузчик', value: "LOADER"},
   {name: 'Диспетчер', value: "MANAGER"}
 ]
+const username = computed(() => {
+return `${uSurname.value}_${uName.value}_${uMidname.value}`
+})
 const form = ref({
-  username: uSurname.value,
   email: email.value,
   role: role.value,
   password: (repassword.value === password.value) ? password.value : ''
 })
-const handleSignup = async () => {
-  const success = await userStore.SIGNUP(form.value)
-  if (success) {
-    router.push('/')
+const handleSignup = () => {
+  if (form.value.password !== repassword.value) {
+    alert('Пароли не совпадают');
+    return;
   }
-}
+  const signupData = {
+    ...form.value,
+    username: username.value
+  }
+ userStore.SIGNUP(signupData);
+};
 // const isDisabled = () => !(uName.value.length !== 0 && uSurname.value.length !== 0 && uMidname.value.length !== 0 && email.value.length !== 0 && password.value.length !== 0 && repassword.value.length !== 0)
 </script>
 <style scoped>

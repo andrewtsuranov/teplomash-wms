@@ -1,6 +1,8 @@
 import {defineStore} from 'pinia'
 import ky from "ky";
 import {useErrorStore} from "@/stores/error/ErrorStore.js";
+import router from "@/router/index.js";
+import {useLocalStorage} from "@/composables/useLocalStorage.js";
 
 const kyStd = ky.create({
     prefixUrl: 'http://38.180.192.229/api/auth/',
@@ -24,22 +26,31 @@ const kyLogin = kyStd.extend({
 })
 const kySignup = kyStd.extend({
     hooks: {
+        afterResponse: [
+            async (request, options, response) => {
+                if (response.ok) {
+                    return response
+                }
+            }
+        ],
+    }
+})
+const kyVerifyandRefresh = kyStd.extend({
+    hooks: {
         beforeRequest: [
             async (request, options) => {
                 console.log(request)
                 console.log(options)
-            },
+            }
         ],
         afterResponse: [
             async (request, options, response) => {
                 console.log(request)
                 console.log(options)
                 console.log(response)
-                // Get a fresh token
-                // const token = await ky('https://example.com/token').text();
-                // Retry with the token
-                // request.headers.set('Authorization', `token ${token}`);
-                // return ky(request);
+                if (response.ok) {
+                    return response
+                }
             }
         ],
     }
@@ -63,15 +74,17 @@ const kySignup = kyStd.extend({
 //         }
 //     ]
 export const useUserStore = defineStore('userStore', {
-    state: () => ({
-        user: JSON.parse(localStorage.getItem('userData')) || null,
+    state: () => {
+        const userData = useLocalStorage('userData', null)
+        return {
+        user: userData || null,
         userUP: null,
         loading: false,
-        error: null,
         tempPassword: null,
-    }),
+        }
+    },
     getters: {
-        isAuthenticated: (state) => !!state.user
+        isAuthenticated: (state) => !!state.user,
     },
     actions: {
         async LOGIN(credentials) {
@@ -82,7 +95,6 @@ export const useUserStore = defineStore('userStore', {
                 const response = await kyLogin
                     .post('login/', {json: credentials})
                     .json()
-                this.user = response
                 localStorage.setItem('userData', JSON.stringify(response))
                 return true
             } catch (err) {
@@ -107,12 +119,19 @@ export const useUserStore = defineStore('userStore', {
             this.loading = true;
             errorStore.clearError();
             try {
-                const response = await kySignup
+                const registerResponse = await kySignup
                     .post('register/', {json: userData})
                     .json()
-                console.log(response)
-                // this.tempPassword = response.password
-                return true;
+                console.log('Registration successful:', registerResponse)
+                const loginCredentials = {
+                    email: userData.email,
+                    password: userData.password
+                }
+                const loginSuccess = await this.LOGIN(loginCredentials)
+                if (loginSuccess) {
+                    router.push('/')
+                    return true
+                }
             } catch (err) {
                 this.error = err.message
                 throw err;
@@ -142,40 +161,40 @@ export const useUserStore = defineStore('userStore', {
         //         this.tempPassword = null
         //     }
         // },
-        // async REQ_VERIFY(token) {
-        //     this.loading = true;
-        //     this.error = null;
-        //     try {
-        //         const response = await api
-        //             .post('token/verify/', {json: token})
-        //         console.log(response)
-        //         return response
-        //     } catch (err) {
-        //         this.error = err.message
-        //         await this.clearUserData()
-        //         throw err;
-        //     } finally {
-        //         this.loading = false
-        //     }
-        // },
-        // async REQ_REFRESH(refresh) {
-        //     this.loading = true;
-        //     this.error = null;
-        //     try {
-        //         const response = await api
-        //             .post('token/refresh/', {json: {refresh}})
-        //             .json()
-        //         console.log(response.access)
-        //         this.token_access = response.access
-        //         return response
-        //     } catch (err) {
-        //         this.error = err.message
-        //         await this.clearUserData()
-        //         throw err;
-        //     } finally {
-        //         this.loading = false
-        //     }
-        // },
+        async VERIFY(token_access, token_refresh) {
+            this.loading = true;
+            this.error = null;
+            try {
+                // Проверяем access token
+                try {
+                    await kyVerifyandRefresh
+                        .post('token/verify/', {json: {token: token_access}})
+                        .json()
+                    return true
+                } catch {
+                    // Если access token невалидный, пробуем refresh
+                    try {
+                        const refreshResponse = await kyVerifyandRefresh
+                            .post('token/refresh/', {json: {refresh: token_refresh}})
+                            .json()
+
+                        // Обновляем access token в userData в localStorage
+                        const userData = JSON.parse(localStorage.getItem('userData'))
+                        userData.access = refreshResponse.access
+                        localStorage.setItem('userData', JSON.stringify(userData))
+                        return true
+                    } catch {
+                        // Если refresh тоже не работает
+                        return false
+                    }
+                }
+            } catch (err) {
+                this.error = err.message
+                return false
+            } finally {
+                this.loading = false
+            }
+        },
         // setUserToLocalStorage(user) {
         //     this.user = user;
         //     localStorage.setItem('userData', JSON.stringify(user))
