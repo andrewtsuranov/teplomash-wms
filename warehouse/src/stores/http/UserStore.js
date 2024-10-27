@@ -1,9 +1,11 @@
+import {useErrorStore} from "@/stores/error/ErrorStore.js"
+import {useRouter} from "vue-router";
 import {defineStore} from 'pinia'
-import ky from "ky";
-import {useErrorStore} from "@/stores/error/ErrorStore.js";
-import router from "@/router/index.js";
-import {useLocalStorage} from "@/composables/useLocalStorage.js";
+import ky from "ky"
+import {ref, computed} from "vue"
 
+const router = useRouter()
+const errorState = useErrorStore
 const kyStd = ky.create({
     prefixUrl: 'http://38.180.192.229/api/auth/',
     // prefixUrl: 'http://lab:8080/api/auth/',
@@ -37,17 +39,8 @@ const kySignup = kyStd.extend({
 })
 const kyVerifyandRefresh = kyStd.extend({
     hooks: {
-        beforeRequest: [
-            async (request, options) => {
-                console.log(request)
-                console.log(options)
-            }
-        ],
         afterResponse: [
             async (request, options, response) => {
-                console.log(request)
-                console.log(options)
-                console.log(response)
                 if (response.ok) {
                     return response
                 }
@@ -55,158 +48,156 @@ const kyVerifyandRefresh = kyStd.extend({
         ],
     }
 })
-//     afterResponse: [
-//         (_request, _options, response) => {
-//             // You could do something with the response, for example, logging.
-//             console.log(response)
-//             // Or return a `Response` instance to overwrite the response.
-//             return new Response('A different response', {status: 200});
-//         },
-//         // Or retry with a fresh token on a 403 error
-//         async (request, options, response) => {
-//             if (response.status === 403) {
-//                 // Get a fresh token
-//                 const token = await ky('https://example.com/token').text();
-//                 // Retry with the token
-//                 request.headers.set('Authorization', `token ${token}`);
-//                 return ky(request);
-//             }
-//         }
-//     ]
-export const useUserStore = defineStore('userStore', {
-    state: () => {
-        const userData = useLocalStorage('userData', null)
+export const useUserStore = defineStore('userStore', () => {
+    const errorStore = useErrorStore()
+//state
+    const user = ref(JSON.parse(localStorage.getItem('userData')) || null)
+    const loading = ref(false)
+    const tempPassword = ref(null)
+    // const userUP = ref(null)
+//getters
+    const isAuthenticated = computed(() => !!user.value)
+    const getFullNameUser = computed(() => {
+        const [lastName, firstName, middlename] = user.value.user.username.split('_')
         return {
-        user: userData || null,
-        userUP: null,
-        loading: false,
-        tempPassword: null,
+            lastName,
+            firstName,
+            middlename,
+            initials: `${firstName[0]}.${middlename[0]}.`
         }
-    },
-    getters: {
-        isAuthenticated: (state) => !!state.user,
-    },
-    actions: {
-        async LOGIN(credentials) {
-            const errorStore = useErrorStore()
-            this.loading = true;
-            errorStore.clearError();
-            try {
-                const response = await kyLogin
-                    .post('login/', {json: credentials})
-                    .json()
-                localStorage.setItem('userData', JSON.stringify(response))
+    })
+    const roleUser = computed(() => {
+        return user.value.user.role
+    })
+
+//actions
+    async function LOGIN(credentials) {
+        loading.value = true;
+        errorStore.clearError();
+        try {
+            const response = await kyLogin
+                .post('login/', {json: credentials})
+                .json()
+            user.value = response
+            localStorage.setItem('userData', JSON.stringify(response))
+            return true
+        } catch (err) {
+            if (err.response?.status === 401) {
+                errorStore.setError({
+                    status: err.response?.status,
+                    message: 'Ошибка авторизации! Проверьте правильность введённых данных или зарегистрируйтесь!'
+                })
+            } else {
+                errorStore.setError({
+                    status: err.response?.status || 500,
+                    message: 'Ошибка авторизации! Произошла ошибка при загрузке данных, попробуйте позже!'
+                })
+            }
+            throw err
+        } finally {
+            loading.value = false
+        }
+    }
+
+    async function SIGNUP(userData) {
+        const errorStore = useErrorStore()
+        loading.value = true;
+        errorStore.clearError();
+        try {
+            const registerResponse = await kySignup
+                .post('register/', {json: userData})
+                .json()
+            console.log('Registration successful:', registerResponse)
+            const loginCredentials = {
+                email: userData.email,
+                password: userData.password
+            }
+            const loginSuccess = await LOGIN(loginCredentials)
+            if (loginSuccess) {
+                router.push('/')
                 return true
-            } catch (err) {
-                if (err.response?.status === 401) {
-                    errorStore.setError({
-                        status: err.response?.status,
-                        message: 'Ошибка авторизации! Пользователь не авторизован, требуется регистрация'
-                    })
-                } else {
-                    errorStore.setError({
-                        status: err.response?.status || 500,
-                        message: 'Ошибка авторизации! Произошла ошибка при загрузке данных!'
-                    })
-                }
-                throw err
-            } finally {
-                this.loading = false
             }
-        },
-        async SIGNUP(userData) {
-            const errorStore = useErrorStore()
-            this.loading = true;
-            errorStore.clearError();
+        } catch (err) {
+            errorState.error = err.message
+            throw err;
+        } finally {
+            loading.value = false
+        }
+    }
+
+    // async REQ_CONFIRM(activation_code) {
+    //     try {
+    //         const email = userUP.value.email || JSON.parse(localStorage.getItem('userUP')).email || '{}'
+    //         const response = await api
+    //             .post('activate/', {json: {activation_code, email}})
+    //             .json()
+    //         if (response.message) {
+    //             if (tempPassword.value) {
+    //                 await LOGIN(email, tempPassword.value)
+    //             } else {
+    //                 errorState.error = "Не удалось выполнить автоматический вход. Пожалуйста, войдите вручную."
+    //             }
+    //         }
+    //         return response
+    //     } catch (err) {
+    //         errorState.error = err.message
+    //         throw err;
+    //     } finally {
+    //         loading.value = false
+    //         tempPassword.value = null
+    //     }
+    // },
+    async function VERIFY(token_access, token_refresh) {
+        loading.value = true;
+        errorState.error = null;
+        try {
+            // Проверяем access token
             try {
-                const registerResponse = await kySignup
-                    .post('register/', {json: userData})
+                await kyVerifyandRefresh
+                    .post('token/verify/', {json: {token: token_access}})
                     .json()
-                console.log('Registration successful:', registerResponse)
-                const loginCredentials = {
-                    email: userData.email,
-                    password: userData.password
-                }
-                const loginSuccess = await this.LOGIN(loginCredentials)
-                if (loginSuccess) {
-                    router.push('/')
-                    return true
-                }
-            } catch (err) {
-                this.error = err.message
-                throw err;
-            } finally {
-                this.loading = false
-            }
-        },
-        // async REQ_CONFIRM(activation_code) {
-        //     try {
-        //         const email = this.userUP.email || JSON.parse(localStorage.getItem('userUP')).email || '{}'
-        //         const response = await api
-        //             .post('activate/', {json: {activation_code, email}})
-        //             .json()
-        //         if (response.message) {
-        //             if (this.tempPassword) {
-        //                 await this.REQ_LOGIN(email, this.tempPassword)
-        //             } else {
-        //                 this.error = "Не удалось выполнить автоматический вход. Пожалуйста, войдите вручную."
-        //             }
-        //         }
-        //         return response
-        //     } catch (err) {
-        //         this.error = err.message
-        //         throw err;
-        //     } finally {
-        //         this.loading = false
-        //         this.tempPassword = null
-        //     }
-        // },
-        async VERIFY(token_access, token_refresh) {
-            this.loading = true;
-            this.error = null;
-            try {
-                // Проверяем access token
+                return true
+            } catch {
+                // Если access token невалидный, пробуем refresh
                 try {
-                    await kyVerifyandRefresh
-                        .post('token/verify/', {json: {token: token_access}})
+                    const refreshResponse = await kyVerifyandRefresh
+                        .post('token/refresh/', {json: {refresh: token_refresh}})
                         .json()
+                    // Обновляем access token в userData в localStorage
+                    const userData = JSON.parse(localStorage.getItem('userData'))
+                    userData.access = refreshResponse.access
+                    localStorage.setItem('userData', JSON.stringify(userData))
                     return true
                 } catch {
-                    // Если access token невалидный, пробуем refresh
-                    try {
-                        const refreshResponse = await kyVerifyandRefresh
-                            .post('token/refresh/', {json: {refresh: token_refresh}})
-                            .json()
-
-                        // Обновляем access token в userData в localStorage
-                        const userData = JSON.parse(localStorage.getItem('userData'))
-                        userData.access = refreshResponse.access
-                        localStorage.setItem('userData', JSON.stringify(userData))
-                        return true
-                    } catch {
-                        // Если refresh тоже не работает
-                        return false
-                    }
+                    // Если refresh тоже не работает
+                    return false
                 }
-            } catch (err) {
-                this.error = err.message
-                return false
-            } finally {
-                this.loading = false
             }
-        },
-        // setUserToLocalStorage(user) {
-        //     this.user = user;
-        //     localStorage.setItem('userData', JSON.stringify(user))
-        // },
-        // setUserUP(user) {
-        //     this.userUP = user;
-        //     localStorage.setItem('userUP', JSON.stringify(user))
-        // },
-        clearUserData() {
-            this.user = null
-            localStorage.removeItem('userData')
-            return true
-        },
+            // eslint-disable-next-line no-unreachable
+        } catch (err) {
+            errorState.error = err.message
+            return false
+        } finally {
+            loading.value = false
+        }
+    }
+
+    function clearUserData() {
+        user.value = null
+        localStorage.removeItem('userData')
+        return true
+    }
+
+    return {
+        user,
+        loading,
+        tempPassword,
+        isAuthenticated,
+        LOGIN,
+        SIGNUP,
+        VERIFY,
+        clearUserData,
+        getFullNameUser,
+        roleUser,
     }
 })

@@ -3,7 +3,7 @@
     <header class="home-layout-header">
       <header-view/>
     </header>
-<!--    <div v-if="userStore.loading">Loading...</div>-->
+    <!--    <div v-if="userStore.loading">Loading...</div>-->
     <main class="home-layout-main">
       <RouterView/>
     </main>
@@ -19,10 +19,7 @@ import HeaderView from "@/views/HeaderView.vue";
   display: grid;
   grid: "homeHeader"
         "homeMain";
-
   grid-template-rows: auto 1fr;
-  row-gap: 50px;
-
 }
 
 .home-layout-header {
@@ -35,5 +32,4 @@ import HeaderView from "@/views/HeaderView.vue";
 .home-layout-main {
   grid-area: homeMain;
 }
-
 </style>

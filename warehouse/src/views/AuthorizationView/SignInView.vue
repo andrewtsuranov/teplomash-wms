@@ -30,7 +30,7 @@
       >{{ loading ? 'Обработка...' : 'Вход' }}
       </my-button>
       <my-button form="" @click="handleSignup">
-        Зарегистрироваться
+        Регистрация
       </my-button>
     </div>
   </form>
@@ -59,10 +59,8 @@ const handleLogin = async () => {
   }
 }
 const handleSignup = async () => {
-  console.log('123')
   router.push({name: 'Signup'})
 }
-// const isDisabled = () => !(form.email.length !== 0 && password.value.length !== 0)
 </script>
 <style scoped>
 .sign-in-container {

@@ -1,8 +1,8 @@
 <template>
   <nav class="header-nav-container">
     <router-link to="/"><i class="bi bi-box-seam"></i> Управление складом</router-link>
-    <router-link to="/">О нас</router-link>
-    <router-link to="/">Контакты</router-link>
+    <router-link to="/about">О нас</router-link>
+    <router-link to="/contact">Контакты</router-link>
   </nav>
 </template>
 <script setup>
@@ -14,9 +14,7 @@
   column-gap: 10px;
   align-items: center;
   justify-items: center;
-
 }
-
 
 nav a {
   color: blanchedalmond;
@@ -25,7 +23,7 @@ nav a {
 
 nav .teplomash-active-exact-link {
   /*background-color: rgba(255, 255, 255, 0.1);*/
-  color: violet;
+  color: chocolate;
 }
 
 i {
