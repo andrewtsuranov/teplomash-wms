@@ -1,26 +1,24 @@
 <template>
   <div class="general-page-container">
-    <div class="wms-input">
+    <div class="wms-input" @click="router.push({name: 'WMSAccept'})">
       Приёмка
     </div>
-    <div class="wms-output">
+    <div class="wms-output" @click="router.push({name: 'WMSShip'})">
       Отгрузка
     </div>
   </div>
 </template>
 <script setup>
+import {useRouter} from "vue-router";
+const router = useRouter()
 </script>
 <style scoped>
 .general-page-container {
   display: grid;
   overflow: hidden;
   grid-template-columns: 1fr;
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 0 20px 0 20px;
   justify-items: center;
   gap: 5rem;
-  align-content: center;
 }
 
 .wms-input {
@@ -45,5 +43,17 @@
 
 .wms-output:hover {
   background-color: #42b983;
+}
+
+@media (max-width: 1024px) {
+  .general-page-container {
+    display: grid;
+    row-gap: 2rem;
+  }
+  .wms-input, .wms-output {
+    font-size: 2rem;
+    padding: 10px 50px;
+  }
+
 }
 </style>

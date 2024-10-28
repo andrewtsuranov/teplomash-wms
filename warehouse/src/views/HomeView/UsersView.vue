@@ -1,8 +1,10 @@
 <template>
-  <w-s-connection/>
+ <div>
+   <h1>Здесь будет список пользователей онлайн</h1>
+ </div>
 </template>
 <script setup>
-import WSConnection from "@/components/Users/WebSocket/WSConnection.vue";
+
 </script>
 <style scoped>
 </style>

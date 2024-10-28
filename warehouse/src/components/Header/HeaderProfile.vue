@@ -5,9 +5,9 @@
                bg-variant="secondary"
                class="btn btn-secondary"
                data-bs-toggle="dropdown"
-               text="AП"
+               :text= userData.initials
                text-variant=""
-               size="3rem"
+               size="2.7rem"
       />
       <div class="dropdown-menu dropdown-menu-dark">
         <div class="header-profile-dropdown">

@@ -39,6 +39,16 @@ const router = createRouter({
                     component: () => import('@/views/HomeView/HomeView.vue'),
                 },
                 {
+                    name: 'WMSAccept',
+                    path: 'wms/acceptance',
+                    component: () => import('@/views/HomeView/WMSView/AcceptanceView.vue'),
+                },
+                {
+                    name: 'WMSShip',
+                    path: 'wms/shipment',
+                    component: () => import('@/views/HomeView/WMSView/ShipmentView.vue'),
+                },
+                {
                     name: 'Profile',
                     path: 'profile',
                     component: () => import('@/views/HomeView/ProfileView.vue'),

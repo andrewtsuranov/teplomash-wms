@@ -4,7 +4,6 @@
     <my-input
         v-model="form.email"
         maxlength="50"
-        pattern=".+@teplomash\.ru"
         placeholder="Введите email..."
         required
         :disabled="loading"

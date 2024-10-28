@@ -4,7 +4,7 @@
       <span>&copy; 2024 &mdash; {{ yearNow }} Тепломаш&reg; warehouse management system.</span>
     </div>
     <div class="footer-about">
-      <span>Адресная система хранения складом Тепломаш&reg;.</span>
+      <span>Система управления складом Тепломаш&reg; с адресным хранением.</span>
     </div>
     <div class="footer-support">
       Поддержка: team@teplomash.ru
