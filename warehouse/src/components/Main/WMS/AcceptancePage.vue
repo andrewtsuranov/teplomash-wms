@@ -9,11 +9,10 @@
         </p>
         <p v-if="webSocketStore.reconnectError" class="error">Ошибка соединения:</p>
         <p v-if="webSocketStore.error" class="error">{{ webSocketStore.error }}</p>
-        <div v-if="webSocketStore.reconnectAttempts > 0"
-             class="wsSetting-panel-reconnected"
-        >Попыток соединения:
-          <p class="reconnected-count">{{ webSocketStore.reconnectAttempts }}</p>
-        </div>
+        <p v-if="webSocketStore.reconnectAttempts > 0" class="wsSetting-panel-reconnected">Попыток соединения:</p>
+        <p v-if="webSocketStore.reconnectAttempts > 0" class="reconnected-count">
+          {{ webSocketStore.reconnectAttempts }}
+        </p>
         <p v-if="webSocketStore.isConnected">Пользователи в сети:</p>
         <p v-if="webSocketStore.isConnected" class="online-users-count">{{ webSocketStore.onlineUsersCount }}</p>
       </div>
@@ -31,7 +30,7 @@
     <div class="wsChat">
       <div v-if="webSocketStore.lastMessage" class="wsChat-field">
         <h3>Последнее обновление:</h3>
-        <pre>{{ webSocketStore.lastMessage }}</pre>
+        <div>{{ webSocketStore.lastMessage }}</div>
       </div>
       <div class="input-group mb-3">
         <input v-model="wsMessage"
@@ -71,25 +70,19 @@ const wsMessage = ref()
   grid-template-areas:
       "title title"
       "settings chat";
-
   /*margin: 0 60px;*/
-
   grid-template-columns: 1fr 1fr;
   row-gap: 30px;
-
-
 }
 
 .ws-title {
   grid-area: title;
-
 }
-
 
 .wsSettings {
   grid-area: settings;
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: minmax(300px, 1fr);
   row-gap: 10px;
   grid-auto-rows: min-content;
 }
@@ -97,12 +90,13 @@ const wsMessage = ref()
 .wsChat {
   grid-area: chat;
   display: grid;
+  grid-template-columns: minmax(300px, 1fr);
   row-gap: 20px;
 }
 
 .wsSetting-panel-isConnected {
   display: grid;
-  grid-template-columns: max-content max-content;
+  grid-template-columns: max-content minmax(min-content, 1fr);
   column-gap: 30px;
   grid-auto-rows: minmax(40px, auto);
   font-weight: bold;
@@ -110,10 +104,10 @@ const wsMessage = ref()
 }
 
 .wsSetting-panel-reconnected {
-  display: grid;
-  grid-column: span 2;
-  column-gap: 20px;
-  grid-template-columns: 190px 1fr;
+  /*display: grid;*/
+  /*grid-column: span 2;*/
+  /*column-gap: 20px;*/
+  /*grid-template-columns: 190px 1fr;*/
 }
 
 .wsSettings-panel-online {
@@ -141,7 +135,6 @@ const wsMessage = ref()
   margin-right: 10px;
 }
 
-
 .status {
   font-weight: bold;
   font-size: 1.1rem;
@@ -164,16 +157,11 @@ const wsMessage = ref()
 .wsChat-field {
   display: grid;
   padding: 20px;
-  grid-auto-rows: min-content minmax(300px, auto);
+  grid-template-rows: min-content minmax(300px, auto);
   border: 1px solid blanchedalmond;
-  border-radius: 10px
-}
-
-pre {
-  /*background-color: #f4f4f4;*/
-  /*border-radius: 4px;*/
-  overflow-x: auto;
+  border-radius: 10px;
   font-size: 1.2rem;
+  overflow-y: auto;
 }
 
 @media (max-width: 1024px) {

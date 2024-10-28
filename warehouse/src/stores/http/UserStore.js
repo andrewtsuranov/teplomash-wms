@@ -7,8 +7,8 @@ import {ref, computed} from "vue"
 const router = useRouter()
 const errorState = useErrorStore
 const kyStd = ky.create({
-    // prefixUrl: 'http://38.180.192.229/api/auth/',
-    prefixUrl: 'http://lab:8080/api/auth/',
+    prefixUrl: 'http://38.180.192.229/api/auth/',
+    // prefixUrl: 'http://lab:8080/api/auth/',
     retry: 0,
 })
 const kyLogin = kyStd.extend({
@@ -69,7 +69,7 @@ export const useUserStore = defineStore('userStore', () => {
     const roleUser = computed(() => {
         return user.value.user.role
     })
-        const getTokenAccess = computed(()=> user.value.access)
+    const getTokenAccess = computed(() => user.value.access)
 
 //actions
     async function LOGIN(credentials) {

@@ -1,8 +1,8 @@
 <template>
   <nav class="header-nav-container">
-    <router-link to="/"><i class="bi bi-box-seam"></i> Управление складом</router-link>
-    <router-link to="/about">О нас</router-link>
-    <router-link to="/contact">Контакты</router-link>
+    <router-link to="/"><i class="icon-header-wms bi bi-box-seam"></i> Управление складом</router-link>
+    <router-link to="/info">Справка</router-link>
+    <router-link to="/support">Поддержка</router-link>
   </nav>
 </template>
 <script setup>
@@ -19,10 +19,10 @@
 nav a {
   color: blanchedalmond;
   text-decoration: none;
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
 nav .teplomash-active-exact-link {
-  /*background-color: rgba(255, 255, 255, 0.1);*/
   color: chocolate;
 }
 
@@ -33,8 +33,22 @@ i {
 @media (max-width: 1024px) {
   .header-nav-container {
     grid-template-columns: 1fr;
-    row-gap: 10px;
-    justify-items: center;
+    grid-auto-rows: minmax(3rem, max-content);
+    row-gap: 0.5rem;
+    justify-items: stretch;
+    align-items: stretch;
+    text-transform: uppercase;
+    font-size: 1.3rem;
+    font-weight: bold;
+  }
+
+  nav a {
+    display: grid;
+    place-items: center;
+  }
+
+  .icon-header-wms {
+    display: none;
   }
 }
 </style>

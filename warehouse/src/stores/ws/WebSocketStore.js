@@ -23,8 +23,8 @@ export const useWebSocketStore = defineStore('websocket', () => {
 
 //Actions
     function initWebSocket() {
-        const wsUrl = `ws://lab:8081/ws/inventory/?token=${userStore.getTokenAccess}`
-        // const wsUrl = `ws://38.180.192.229/ws/inventory/?token=${userStore.getTokenAccess}`
+        // const wsUrl = `ws://lab:8081/ws/inventory/?token=${userStore.getTokenAccess}`
+        const wsUrl = `ws://38.180.192.229/ws/inventory/?token=${userStore.getTokenAccess}`
         socket.value = new WebSocket(wsUrl)
         socket.value.onopen = onOpen.bind(this)
         socket.value.onclose = onClose.bind(this)
@@ -68,7 +68,7 @@ export const useWebSocketStore = defineStore('websocket', () => {
             // console.log('Received message:', message.value)
             // Если получен ping в формате JSON
             if (data.type === 'ping') {
-               return sendPong()
+                return sendPong()
             }
             // Обработка других типов сообщений
             if (data.type === 'online_users') {
@@ -79,14 +79,16 @@ export const useWebSocketStore = defineStore('websocket', () => {
             error.value = 'error parsing WebSocket message'
         }
     }
+
     function sendPong() {
         if (isConnected.value && socket.value?.readyState === WebSocket.OPEN) {
             // Отправляем pong в том же формате, в котором получили ping
-            socket.value.send(JSON.stringify({ type: 'pong' }))
+            socket.value.send(JSON.stringify({type: 'pong'}))
             lastPongTime.value = Date.now()
             // console.log('Pong sent')
         }
     }
+
     function onError(error) {
         console.error('WebSocket error:', error)
         error.value = 'WebSocket error occurred'

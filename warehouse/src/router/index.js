@@ -62,14 +62,14 @@ const router = createRouter({
                     component: () => import('@/views/HomeView/UsersView.vue')
                 },
                 {
-                    name: 'About',
-                    path: 'about/',
-                    component: () => import('@/views/HomeView/AboutView.vue')
+                    name: 'Info',
+                    path: 'info/',
+                    component: () => import('@/views/HomeView/InfoView.vue')
                 },
                 {
-                    name: 'Contact',
-                    path: 'contact/',
-                    component: () => import('@/views/HomeView/ContactView.vue')
+                    name: 'Support',
+                    path: 'support/',
+                    component: () => import('@/views/HomeView/SupportView.vue')
                 },
             ]
         },

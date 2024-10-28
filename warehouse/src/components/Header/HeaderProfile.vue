@@ -1,11 +1,15 @@
 <template>
   <div class="header-profile-container">
-    <div class="dropdown">
+    <div class="dropdown d-grid">
+      <div class="avatar-desktop" data-bs-toggle="dropdown">Профиль: {{ userData.lastName }} {{
+          userData.initials
+        }}
+      </div>
       <BAvatar aria-expanded="false"
                bg-variant="secondary"
-               class="btn btn-secondary"
+               class="btn btn-secondary avatar-mobile"
                data-bs-toggle="dropdown"
-               :text= userData.initials
+               :text=userData.initials
                text-variant=""
                size="2.7rem"
       />
@@ -52,6 +56,10 @@ const logout = () => {
   row-gap: 10px;
 }
 
+.avatar-desktop {
+  display: none;
+}
+
 .logout-btn {
   border-top: 1px solid grey;
 }
@@ -68,5 +76,15 @@ nav.teplomash-active-exact-link {
 
 i {
   font-size: 1.3rem;
+}
+
+@media (max-width: 1024px) {
+  .avatar-mobile {
+    display: none;
+  }
+
+  .avatar-desktop {
+    display: block;
+  }
 }
 </style>

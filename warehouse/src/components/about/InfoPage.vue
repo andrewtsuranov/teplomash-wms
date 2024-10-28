@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1>Here is gonna be about page</h1>
+    <h1>Here is gonna be Info page</h1>
   </div>
 </template>
 <script setup>
