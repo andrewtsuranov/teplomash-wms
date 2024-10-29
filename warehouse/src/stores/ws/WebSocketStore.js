@@ -16,10 +16,12 @@ export const useWebSocketStore = defineStore('websocket', () => {
     const reconnectDelay = ref(3000)
     const onlineUsers = ref(0)
     const lastPongTime = ref(null)
+    const userConnect = ref([])
 //Getters
     const lastMessage = computed(() => message.value)
     const connectionStatus = computed(() => isConnected.value ? 'В сети' : 'Не в сети')
     const onlineUsersCount = computed(() => onlineUsers.value)
+    const onlineDeviceId = computed(() => userConnect.value)
 
 //Actions
     function initWebSocket() {
@@ -65,7 +67,6 @@ export const useWebSocketStore = defineStore('websocket', () => {
             // Обработка обычных JSON сообщений
             const data = JSON.parse(event.data)
             message.value = data
-            // console.log('Received message:', message.value)
             // Если получен ping в формате JSON
             if (data.type === 'ping') {
                 return sendPong()
@@ -73,7 +74,9 @@ export const useWebSocketStore = defineStore('websocket', () => {
             // Обработка других типов сообщений
             if (data.type === 'online_users') {
                 onlineUsers.value = data.users.length
+                userConnect.value = data.users
             }
+
         } catch (e) {
             console.error('error parsing WebSocket message:', e)
             error.value = 'error parsing WebSocket message'
@@ -173,11 +176,13 @@ export const useWebSocketStore = defineStore('websocket', () => {
         maxReconnectAttempts,
         reconnectDelay,
         onlineUsers,
+        userConnect,
 //getters
         lastMessage,
         connectionStatus,
         onlineUsersCount,
         lastPongTime,
+        onlineDeviceId,
 //actions
         initWebSocket,
         onOpen,

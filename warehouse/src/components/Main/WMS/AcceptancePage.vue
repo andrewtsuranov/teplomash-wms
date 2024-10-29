@@ -27,25 +27,64 @@
         </my-button>
       </div>
     </div>
-    <div class="wsChat">
-      <div v-if="webSocketStore.lastMessage" class="wsChat-field">
-        <h3>Последнее обновление:</h3>
-        <div>{{ webSocketStore.lastMessage }}</div>
+    <div class="active-device">
+      <label v-if="webSocketStore.isConnected">Активные ТСД:</label>
+      <label v-else style="color: gray">Нет активных ТСД</label>
+      <div v-for="device in webSocketStore.onlineDeviceId"
+           class="wsChat-active-device-item"
+      >
+        <span class="item-name-TSD">ТСД № {{ device.id || 'Нет подключённых ТСД' }} ({{ device.email }})</span>
       </div>
-      <div class="input-group mb-3">
-        <input v-model="wsMessage"
-               aria-describedby="button-addon2"
-               aria-label="Recipient's username"
-               class="form-control"
-               placeholder="Отправить сообщение..."
-               type="text"
-        >
-        <button id="button-addon2"
-                class="btn btn-outline-success"
-                type="button"
-                @click="webSocketStore.sendMessage(wsMessage, 4)"
-        >Отправить
-        </button>
+      <div v-for="device in webSocketStore.onlineDeviceId"
+           class="wsChat-active-device-item"
+      >
+        <span class="item-name-TSD">ТСД № {{ device.id || 'Нет подключённых ТСД' }} ({{ device.email }})</span>
+      </div>
+      <div v-for="device in webSocketStore.onlineDeviceId"
+           class="wsChat-active-device-item"
+      >
+        <span class="item-name-TSD">ТСД № {{ device.id || 'Нет подключённых ТСД' }} ({{ device.email }})</span>
+      </div>
+      <div v-for="device in webSocketStore.onlineDeviceId"
+           class="wsChat-active-device-item"
+      >
+        <span class="item-name-TSD">ТСД № {{ device.id || 'Нет подключённых ТСД' }} ({{ device.email }})</span>
+      </div>
+      <div v-for="device in webSocketStore.onlineDeviceId"
+           class="wsChat-active-device-item"
+      >
+        <span class="item-name-TSD">ТСД № {{ device.id || 'Нет подключённых ТСД' }} ({{ device.email }})</span>
+      </div>
+      <div v-for="device in webSocketStore.onlineDeviceId"
+           class="wsChat-active-device-item"
+      >
+        <span class="item-name-TSD">ТСД № {{ device.id || 'Нет подключённых ТСД' }} ({{ device.email }})</span>
+      </div>
+    </div>
+    <div class="wsChat">
+      <div class="wsChat-active-device-field">Chosen active device</div>
+      <div class="wsChat-field">
+        <div v-if="webSocketStore.lastMessage">
+          <h3>Последнее обновление:</h3>
+          <div>{{ webSocketStore.lastMessage }}</div>
+        </div>
+      </div>
+      <div class="wsChat-send-message">
+        <div class=" input-group">
+          <input v-model="wsMessage"
+                 aria-describedby="button-addon2"
+                 aria-label="Recipient's username"
+                 class="form-control"
+                 placeholder="Отправить сообщение..."
+                 type="text"
+          >
+          <button id="button-addon2"
+                  class="btn btn-outline-success"
+                  type="button"
+                  @click="webSocketStore.sendMessage(wsMessage, 4)"
+          >Отправить
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -68,11 +107,12 @@ const wsMessage = ref()
 .wsConnection-container {
   display: grid;
   grid-template-areas:
-      "title title"
-      "settings chat";
+      "title title title"
+      "settings active chat";
   /*margin: 0 60px;*/
-  grid-template-columns: 1fr 1fr;
-  row-gap: 30px;
+  grid-template-columns: max-content max-content max-content;
+  justify-self: center;
+  gap: 2rem;
 }
 
 .ws-title {
@@ -84,14 +124,56 @@ const wsMessage = ref()
   display: grid;
   grid-template-columns: minmax(300px, 1fr);
   row-gap: 10px;
-  grid-auto-rows: min-content;
+  /*grid-auto-rows: min-content;*/
 }
 
 .wsChat {
   grid-area: chat;
   display: grid;
-  grid-template-columns: minmax(300px, 1fr);
-  row-gap: 20px;
+  /*grid-template-rows: minmax(auto, 33.1rem);*/
+  grid-template-columns: minmax(min-content, 25rem);
+  grid-template-rows: min-content 1fr min-content;
+  column-gap: 50px;
+  /*align-items: start;*/
+  overflow-y: auto;
+}
+
+.active-device {
+  grid-area: active;
+  display: grid;
+  grid-auto-rows: minmax(3rem, max-content);
+  border: 1px solid #605039e0;
+  background-color: #2623238f;
+  border-radius: 10px;
+  font-size: 1.2rem;
+}
+
+.wsChat-active-field {
+
+}
+
+.wsChat-active-device-item {
+  display: grid;
+  border-bottom: 1px solid #605039e0;
+  align-items: center;
+  background-color: #0000004a;
+
+
+}
+
+.wsChat-active-device-item:first-of-type {
+  border-top: 1px solid #605039e0;
+}
+
+.wsChat-active-device-item:hover {
+  cursor: pointer;
+  background-color: #4CAF50;
+}
+
+.item-name-TSD {
+  padding: 0 1rem;
+  font-size: 1rem;
+  color: #ffffffbf;
 }
 
 .wsSetting-panel-isConnected {
@@ -110,11 +192,6 @@ const wsMessage = ref()
   /*grid-template-columns: 190px 1fr;*/
 }
 
-.wsSettings-panel-online {
-  /*display: grid;*/
-  /*grid-template-columns: 190px 1fr;*/
-  /*column-gap: 20px;*/
-}
 
 .online-users-count {
   font-size: 1.1rem;
@@ -135,13 +212,22 @@ const wsMessage = ref()
   margin-right: 10px;
 }
 
+label {
+  display: grid;
+  align-items: center;
+  color: #4CAF50;
+  font-weight: bold;
+  padding: 0 1rem;
+  /*text-align: center;*/
+}
+
 .status {
   font-weight: bold;
   font-size: 1.1rem;
 }
 
 .status.connected {
-  color: green;
+  color: #4CAF50;
 }
 
 .status.disconnected {
@@ -156,8 +242,7 @@ const wsMessage = ref()
 
 .wsChat-field {
   display: grid;
-  padding: 20px;
-  grid-template-rows: min-content minmax(300px, auto);
+  grid-template-rows: max-content minmax(20rem, auto) min-content;
   border: 1px solid blanchedalmond;
   border-radius: 10px;
   font-size: 1.2rem;
@@ -170,6 +255,7 @@ const wsMessage = ref()
     grid-template-areas:
       "title"
       "settings"
+      "active"
       "chat";
     /*column-gap: 20px;*/
     grid-template-columns: 1fr;

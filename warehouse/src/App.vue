@@ -3,12 +3,12 @@
     <main class="app-main">
       <RouterView/>
     </main>
-    <footer-main-view class="footer"/>
+    <footer-view class="footer"/>
   </div>
 </template>
 <script setup>
 import {RouterView} from 'vue-router'
-import FooterMainView from "@/views/FooterMainView.vue";
+import FooterView from "@/views/FooterView.vue";
 </script>
 <style scoped>
 .app-container {

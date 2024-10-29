@@ -19,16 +19,24 @@ const router = useRouter()
 <style scoped>
 .not-found-container {
   display: grid;
+  /*grid-template-columns: minmax(min-content, auto);*/
   place-items: center;
 }
 
 .not-found {
   display: grid;
-  grid-template-columns: max-content;
+  /*grid-template-columns: minmax(min-content, auto);*/
   row-gap: 40px;
 }
 
 .not-found-btn {
   justify-self: center;
+}
+
+@media (max-width: 1024px) {
+  .not-found {
+    padding: 0 20px;
+    text-align: center;
+  }
 }
 </style>

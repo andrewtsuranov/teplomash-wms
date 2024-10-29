@@ -36,12 +36,12 @@
     <my-input
         v-model="form.email"
         maxlength="50"
-        pattern="^\S+@teplomash.ru"
         placeholder="email* ___@teplomash.ru"
         required
         size="64"
         title="Пожалуйста, используйте корпоративный адрес почты"
         type="email"
+        pattern="^\S+@teplomash.ru"
     />
     <my-input
         v-model="form.password"
@@ -67,7 +67,6 @@
 import {useUserStore} from "@/stores/http/UserStore.js";
 import MyInput from "@/components/UI/MyInput.vue";
 import MyButton from "@/components/UI/MyButton.vue"
-// import router from "@/router/index.js";
 import {computed, ref} from "vue";
 import MySelect from "@/components/UI/MySelect.vue"
 
@@ -103,6 +102,7 @@ const handleSignup = () => {
  userStore.SIGNUP(signupData);
 };
 // const isDisabled = () => !(uName.value.length !== 0 && uSurname.value.length !== 0 && uMidname.value.length !== 0 && email.value.length !== 0 && password.value.length !== 0 && repassword.value.length !== 0)
+
 </script>
 <style scoped>
 .login-wrapper {
@@ -112,4 +112,5 @@ const handleSignup = () => {
   gap: 15px;
   color: blanchedalmond;
 }
+
 </style>

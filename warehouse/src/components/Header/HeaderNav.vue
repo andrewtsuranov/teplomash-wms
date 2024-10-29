@@ -19,7 +19,7 @@
 nav a {
   color: blanchedalmond;
   text-decoration: none;
-  background-color: rgba(255, 255, 255, 0.1);
+
 }
 
 nav .teplomash-active-exact-link {
@@ -45,6 +45,7 @@ i {
   nav a {
     display: grid;
     place-items: center;
+    background-color: rgba(255, 255, 255, 0.1);
   }
 
   .icon-header-wms {

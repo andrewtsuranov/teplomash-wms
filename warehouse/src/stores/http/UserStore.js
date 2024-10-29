@@ -101,6 +101,7 @@ export const useUserStore = defineStore('userStore', () => {
     }
 
     async function SIGNUP(userData) {
+        console.log(userData)
         const errorStore = useErrorStore()
         loading.value = true;
         errorStore.clearError();
