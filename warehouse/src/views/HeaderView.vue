@@ -88,9 +88,7 @@ const logoHeight = ref('50px')
     grid: "search"
         "navigation"
         "profile";
-    row-gap: 20px;
-    grid-template-rows: auto auto minmax(3rem, max-content);
-    align-items: stretch;
+    row-gap: 1.7rem;
   }
 
   .header-search {
@@ -99,12 +97,7 @@ const logoHeight = ref('50px')
 
   .header-profile {
     display: grid;
-    place-items: center;
-    background-color: rgba(255, 255, 255, 0.1);
-    text-transform: uppercase;
-    font-size: 1.3rem;
-    font-weight: bold;
-    column-gap: 0;
+    justify-items: stretch;
   }
 
   .desktop-header {
@@ -112,7 +105,7 @@ const logoHeight = ref('50px')
   }
 
   .mobile-header {
-    display: block;
+    display: grid;
   }
 }
 </style>

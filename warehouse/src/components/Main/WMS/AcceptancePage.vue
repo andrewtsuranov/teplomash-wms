@@ -1,6 +1,6 @@
 <template>
   <div class="wsConnection-container">
-    <h3 class="ws-title">Тепломаш&reg; Messenger</h3>
+    <h3 class="ws-title">Тепломаш&reg; Task Manager </h3>
     <div class="wsSettings">
       <div class="wsSetting-panel-isConnected">
         <p>Статус соединения:</p>
@@ -31,38 +31,19 @@
       <label v-if="webSocketStore.isConnected">Активные ТСД:</label>
       <label v-else style="color: gray">Нет активных ТСД</label>
       <div v-for="device in webSocketStore.onlineDeviceId"
+           v-bind:key="device.id"
            class="wsChat-active-device-item"
       >
-        <span class="item-name-TSD">ТСД № {{ device.id || 'Нет подключённых ТСД' }} ({{ device.email }})</span>
-      </div>
-      <div v-for="device in webSocketStore.onlineDeviceId"
-           class="wsChat-active-device-item"
-      >
-        <span class="item-name-TSD">ТСД № {{ device.id || 'Нет подключённых ТСД' }} ({{ device.email }})</span>
-      </div>
-      <div v-for="device in webSocketStore.onlineDeviceId"
-           class="wsChat-active-device-item"
-      >
-        <span class="item-name-TSD">ТСД № {{ device.id || 'Нет подключённых ТСД' }} ({{ device.email }})</span>
-      </div>
-      <div v-for="device in webSocketStore.onlineDeviceId"
-           class="wsChat-active-device-item"
-      >
-        <span class="item-name-TSD">ТСД № {{ device.id || 'Нет подключённых ТСД' }} ({{ device.email }})</span>
-      </div>
-      <div v-for="device in webSocketStore.onlineDeviceId"
-           class="wsChat-active-device-item"
-      >
-        <span class="item-name-TSD">ТСД № {{ device.id || 'Нет подключённых ТСД' }} ({{ device.email }})</span>
-      </div>
-      <div v-for="device in webSocketStore.onlineDeviceId"
-           class="wsChat-active-device-item"
-      >
-        <span class="item-name-TSD">ТСД № {{ device.id || 'Нет подключённых ТСД' }} ({{ device.email }})</span>
+        <router-link class="item-name-TSD" :to="{ name: 'IDDCT', params: { id: device.id } }">ТСД № {{
+            device.id || 'Нет подключённых ТСД'
+          }} ({{ device.email }})
+        </router-link>
       </div>
     </div>
     <div class="wsChat">
-      <div class="wsChat-active-device-field">Chosen active device</div>
+      <div class="wsChat-active-device-field">
+        <RouterView/>
+      </div>
       <div class="wsChat-field">
         <div v-if="webSocketStore.lastMessage">
           <h3>Последнее обновление:</h3>
@@ -91,6 +72,7 @@
 </template>
 <script setup>
 import {useWebSocketStore} from '@/stores/ws/WebSocketStore.js'
+import {RouterView} from "vue-router";
 import MyButton from "@/components/UI/MyButton.vue"
 import {ref} from "vue";
 // import {onMounted, onUnmounted} from "vue";
@@ -133,8 +115,7 @@ const wsMessage = ref()
   /*grid-template-rows: minmax(auto, 33.1rem);*/
   grid-template-columns: minmax(min-content, 25rem);
   grid-template-rows: min-content 1fr min-content;
-  column-gap: 50px;
-  /*align-items: start;*/
+  row-gap: 1.7rem;
   overflow-y: auto;
 }
 
@@ -149,7 +130,6 @@ const wsMessage = ref()
 }
 
 .wsChat-active-field {
-
 }
 
 .wsChat-active-device-item {
@@ -157,8 +137,6 @@ const wsMessage = ref()
   border-bottom: 1px solid #605039e0;
   align-items: center;
   background-color: #0000004a;
-
-
 }
 
 .wsChat-active-device-item:first-of-type {
@@ -191,7 +169,6 @@ const wsMessage = ref()
   /*column-gap: 20px;*/
   /*grid-template-columns: 190px 1fr;*/
 }
-
 
 .online-users-count {
   font-size: 1.1rem;
@@ -242,6 +219,7 @@ label {
 
 .wsChat-field {
   display: grid;
+  padding: 1rem;
   grid-template-rows: max-content minmax(20rem, auto) min-content;
   border: 1px solid blanchedalmond;
   border-radius: 10px;
@@ -257,8 +235,11 @@ label {
       "settings"
       "active"
       "chat";
-    /*column-gap: 20px;*/
     grid-template-columns: 1fr;
+  }
+
+  .wsChat-field {
+    display: grid;
   }
 }
 </style>

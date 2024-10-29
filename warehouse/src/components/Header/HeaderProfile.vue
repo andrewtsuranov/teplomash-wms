@@ -1,13 +1,12 @@
 <template>
   <div class="header-profile-container">
     <div class="dropdown d-grid">
-      <div class="avatar-desktop" data-bs-toggle="dropdown">Профиль: {{ userData.lastName }} {{
-          userData.initials
-        }}
+      <div class="avatar-mobile" data-bs-toggle="dropdown">
+        <label>Профиль: {{ userData.lastName }} {{ userData.initials }}</label>
       </div>
       <BAvatar aria-expanded="false"
                bg-variant="secondary"
-               class="btn btn-secondary avatar-mobile"
+               class="btn btn-secondary avatar-desktop"
                data-bs-toggle="dropdown"
                :text=userData.initials
                text-variant=""
@@ -43,20 +42,19 @@ const logout = () => {
 <style scoped>
 .header-profile-container {
   display: grid;
-  grid-template-columns: 1fr max-content;
-  align-items: center;
-  column-gap: 20px;
+  place-items: center;
 }
 
 .header-profile-dropdown {
   display: grid;
-  grid-template-columns: 1fr;
-  grid-auto-rows: min-content;
-  place-items: center;
-  row-gap: 10px;
+  row-gap: 0.8rem;
 }
 
 .avatar-desktop {
+  display: block;
+}
+
+.avatar-mobile {
   display: none;
 }
 
@@ -79,12 +77,30 @@ i {
 }
 
 @media (max-width: 1024px) {
-  .avatar-mobile {
-    display: none;
+  .header-profile-container {
+    grid-template-rows: minmax(3rem, max-content);
+    background-color: rgba(255, 255, 255, 0.1);
+    place-items: stretch;
+    text-transform: uppercase;
+    font-size: 1.3rem;
+    font-weight: bold;
+    cursor: pointer;
+  }
+
+  .header-profile-dropdown {
+    display: grid;
   }
 
   .avatar-desktop {
-    display: block;
+    display: none;
+  }
+
+  .avatar-mobile {
+    display: grid;
+  }
+
+  label {
+    place-self: center;
   }
 }
 </style>

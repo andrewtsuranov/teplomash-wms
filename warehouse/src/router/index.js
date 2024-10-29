@@ -42,6 +42,13 @@ const router = createRouter({
                     name: 'WMSAccept',
                     path: 'wms/acceptance',
                     component: () => import('@/views/HomeView/WMSView/AcceptanceView.vue'),
+                    children: [
+                        {
+                            name: 'IDDCT',
+                            path: '/dct/:id',
+                            component: () => import('@/views/HomeView/IDTCDView.vue'),
+                        },
+                    ]
                 },
                 {
                     name: 'WMSShip',
@@ -55,11 +62,6 @@ const router = createRouter({
                     meta: {
                         isPersonalPage: true
                     },
-                },
-                {
-                    name: 'Users',
-                    path: 'users/:id',
-                    component: () => import('@/views/HomeView/UsersView.vue')
                 },
                 {
                     name: 'Info',
