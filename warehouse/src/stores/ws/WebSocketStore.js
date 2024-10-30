@@ -25,8 +25,8 @@ export const useWebSocketStore = defineStore('websocket', () => {
 
 //Actions
     function initWebSocket() {
-        const wsUrl = `ws://lab:8081/ws/inventory/?token=${userStore.getTokenAccess}`
-        // const wsUrl = `ws://38.180.192.229/ws/inventory/?token=${userStore.getTokenAccess}`
+        // const wsUrl = `ws://lab:8081/ws/inventory/?token=${userStore.getTokenAccess}`
+        const wsUrl = `ws://38.180.192.229/ws/inventory/?token=${userStore.getTokenAccess}`
         socket.value = new WebSocket(wsUrl)
         socket.value.onopen = onOpen.bind(this)
         socket.value.onclose = onClose.bind(this)
@@ -76,7 +76,6 @@ export const useWebSocketStore = defineStore('websocket', () => {
                 onlineUsers.value = data.users.length
                 userConnect.value = data.users
             }
-
         } catch (e) {
             console.error('error parsing WebSocket message:', e)
             error.value = 'error parsing WebSocket message'
@@ -105,6 +104,7 @@ export const useWebSocketStore = defineStore('websocket', () => {
             message: message
         }
         if (isConnected.value && socket.value && socket.value.readyState === WebSocket.OPEN) {
+            console.log(data)
             socket.value.send(JSON.stringify(data))
         } else {
             console.error('Cannot send message: WebSocket is not connected')

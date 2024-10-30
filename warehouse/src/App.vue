@@ -18,6 +18,17 @@ import FooterView from "@/views/FooterView.vue";
         "footer";
   overflow: hidden;
   grid-template-rows: 1fr auto;
+  background: linear-gradient(
+      160deg,
+      rgb(140, 32, 41) 0%,
+      black 50%,
+      black 50%,
+      rgb(45, 66, 120) 100%
+  );
+  background-size: 200% 200%;
+  animation: gradientShift 15s ease infinite;
+  transition: color 0.5s,
+  background-color 0.5s;
 }
 
 .app-main {
@@ -30,5 +41,17 @@ import FooterView from "@/views/FooterView.vue";
   display: grid;
   background-color: rgba(0, 0, 0, 0.3);
   margin-top: auto;
+}
+
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
 }
 </style>
