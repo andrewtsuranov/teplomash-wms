@@ -8,6 +8,7 @@
 ul, ul li  {
     list-style: none;
 }
+
 html, body {
     min-height: 100vh;
     font-size: 16px;

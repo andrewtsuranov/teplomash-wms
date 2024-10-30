@@ -1,13 +1,13 @@
 <template>
-  <div class="acceptance-view-container">
-    <acceptance-page/>
+  <div class="wms-in-container">
+    <teplomash-task-manager/>
   </div>
 </template>
 <script setup>
-import AcceptancePage from "@/components/Main/WMS/AcceptancePage.vue";
+import TeplomashTaskManager from "@/components/Main/WMS/TeplomashTaskManager/TeplomashTaskManager.vue";
 </script>
 <style scoped>
-.acceptance-view-container {
+.wms-in-container {
   display: grid;
   align-content: start;
   margin: 0 60px;
@@ -17,7 +17,7 @@ import AcceptancePage from "@/components/Main/WMS/AcceptancePage.vue";
 }
 
 @media (max-width: 1024px) {
-  .acceptance-view-container {
+  .wms-in-container {
     display: grid;
     margin: 0;
     padding: 20px 20px;

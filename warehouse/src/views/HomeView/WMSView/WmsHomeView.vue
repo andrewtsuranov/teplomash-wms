@@ -1,9 +1,9 @@
 <template>
-  <div class="general-page-container">
-    <div class="wms-input" @click="router.push({name: 'WMSAccept'})">
+  <div class="wms-home-container">
+    <div class="wms-input" @click="router.push({name: 'wmsIN'})">
       Приёмка
     </div>
-    <div class="wms-output" @click="router.push({name: 'WMSShip'})">
+    <div class="wms-output" @click="router.push({name: 'wmsOUT'})">
       Отгрузка
     </div>
   </div>
@@ -13,7 +13,7 @@ import {useRouter} from "vue-router";
 const router = useRouter()
 </script>
 <style scoped>
-.general-page-container {
+.wms-home-container {
   display: grid;
   overflow: hidden;
   grid-template-columns: 1fr;

@@ -8,7 +8,7 @@ export const useWebSocketStore = defineStore('websocket', () => {
 //State
     const socket = ref(null)
     const isConnected = ref(false)
-    const message = ref('Нет сообщений или нет соединения')
+    const message = ref(null)
     const reconnectError = ref(false)
     const error = ref()
     const reconnectAttempts = ref(0)
@@ -25,8 +25,8 @@ export const useWebSocketStore = defineStore('websocket', () => {
 
 //Actions
     function initWebSocket() {
-        // const wsUrl = `ws://lab:8081/ws/inventory/?token=${userStore.getTokenAccess}`
-        const wsUrl = `ws://38.180.192.229/ws/inventory/?token=${userStore.getTokenAccess}`
+        const wsUrl = `ws://lab:8081/ws/inventory/?token=${userStore.getTokenAccess}`
+        // const wsUrl = `ws://38.180.192.229/ws/inventory/?token=${userStore.getTokenAccess}`
         socket.value = new WebSocket(wsUrl)
         socket.value.onopen = onOpen.bind(this)
         socket.value.onclose = onClose.bind(this)

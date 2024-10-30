@@ -20,7 +20,7 @@ nav a {
   text-decoration: none;
 }
 
-nav .teplomash-active-exact-link {
+.teplomash-active-exact-link {
   color: chocolate;
 }
 

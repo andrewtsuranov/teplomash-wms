@@ -34,26 +34,26 @@ const router = createRouter({
             meta: {requiresAuth: true},
             children: [
                 {
-                    name: 'General',
+                    name: 'Home',
                     path: '',
                     component: () => import('@/views/HomeView/HomeView.vue'),
                 },
                 {
-                    name: 'WMSAccept',
-                    path: 'wms/acceptance',
-                    component: () => import('@/views/HomeView/WMSView/AcceptanceView.vue'),
+                    name: 'wmsIN',
+                    path: 'wms/in',
+                    component: () => import('@/views/HomeView/WMSView/wmsINView/WmsInView.vue'),
                     children: [
                         {
-                            name: 'IDDCT',
-                            path: '/dct/:id',
-                            component: () => import('@/views/HomeView/IDTCDView.vue'),
+                            name: 'taskTsd',
+                            path: 'task/tsd/:id',
+                            component: () => import('@/components/Main/WMS/TeplomashTaskManager/TaskTsd.vue'),
                         },
                     ]
                 },
                 {
-                    name: 'WMSShip',
-                    path: 'wms/shipment',
-                    component: () => import('@/views/HomeView/WMSView/ShipmentView.vue'),
+                    name: 'wmsOUT',
+                    path: 'wms/out',
+                    component: () => import('@/views/HomeView/WMSView/wmsOutView/WmsOutView.vue'),
                 },
                 {
                     name: 'Profile',
@@ -108,7 +108,7 @@ router.beforeEach(async (to) => {
         return {name: 'Login'}
     }
     if (userStore.isAuthenticated && !!to.meta.guestOnly) {
-        return {name: 'General'}
+        return {name: 'Home'}
     }
 })
 router.onError((error) => {

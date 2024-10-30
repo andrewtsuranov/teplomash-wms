@@ -1,13 +1,13 @@
 <template>
-  <div class="general-page">
-    <general-page/>
+  <div class="home-view-container">
+    <wms-home-view/>
   </div>
 </template>
 <script setup>
-import GeneralPage from "@/components/Main/GeneralPage.vue";
+import WmsHomeView from "@/views/HomeView/WMSView/WmsHomeView.vue";
 </script>
 <style scoped>
-.general-page {
+.home-view-container {
   display: grid;
   background-color: rgba(245, 245, 245, 0.05);
   margin: 0 60px;
@@ -15,7 +15,7 @@ import GeneralPage from "@/components/Main/GeneralPage.vue";
   place-content: center;
 }
 @media (max-width: 1024px) {
-  .general-page {
+  .home-view-container {
     display: grid;
     grid-template-columns: 1fr;
     margin: 0;
