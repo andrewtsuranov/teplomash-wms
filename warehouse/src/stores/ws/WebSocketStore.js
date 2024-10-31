@@ -17,16 +17,21 @@ export const useWebSocketStore = defineStore('websocket', () => {
     const onlineUsers = ref(0)
     const lastPongTime = ref(null)
     const userConnect = ref([])
+    const privateMessage = ref(null)
+    const privateMessageID = ref(null)
+    const receivedMessage = ref(null)
 //Getters
     const lastMessage = computed(() => message.value)
     const connectionStatus = computed(() => isConnected.value ? 'В сети' : 'Не в сети')
     const onlineUsersCount = computed(() => onlineUsers.value)
     const onlineDeviceId = computed(() => userConnect.value)
+    const getPrivateMessage = computed(() => privateMessage.value)
+    const getPrivateMessageID = computed(() => privateMessageID.value)
 
 //Actions
     function initWebSocket() {
-        // const wsUrl = `ws://lab:8081/ws/inventory/?token=${userStore.getTokenAccess}`
-        const wsUrl = `ws://38.180.192.229/ws/inventory/?token=${userStore.getTokenAccess}`
+        const wsUrl = `ws://lab:8081/ws/inventory/?token=${userStore.getTokenAccess}`
+        // const wsUrl = `ws://38.180.192.229/ws/inventory/?token=${userStore.getTokenAccess}`
         socket.value = new WebSocket(wsUrl)
         socket.value.onopen = onOpen.bind(this)
         socket.value.onclose = onClose.bind(this)
@@ -71,10 +76,17 @@ export const useWebSocketStore = defineStore('websocket', () => {
             if (data.type === 'ping') {
                 return sendPong()
             }
-            // Обработка других типов сообщений
+            // Обработка сообщения: получение активных пользователей
             if (data.type === 'online_users') {
                 onlineUsers.value = data.users.length
                 userConnect.value = data.users
+            }
+            // Обработка сообщения: получение приватного ссобщения
+            if (data.type === 'private_message') {
+                receivedMessage.value = {
+                    from_id: `(Получено сообщение от ТСД №${data.from_user}) >>`,
+                    message: data.message
+                }
             }
         } catch (e) {
             console.error('error parsing WebSocket message:', e)
@@ -99,7 +111,7 @@ export const useWebSocketStore = defineStore('websocket', () => {
 
     function sendMessage(message, id) {
         const data = {
-            action: 'private_message',
+            action: 'send_private_message',
             to: id,
             message: message
         }
@@ -177,12 +189,17 @@ export const useWebSocketStore = defineStore('websocket', () => {
         reconnectDelay,
         onlineUsers,
         userConnect,
+        privateMessage,
+        privateMessageID,
+        receivedMessage,
 //getters
         lastMessage,
         connectionStatus,
         onlineUsersCount,
         lastPongTime,
         onlineDeviceId,
+        getPrivateMessage,
+        getPrivateMessageID,
 //actions
         initWebSocket,
         onOpen,

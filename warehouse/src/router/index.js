@@ -47,6 +47,7 @@ const router = createRouter({
                             name: 'taskTsd',
                             path: 'task/tsd/:id',
                             component: () => import('@/components/Main/WMS/TeplomashTaskManager/TaskTsd.vue'),
+                            meta: {isLoading: true}
                         },
                     ]
                 },

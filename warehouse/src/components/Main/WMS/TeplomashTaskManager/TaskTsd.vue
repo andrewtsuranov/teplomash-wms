@@ -1,14 +1,15 @@
 <template>
   <div class="ttm-task-container">
-    <div class="ttm-task-active-tsd">Выбран: ТСД №{{ $route.params.id }}</div>
+    <div class="ttm-task-active-tsd">Выбран: ТСД №{{ route.params.id }}</div>
     <div class="ttm-task-terminal">
       <div>
-        <h3>Последнее обновление:</h3>
-        <div>{{ webSocketStore.lastMessage }}</div>
+        <h3>Терминал:</h3>
+<!--        <div>{{sendData.user_id}} {{sendData.text}}</div>-->
+        <div v-if="webSocketStore.receivedMessage?.from_id">{{webSocketStore.receivedMessage.from_id}} {{ webSocketStore.receivedMessage.message }}</div>
       </div>
     </div>
     <div class="ttm-task-confirmed input-group input-group-lg">
-      <input v-model="wsMessage"
+      <input v-model="message"
              aria-describedby="button-addon2"
              aria-label="Recipient's username"
              class="form-control"
@@ -18,7 +19,7 @@
       <button id="button-addon2"
               class="btn btn-dark"
               type="button"
-              @click="webSocketStore.sendMessage(wsMessage, $route.params.id)"
+              @click="webSocketStore.sendMessage(message, route.params.id)"
       >Отправить
       </button>
     </div>
@@ -26,10 +27,19 @@
 </template>
 <script setup>
 import {useWebSocketStore} from '@/stores/ws/WebSocketStore.js'
+import {useUserStore} from "@/stores/http/UserStore.js";
+import {useRouter, useRoute } from 'vue-router'
 import {ref} from "vue";
 
 const webSocketStore = useWebSocketStore()
-const wsMessage = ref()
+const userStore = useUserStore()
+const message = ref()
+const router = useRouter()
+const route = useRoute()
+
+
+
+
 </script>
 <style scoped>
 .ttm-task-container {

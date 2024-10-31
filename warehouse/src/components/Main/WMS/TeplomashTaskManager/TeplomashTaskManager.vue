@@ -1,6 +1,6 @@
 <template>
   <div class="teplomash-task-manager-container">
-    <label class="ttm-title">Тепломаш&reg; Task Manager: </label>
+    <label class="ttm-title">Тепломаш&reg; Task Manager : </label>
     <div class="ttm-settings">
       <div class="ttm-setting-panel-isConnected">
         <span>Статус соединения:</span>
@@ -39,7 +39,7 @@
         >Connect
         </my-button>
         <my-button :disabled="!webSocketStore.isConnected"
-                   @click="webSocketStore.disconnect"
+                   @click="handlerDisconnect"
                    class="my-btn-disconnect"
         >Disconnect
         </my-button>
@@ -75,6 +75,8 @@
     <div class="ttm-task">
       <div>
         <router-view v-if="webSocketStore.isConnected"></router-view>
+        <div v-else>Нет подключения к сети</div>
+        <div v-if="webSocketStore.isConnected && !route.meta.isLoading">Выберите активный ТСД</div>
       </div>
     </div>
   </div>
@@ -82,9 +84,17 @@
 <script setup>
 import {useWebSocketStore} from '@/stores/ws/WebSocketStore.js'
 import {RouterView} from "vue-router";
+import {useRouter, useRoute} from "vue-router";
 import MyButton from "@/components/UI/MyButton.vue"
 // import {onMounted, onUnmounted} from "vue";
 const webSocketStore = useWebSocketStore()
+const router = useRouter()
+const route = useRoute()
+const handlerDisconnect = () => {
+  webSocketStore.disconnect()
+  router.push({name: 'wmsIN'})
+
+}
 // onMounted(() => {
 //   userStore.initWebSocket()
 // })
@@ -276,7 +286,7 @@ a:active {
 }
 
 .teplomash-active-exact-link {
-  background-color: rgba(50, 50, 50, 0.6);
+  background-color: rgba(2, 73, 89, 0.6);
 }
 
 @media (max-width: 1024px) {

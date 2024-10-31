@@ -19,7 +19,6 @@ import WmsHomeView from "@/views/HomeView/WMSView/WmsHomeView.vue";
     display: grid;
     grid-template-columns: 1fr;
     margin: 0;
-
   }
 }
 </style>

@@ -21,7 +21,6 @@ const userStore = useUserStore()
   grid: "homeHeader"
         "homeMain";
   grid-template-rows: 60px 1fr;
-  min-height: 100vh;
 }
 
 .home-layout-header {
