@@ -4,7 +4,7 @@
   </div>
 </template>
 <script setup>
-import LoginView from "@/views/AuthorizationView/AuthorizationView.vue";
+import LoginView from "@/views/Authorization/AuthorizationView.vue";
 </script>
 <style scoped>
 .authorization-layout {

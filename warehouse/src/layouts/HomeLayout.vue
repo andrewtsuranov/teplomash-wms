@@ -5,13 +5,13 @@
     </header>
     <div v-if="userStore.loading">Loading...</div>
     <main class="home-layout-main">
-      <RouterView/>
+      <router-view></router-view>
     </main>
   </div>
 </template>
 <script setup>
-import HeaderView from "@/views/HeaderView.vue";
-import {useUserStore} from "@/stores/http/UserStore.js";
+import HeaderView from "@/views/Header/HeaderView.vue";
+import {useUserStore} from "@/stores/HTTP/UserStore.js";
 
 const userStore = useUserStore()
 </script>

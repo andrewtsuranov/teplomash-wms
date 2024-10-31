@@ -1,90 +1,106 @@
 import {createRouter, createWebHistory} from 'vue-router'
-import {useUserStore} from "@/stores/http/UserStore.js";
+import {useUserStore} from "@/stores/HTTP/UserStore.js";
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
     routes: [
         {
-            name: '',
             path: '/login',
             component: () => import('@/layouts/AuthorizationLayout.vue'),
             meta: {guestOnly: true},
             children: [
                 {
-                    name: 'Login',
                     path: '',
-                    component: () => import('@/views/AuthorizationView/SignInView.vue'),
+                    name: 'Login',
+                    component: () => import('@/views/Authorization/SignIn/SignInView.vue'),
                 },
                 {
-                    name: 'Signup',
                     path: '/signup',
-                    component: () => import('@/views/AuthorizationView/SignUpView.vue'),
+                    name: 'Signup',
+                    component: () => import('@/views/Authorization/SignUp/SignUpView.vue'),
                 },
                 {
-                    name: 'Confirmation',
                     path: '/signup/confirm',
-                    component: () => import('@/views/AuthorizationView/ConfirmSignUpView.vue'),
+                    name: 'Confirmation',
+                    component: () => import('@/views/Authorization/SignUp/SignUpCodeEmailView.vue'),
                 },
             ],
         },
         {
-            name: '',
             path: '/',
             component: () => import('@/layouts/HomeLayout.vue'),
             meta: {requiresAuth: true},
             children: [
                 {
-                    name: 'Home',
                     path: '',
-                    component: () => import('@/views/HomeView/HomeView.vue'),
+                    name: 'Home',
+                    component: () => import('@/views/Home/HomeView.vue'),
                 },
                 {
-                    name: 'wmsIN',
-                    path: 'wms/in',
-                    component: () => import('@/views/HomeView/WMSView/wmsINView/WmsInView.vue'),
+                    path: 'wms',
+                    name: 'WMS',
+                    component: () => import('@/views/Home/WMS/StorageActionsView.vue'),
                     children: [
                         {
-                            name: 'taskTsd',
-                            path: 'task/tsd/:id',
-                            component: () => import('@/components/Main/WMS/TeplomashTaskManager/TaskTsd.vue'),
-                            meta: {isLoading: true}
+                            path: ':id',
+                            name: 'WMS_Storage',
+                            component: () => import('@/views/Home/WMS/StorageActionsView.vue'),
                         },
+                        {
+                            path: 'in',
+                            name: 'wmsIN',
+                            components: {
+                                default: () => import('@/views/Home/WMS/Storage/GReceiptFrom/GoodsReceiptFromView.vue'),
+                                TableFrom1C: () => import('@/views/Home/WMS/Storage/GReceiptFrom/GoodsReceiptFromView.vue'),
+                                TTM: () => import('@/views/Home/WMS/TeplomashTaskManager/Terminal/TTMTerminal.vue')
+                            },
+                            meta: {isLoading: true},
+// children: [
+//     {
+//         path: 'tsd/:id',
+//         name: 'taskTsd',
+//         component: () => ,
+//
+//
+                            //     },
+                            // ]
+                        }
                     ]
                 },
                 {
+                    path: 'out',
                     name: 'wmsOUT',
-                    path: 'wms/out',
-                    component: () => import('@/views/HomeView/WMSView/wmsOutView/WmsOutView.vue'),
+                    component: () => import('@/views/Home/WMS/Storage/GShipTo/GoodsShipToView.vue'),
                 },
                 {
-                    name: 'Profile',
                     path: 'profile',
-                    component: () => import('@/views/HomeView/ProfileView.vue'),
+                    name: 'Profile',
+                    component: () => import('@/views/Home/Profile/ProfileView.vue'),
                     meta: {
                         isPersonalPage: true
                     },
                 },
                 {
-                    name: 'Info',
                     path: 'info/',
-                    component: () => import('@/views/HomeView/InfoView.vue')
+                    name: 'Info',
+                    component: () => import('@/views/Home/About/AboutView.vue')
                 },
                 {
-                    name: 'Support',
                     path: 'support/',
-                    component: () => import('@/views/HomeView/SupportView.vue')
+                    name: 'Support',
+                    component: () => import('@/views/Home/Support/SupportView.vue')
                 },
             ]
         },
         {
-            name: 'NotFound',
             path: '/login/:pathMatch(.*)*',
-            component: () => import('@/components/404/NotFound404.vue')
+            name: 'NotFound',
+            component: () => import('@/router/404/NotFound404.vue')
         },
         {
-            name: 'NotFound',
             path: '/:pathMatch(.*)*',
-            component: () => import('@/components/404/NotFound404.vue')
+            name: 'NotFound',
+            component: () => import('@/router/404/NotFound404.vue')
         }
     ],
     linkExactActiveClass: 'teplomash-active-exact-link'
