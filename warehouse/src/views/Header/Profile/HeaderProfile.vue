@@ -25,7 +25,7 @@
   </div>
 </template>
 <script setup>
-import {useUserStore} from "@/stores/HTTP/UserStore.js";
+import {useUserStore} from "@/stores/HTTP/Auth/UserStore.js";
 import {useRouter} from 'vue-router'
 import {computed} from "vue";
 import {BAvatar} from "bootstrap-vue-next";

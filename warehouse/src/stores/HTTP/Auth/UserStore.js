@@ -5,10 +5,10 @@ import ky from "ky"
 import {ref, computed} from "vue"
 
 const router = useRouter()
-const errorState = useErrorStore
+
 const kyStd = ky.create({
-    prefixUrl: 'http://38.180.192.229/api/auth/',
-    // prefixUrl: 'http://lab:8080/api/auth/',
+    // prefixUrl: 'http://38.180.192.229/api/auth/',
+    prefixUrl: 'http://lab:8080/api/auth/',
     retry: 0,
 })
 const kyLogin = kyStd.extend({
@@ -122,7 +122,7 @@ export const useUserStore = defineStore('userStore', () => {
                 return true
             }
         } catch (err) {
-            errorState.error = err.message
+            errorStore.error = err.message
             throw err;
         } finally {
             loading.value = false
@@ -139,12 +139,12 @@ export const useUserStore = defineStore('userStore', () => {
     //             if (tempPassword.value) {
     //                 await LOGIN(email, tempPassword.value)
     //             } else {
-    //                 errorState.Error = "Не удалось выполнить автоматический вход. Пожалуйста, войдите вручную."
+    //                 errorStore.Error = "Не удалось выполнить автоматический вход. Пожалуйста, войдите вручную."
     //             }
     //         }
     //         return response
     //     } catch (err) {
-    //         errorState.Error = err.message
+    //         errorStore.Error = err.message
     //         throw err;
     //     } finally {
     //         loading.value = false
@@ -153,7 +153,7 @@ export const useUserStore = defineStore('userStore', () => {
     // },
     async function VERIFY(token_access, token_refresh) {
         loading.value = true;
-        errorState.error = null;
+        errorStore.error = null;
         try {
             // Проверяем access token
             try {
@@ -179,7 +179,7 @@ export const useUserStore = defineStore('userStore', () => {
             }
             // eslint-disable-next-line no-unreachable
         } catch (err) {
-            errorState.error = err.message
+            errorStore.error = err.message
             return false
         } finally {
             loading.value = false

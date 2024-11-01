@@ -64,7 +64,7 @@
   </form>
 </template>
 <script setup>
-import {useUserStore} from "@/stores/HTTP/UserStore.js";
+import {useUserStore} from "@/stores/HTTP/Auth/UserStore.js";
 import MyInput from "@/components/UI/MyInput.vue";
 import MyButton from "@/components/UI/MyButton.vue"
 import {computed, ref} from "vue";

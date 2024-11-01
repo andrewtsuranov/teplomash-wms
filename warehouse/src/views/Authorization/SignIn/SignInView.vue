@@ -36,7 +36,7 @@
 </template>
 <script setup>
 import {ref, computed} from 'vue'
-import {useUserStore} from "@/stores/HTTP/UserStore.js";
+import {useUserStore} from "@/stores/HTTP/Auth/UserStore.js";
 import {useErrorStore} from "@/stores/Error/ErrorStore.js";
 import MyButton from "@/components/UI/MyButton.vue";
 import MyInput from "@/components/UI/MyInput.vue";

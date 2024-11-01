@@ -39,8 +39,10 @@
       </tbody>
     </table>
   </div>
+
 </template>
 <script setup>
+import {RouterView} from "vue-router";
 </script>
 <style scoped>
 .in-table-container {

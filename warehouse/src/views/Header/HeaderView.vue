@@ -28,10 +28,10 @@
   </div>
 </template>
 <script setup>
-import HeaderSearch from "@/views/Header/HeaderSearch.vue";
-import HeaderProfile from "@/views/Header/HeaderProfile.vue";
+import HeaderSearch from "@/views/Header/Search/HeaderSearch.vue";
+import HeaderProfile from "@/views/Header/Profile/HeaderProfile.vue";
 import LogoTeplomash from "@/components/UI/LogoTeplomash.vue";
-import HeaderNav from "@/views/Header/HeaderNav.vue";
+import HeaderNav from "@/views/Header/Navigation/HeaderNav.vue";
 import {ref} from "vue";
 
 const logoHeight = ref('50px')

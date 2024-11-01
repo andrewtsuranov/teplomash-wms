@@ -1,5 +1,5 @@
 import {defineStore} from 'pinia'
-import {useUserStore} from '@/stores/HTTP/UserStore.js'
+import {useUserStore} from '@/stores/HTTP/Auth/UserStore.js'
 import {computed, ref} from "vue";
 
 export const useWebSocketStore = defineStore('websocket', () => {
@@ -30,8 +30,8 @@ export const useWebSocketStore = defineStore('websocket', () => {
 
 //Actions
     function initWebSocket() {
-        // const wsUrl = `WebSockets://lab:8081/WebSockets/inventory/?token=${userStore.getTokenAccess}`
-        const wsUrl = `ws://38.180.192.229/ws/inventory/?token=${userStore.getTokenAccess}`
+        const wsUrl = `WebSockets://lab:8081/WebSockets/inventory/?token=${userStore.getTokenAccess}`
+        // const wsUrl = `ws://38.180.192.229/ws/inventory/?token=${userStore.getTokenAccess}`
         socket.value = new WebSocket(wsUrl)
         socket.value.onopen = onOpen.bind(this)
         socket.value.onclose = onClose.bind(this)

@@ -86,7 +86,6 @@ import {useWebSocketStore} from '@/stores/WebSockets/TSDStore.js'
 import {RouterView} from "vue-router";
 import {useRouter, useRoute} from "vue-router";
 import MyButton from "@/components/UI/MyButton.vue"
-// import {onMounted, onUnmounted} from "vue";
 const webSocketStore = useWebSocketStore()
 const router = useRouter()
 const route = useRoute()
@@ -95,12 +94,7 @@ const handlerDisconnect = () => {
   router.push({name: 'wmsIN'})
 
 }
-// onMounted(() => {
-//   userStore.initWebSocket()
-// })
-// onUnmounted(() => {
-//   userStore.disconnect()
-// })
+
 </script>
 <style scoped>
 .teplomash-task-manager-container {

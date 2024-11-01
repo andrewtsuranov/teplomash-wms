@@ -1,16 +1,30 @@
 <template>
   <div class="wms-home-container">
-    <div class="wms-input" @click="router.push({name: 'wmsIN'})">
-      Приёмка
-    </div>
-    <div class="wms-output" @click="router.push({name: 'wmsOUT'})">
-      Отгрузка
+    <div v-for="item in storageStore.fullListWarehouses"
+         class="wms-input"
+         @click="handlerClickStorage(item.id)"
+    >Склад Тепломаш {{ item.name }}
     </div>
   </div>
 </template>
 <script setup>
-import {useRouter} from "vue-router";
+import {onMounted} from "vue";
+import {useRouter, useRoute} from "vue-router";
+import {useUserStore} from "@/stores/HTTP/Auth/UserStore.js";
+import {useStorageStore} from "@/stores/HTTP/WMS/StorageStore.js";
+
+const userStore = useUserStore()
+const storageStore = useStorageStore()
 const router = useRouter()
+const route = useRoute()
+onMounted(() => {
+  storageStore.GET_WAREHOUSES()
+})
+const handlerClickStorage = async (id) => {
+  await storageStore.WAREHOUSE_ID(id)
+  router.push({name: 'WMSStorage', params: {id: id}})
+  localStorage.removeItem('warehouses')
+}
 </script>
 <style scoped>
 .wms-home-container {
@@ -50,6 +64,7 @@ const router = useRouter()
     display: grid;
     row-gap: 2rem;
   }
+
   .wms-input, .wms-output {
     font-size: 2rem;
     padding: 10px 50px;

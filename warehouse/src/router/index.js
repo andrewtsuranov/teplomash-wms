@@ -1,5 +1,5 @@
 import {createRouter, createWebHistory} from 'vue-router'
-import {useUserStore} from "@/stores/HTTP/UserStore.js";
+import {useUserStore} from "@/stores/HTTP/Auth/UserStore.js";
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -39,58 +39,47 @@ const router = createRouter({
                 {
                     path: 'wms',
                     name: 'WMS',
-                    component: () => import('@/views/Home/WMS/StorageActionsView.vue'),
-                    children: [
-                        {
-                            path: ':id',
-                            name: 'WMS_Storage',
-                            component: () => import('@/views/Home/WMS/StorageActionsView.vue'),
-                        },
-                        {
-                            path: 'in',
-                            name: 'wmsIN',
-                            components: {
-                                default: () => import('@/views/Home/WMS/Storage/GReceiptFrom/GoodsReceiptFromView.vue'),
-                                TableFrom1C: () => import('@/views/Home/WMS/Storage/GReceiptFrom/GoodsReceiptFromView.vue'),
-                                TTM: () => import('@/views/Home/WMS/TeplomashTaskManager/Terminal/TTMTerminal.vue')
-                            },
-                            meta: {isLoading: true},
-// children: [
-//     {
-//         path: 'tsd/:id',
-//         name: 'taskTsd',
-//         component: () => ,
-//
-//
-                            //     },
-                            // ]
-                        }
-                    ]
+                    component: () => import('@/views/Home/WMS/StoragesView.vue')
                 },
                 {
-                    path: 'out',
-                    name: 'wmsOUT',
-                    component: () => import('@/views/Home/WMS/Storage/GShipTo/GoodsShipToView.vue'),
+                    path: 'wms/:id',
+                    name: 'WMSStorage',
+                    component: () => import('@/views/Home/WMS/Storage/StorageID.vue'),
                 },
                 {
-                    path: 'profile',
-                    name: 'Profile',
-                    component: () => import('@/views/Home/Profile/ProfileView.vue'),
-                    meta: {
-                        isPersonalPage: true
+                    path: 'wms/:id/in',
+                    name: 'wmsIN',
+                    components: {
+                        default: () => import('@/views/Home/WMS/Storage/GReceiptFrom/Data/ReceiptListView.vue'),
+                        TTM: () => import('@/views/Home/WMS/TeplomashTaskManager/Terminal/TTMTerminal.vue')
                     },
                 },
                 {
-                    path: 'info/',
-                    name: 'Info',
-                    component: () => import('@/views/Home/About/AboutView.vue')
+                    path: 'wms/:id/out',
+                    name: 'wmsOUT',
+                    components: {
+                        default: () => import('@/views/Home/WMS/Storage/GShipTo/GoodsShipToView.vue'),
+                    },
                 },
-                {
-                    path: 'support/',
-                    name: 'Support',
-                    component: () => import('@/views/Home/Support/SupportView.vue')
-                },
-            ]
+            ],
+        },
+        {
+            path: '/profile',
+            name: 'Profile',
+            component: () => import('@/views/Home/Profile/ProfileView.vue'),
+            meta: {
+                isPersonalPage: true
+            },
+        },
+        {
+            path: '/info',
+            name: 'Info',
+            component: () => import('@/views/Home/About/AboutView.vue')
+        },
+        {
+            path: '/support',
+            name: 'Support',
+            component: () => import('@/views/Home/Support/SupportView.vue')
         },
         {
             path: '/login/:pathMatch(.*)*',

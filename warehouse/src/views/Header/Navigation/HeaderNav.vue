@@ -1,6 +1,6 @@
 <template>
   <nav class="header-nav-container">
-    <router-link :to="{name: 'WMS'}"> Управление складом</router-link>
+    <router-link :to="{name: 'Home'}"> Управление складом</router-link>
     <router-link to="/info">Справка</router-link>
     <router-link to="/support">Поддержка</router-link>
   </nav>
