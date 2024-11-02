@@ -61,25 +61,25 @@ const router = createRouter({
                         default: () => import('@/views/Home/WMS/Storage/GShipTo/GoodsShipToView.vue'),
                     },
                 },
+                {
+                    path: '/profile',
+                    name: 'Profile',
+                    component: () => import('@/views/Home/Profile/ProfileView.vue'),
+                    meta: {
+                        isPersonalPage: true
+                    },
+                },
+                {
+                    path: 'info',
+                    name: 'Info',
+                    component: () => import('@/views/Home/About/AboutView.vue')
+                },
+                {
+                    path: 'support',
+                    name: 'Support',
+                    component: () => import('@/views/Home/Support/SupportView.vue')
+                },
             ],
-        },
-        {
-            path: '/profile',
-            name: 'Profile',
-            component: () => import('@/views/Home/Profile/ProfileView.vue'),
-            meta: {
-                isPersonalPage: true
-            },
-        },
-        {
-            path: '/info',
-            name: 'Info',
-            component: () => import('@/views/Home/About/AboutView.vue')
-        },
-        {
-            path: '/support',
-            name: 'Support',
-            component: () => import('@/views/Home/Support/SupportView.vue')
         },
         {
             path: '/login/:pathMatch(.*)*',

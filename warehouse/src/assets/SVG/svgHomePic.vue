@@ -2,7 +2,7 @@
 
   <svg xmlns="http://www.w3.org/2000/svg"
        xml:space="preserve"
-       width="1009px"
+       :width="width"
        style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd"
        viewBox="0 0 397.23 363.27"
        :height="height"
@@ -2608,6 +2608,7 @@
 <script setup>
 defineProps({
   height: String,
+  width: String,
 })
 </script>
 <style scoped>

@@ -13,6 +13,7 @@
   grid-template-columns: minmax(30px, max-content) repeat(auto-fit, minmax(100px, 1fr));
   column-gap: 10px;
   place-items: center;
+  text-transform: uppercase;
 }
 
 nav a {
@@ -21,7 +22,7 @@ nav a {
 }
 
 .teplomash-active-exact-link {
-  color: chocolate;
+  color: #bc985f;
 }
 
 i {
