@@ -48,6 +48,11 @@
 .svg-container {
   aspect-ratio: auto;
 }
+
+svg {
+  cursor: pointer;
+}
+
 .responsive-svg {
   height: 100%;
   display: grid;

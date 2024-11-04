@@ -3,20 +3,38 @@
     <main class="app-main">
       <router-view/>
     </main>
-    <footer-view class="footer"/>
+    <footer>
+      <footer-view/>
+    </footer>
   </div>
 </template>
 <script setup>
 import {RouterView} from 'vue-router'
 import FooterView from "@/views/Footer/FooterView.vue";
 </script>
-<style scoped>
+<style>
+.router-link,
+.router-link:link,
+.router-link:visited,
+.router-link:hover,
+.router-link:active {
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+  padding: 0;
+  margin: 0;
+  background: none;
+  border: none;
+  font: inherit;
+}
+
 .app-container {
   display: grid;
   min-height: 100vh;
   grid: "main"
         "footer";
   overflow: hidden;
+  /*grid-template-columns: minmax(auto, 1440px);*/
   grid-template-rows: 1fr auto;
   background: linear-gradient(
       160deg,
@@ -33,16 +51,15 @@ import FooterView from "@/views/Footer/FooterView.vue";
 
 .app-main {
   grid-area: main;
-  display: grid;
-  grid-template-columns: 1fr;
-  grid-template-rows: 1fr;
 }
 
-.footer {
-  grid-area: footer;
+footer {
   display: grid;
+  grid-area: footer;
   background-color: rgba(0, 0, 0, 0.3);
   margin-top: auto;
+  grid-template-columns: minmax(auto, 1440px);
+  justify-content: center;
 }
 
 @keyframes gradientShift {

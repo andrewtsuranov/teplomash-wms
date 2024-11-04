@@ -30,7 +30,7 @@ nav a:hover {
   background-color: #4a383882;
 }
 
-@media (max-width: 1024px) {
+@media (max-width: 800px) {
   .menu-container {
     grid-auto-flow: row;
     grid-auto-rows: minmax(3rem, max-content);

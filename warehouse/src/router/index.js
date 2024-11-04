@@ -50,21 +50,31 @@ const router = createRouter({
                     path: 'wms/:id',
                     name: 'WMSStorage',
                     component: () => import('@/views/Home/WMS/Storage/StorageID.vue'),
-                },
-                {
-                    path: 'wms/:id/in',
-                    name: 'wmsIN',
-                    components: {
-                        default: () => import('@/views/Home/WMS/Storage/GReceiptFrom/Data/ReceiptListView.vue'),
-                        TTM: () => import('@/views/Home/WMS/TeplomashTaskManager/Terminal/TTMTerminal.vue')
-                    },
-                },
-                {
-                    path: 'wms/:id/out',
-                    name: 'wmsOUT',
-                    components: {
-                        default: () => import('@/views/Home/WMS/Storage/GShipTo/GoodsShipToView.vue'),
-                    },
+                    children: [
+                        {
+                            path: 'in',
+                            name: 'wmsIN',
+                            components: {
+                                default: () => import('@/views/Home/WMS/Storage/GReceiptFrom/Data/ReceiptListView.vue'),
+                                TTM: () => import('@/views/Home/WMS/TeplomashTaskManager/TeplomashTaskManagerView.vue')
+                            },
+                        },
+                        {
+                            path: 'out',
+                            name: 'wmsOUT',
+                            component: () => import('@/views/Home/WMS/Storage/GShipTo/Data/GoodsShipToView.vue'),
+                        },
+                        {
+                            path: 'transfer',
+                            name: 'wmsTransfer',
+                            component: () => import('@/views/Home/WMS/Storage/GTransfering/GoodsTransferingView.vue'),
+                        },
+                        {
+                            path: 'check',
+                            name: 'wmsCheck',
+                            component: () => import('@/views/Home/WMS/Storage/GCounting/GoodsCountingView.vue'),
+                        },
+                    ]
                 },
                 {
                     path: '/profile',

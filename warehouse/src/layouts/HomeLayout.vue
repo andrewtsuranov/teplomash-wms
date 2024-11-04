@@ -19,8 +19,10 @@ const userStore = useUserStore()
 <style scoped>
 .home-layout-container {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: minmax(auto, 1440px);
   grid-template-rows: minmax(60px, auto) 1fr;
+  justify-content: center;
+  height: 100%;
 }
 
 .home-layout-header {

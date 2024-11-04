@@ -1,12 +1,10 @@
 import {useErrorStore} from "@/stores/Error/ErrorStore.js"
-import {useRouter} from "vue-router";
 import {defineStore} from 'pinia'
 import {useUserStore} from "@/stores/HTTP/Auth/UserStore.js";
 import ky from "ky"
-import {ref, computed} from "vue"
+import {ref} from "vue"
 
 const userStore = useUserStore()
-const router = useRouter()
 const kyStd = ky.create({
     prefixUrl: 'http://38.180.192.229/api/manager/',
     // prefixUrl: 'http://lab:8080/api/manager/',
@@ -20,7 +18,7 @@ export const useStorageStore = defineStore('storageStore', () => {
 //state
     const loading = ref(false)
     const fullListWarehouses = ref(JSON.parse(localStorage.getItem('warehouses')) || null)
-    const warehouseData = ref(JSON.parse(localStorage.getItem('warehouses')) || null)
+    const warehouseData = ref(JSON.parse(localStorage.getItem('warehouseData')) || null)
 //getters
 //actions
     async function GET_WAREHOUSES() {

@@ -1,6 +1,6 @@
 <template>
   <div class="authorization-layout">
-    <login-view />
+    <login-view/>
   </div>
 </template>
 <script setup>
@@ -9,8 +9,9 @@ import LoginView from "@/views/Authorization/AuthorizationView.vue";
 <style scoped>
 .authorization-layout {
   display: grid;
-  grid-auto-columns: minmax(auto, 1350px);
-  place-content: center;
+  grid-template-columns: minmax(auto, 1440px);
+  grid-template-rows: 1fr;
+  justify-content: center;
+  height: 100%;
 }
-
 </style>

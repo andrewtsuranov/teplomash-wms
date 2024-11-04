@@ -86,15 +86,14 @@ import {useWebSocketStore} from '@/stores/WebSockets/TSDStore.js'
 import {RouterView} from "vue-router";
 import {useRouter, useRoute} from "vue-router";
 import MyButton from "@/components/UI/MyButton.vue"
+
 const webSocketStore = useWebSocketStore()
 const router = useRouter()
 const route = useRoute()
 const handlerDisconnect = () => {
   webSocketStore.disconnect()
   router.push({name: 'wmsIN'})
-
 }
-
 </script>
 <style scoped>
 .teplomash-task-manager-container {
@@ -104,7 +103,7 @@ const handlerDisconnect = () => {
       "settings task"
       "tsd task";
   grid-template-columns: minmax(auto, 1fr) minmax(auto, 1fr);
-  gap: 1.7rem;
+  gap: 1rem;
 }
 
 .ttm-title {
@@ -283,7 +282,7 @@ a:active {
   background-color: rgba(2, 73, 89, 0.6);
 }
 
-@media (max-width: 1024px) {
+@media (max-width: 800px) {
   .teplomash-task-manager-container {
     display: grid;
     grid-template-areas:

@@ -39,14 +39,14 @@
       </tbody>
     </table>
   </div>
-
 </template>
 <script setup>
-import {RouterView} from "vue-router";
 </script>
 <style scoped>
 .in-table-container {
   display: grid;
+  grid-template-columns: minmax(auto, 1fr);
+  grid-template-rows: 1fr;
   overflow-x: auto;
 }
 </style>

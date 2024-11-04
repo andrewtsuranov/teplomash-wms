@@ -1,5 +1,5 @@
 <template>
-  <div>Here is gonna be StorageTransferView</div>
+  <h1>Here is gonna be StorageTransferView</h1>
 </template>
 <script setup>
 </script>

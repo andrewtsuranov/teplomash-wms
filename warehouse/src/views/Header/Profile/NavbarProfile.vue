@@ -52,6 +52,9 @@ const logout = () => {
 
 .avatar-desktop {
   display: block;
+  background: none !important;
+  border: 1px solid blanchedalmond;
+  color: blanchedalmond !important;
 }
 
 .avatar-mobile {
@@ -71,7 +74,7 @@ i {
   font-size: 1.3rem;
 }
 
-@media (max-width: 1024px) {
+@media (max-width: 800px) {
   .profile-container {
     grid-template-rows: minmax(3rem, max-content);
     background-color: rgba(255, 255, 255, 0.1);

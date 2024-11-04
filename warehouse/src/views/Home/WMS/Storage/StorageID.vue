@@ -1,11 +1,32 @@
 <template>
-  <div class="wms-home-container">
-    <div class="wms-input"
-         @click="router.push({name: 'wmsIN'})"
-    >ПРИЁМКА
+  <div class="storage-id-container">
+    <div class="storage-id-title">
+      <div>Склад {{ storageStore.warehouseData.number }}: {{ storageStore.warehouseData.name }},
+        {{ storageStore.warehouseData.address }} [ Ёмкость: {{ storageStore.warehouseData.max_capacity }} ячеек ]
+      </div>
     </div>
-    <router-view></router-view>
-    <router-view name="TTM"/>
+    <div class="storage-id-actions">
+      <router-link class="storage-id-actions-items"
+                   :to="{name: 'wmsIN'}"
+      >Приёмка
+      </router-link>
+      <router-link class="storage-id-actions-items"
+                   :to="{name: 'wmsOUT'}"
+      >Отгрузка
+      </router-link>
+      <router-link class="storage-id-actions-items"
+                   :to="{name: 'wmsTransfer'}"
+      >Перемещение
+      </router-link>
+      <router-link class="storage-id-actions-items"
+                   :to="{name: 'wmsCheck'}"
+      >Инвентаризация
+      </router-link>
+    </div>
+    <div class="storage-id-terminal">
+      <router-view></router-view>
+      <router-view name="TTM"/>
+    </div>
   </div>
 </template>
 <script setup>
@@ -18,48 +39,82 @@ const storageStore = useStorageStore()
 const router = useRouter()
 </script>
 <style scoped>
-.wms-home-container {
+.storage-id-container {
   display: grid;
-  overflow: hidden;
+  grid-template-areas:
+      "storageTitle storageTitle"
+      "storageActions storageTerminal";
+  grid-template-columns: minmax(auto, max-content) 1fr;
+  grid-template-rows: min-content;
+  gap: 2rem;
+  padding: 0 1rem;
+}
+
+.storage-id-title {
+  grid-area: storageTitle;
+  display: grid;
   grid-template-columns: 1fr;
-  justify-items: center;
-  gap: 5rem;
+  font-size: 1.5rem;
+  color: #9B9482;
+  border-bottom: 1px solid #9B9482;
 }
 
-.wms-input {
-  border: 2px double #E32029;
-  font-size: 5rem;
-  text-transform: uppercase;
-  padding: 10px;
+.storage-id-actions {
+  grid-area: storageActions;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-auto-rows: min-content;
+  font-size: 1.5rem;
+  row-gap: 2rem;
   cursor: pointer;
 }
 
-.wms-input:hover {
-  background-color: #42b983;
+.storage-id-actions-items {
+  display: grid;
+  padding: 1rem 5px;
+  border: 1px solid #9B9482;
+  text-align: center;
 }
 
-.wms-output {
-  border: 2px double #E32029;
-  font-size: 5rem;
-  text-transform: uppercase;
-  padding: 10px;
-  cursor: pointer;
+.storage-id-actions-items:hover {
+  background: #9B9482;
 }
 
-.wms-output:hover {
-  background-color: #42b983;
+.storage-id-terminal {
+  grid-area: storageTerminal;
+  overflow: hidden;
 }
 
-@media (max-width: 1024px) {
-  .general-page-container {
+.teplomash-active-exact-link {
+  background-color: #9B9482;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+  margin: 0;
+  padding: 0;
+}
+
+@media (max-width: 800px) {
+  .storage-id-container {
     display: grid;
-    row-gap: 2rem;
+    grid-template-areas:
+      "storageTitle"
+      "storageActions"
+      "storageTerminal";
+    grid-template-columns: 1fr;
+    grid-template-rows: min-content;
+    gap: 2rem;
+    padding: 0 1rem;
   }
 
-  .wms-input, .wms-output {
-    font-size: 2rem;
-    padding: 10px 50px;
+  .storage-id-title {
+    font-size: 1rem;
   }
 
+  .storage-id-actions {
+    row-gap: 1rem;
+  }
 }
 </style>

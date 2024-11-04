@@ -13,8 +13,8 @@
     </div>
     <nav class="navbar navbar-dark bg-dark">
       <div class="container-fluid">
-        <div>
-          <logo-teplomash class="navbar-logo"/>
+        <div class="navbar-logo">
+          <logo-teplomash @click="router.push({name: 'Home'})"/>
         </div>
         <button aria-controls="navbarToggleExternalContent" aria-expanded="false" aria-label="Toggle navigation"
                 class="navbar-toggler collapsed" data-bs-target="#navbarToggleExternalContent"
@@ -26,7 +26,7 @@
   </div>
   <!-- Основной header для десктопа -->
   <div class="navbar-content desktop-navbar">
-    <logo-teplomash class="navbar-logo"/>
+    <logo-teplomash class="navbar-logo" @click="router.push({name: 'Home'})"/>
     <header-nav class="navbar-menu"/>
     <header-search class="navbar-search"/>
     <header-profile class="navbar-profile"/>
@@ -37,9 +37,14 @@ import HeaderSearch from "@/views/Header/Search/NavbarSearch.vue";
 import HeaderProfile from "@/views/Header/Profile/NavbarProfile.vue";
 import LogoTeplomash from "@/components/UI/SVG/svgLogo.vue";
 import HeaderNav from "@/views/Header/Menu/NavbarMenu.vue";
+import {useRouter} from "vue-router";
+
+const router = useRouter()
 </script>
 <style scoped>
 .navbar-content {
+  max-width: 1400px;
+  margin: 0 auto;
   display: grid;
   grid: "logo navigation search profile";
   column-gap: 20px;
@@ -73,7 +78,7 @@ import HeaderNav from "@/views/Header/Menu/NavbarMenu.vue";
   display: none;
 }
 
-@media (max-width: 1350px) {
+@media (max-width: 1140px) {
   .navbar-content {
     grid: "logo navigation profile"
           "search search search";
@@ -82,7 +87,7 @@ import HeaderNav from "@/views/Header/Menu/NavbarMenu.vue";
   }
 }
 
-@media (max-width: 1024px) {
+@media (max-width: 800px) {
   /* Стили для мобильного navbar */
   .navbar-content {
     padding: 0;

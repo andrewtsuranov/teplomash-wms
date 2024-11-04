@@ -24,7 +24,7 @@ const yearNow = ref(new Date().getFullYear())
   grid-template-columns: auto 1fr auto;
   grid-template-rows: minmax(50px, auto) auto;
   column-gap: 20px;
-  padding: 0 20px;
+  padding: 0 1.2rem;
   color: dimgray;
   align-items: center;
 }

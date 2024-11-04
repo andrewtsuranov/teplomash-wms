@@ -1,7 +1,5 @@
 <template>
-  <div>
-    <h1>Ship to...list</h1>
-  </div>
+  <h1>Here is gonna be StorageShipToView</h1>
 </template>
 <script setup>
 </script>

@@ -9,14 +9,11 @@
 </template>
 <script setup>
 import {onMounted} from "vue";
-import {useRouter, useRoute} from "vue-router";
-import {useUserStore} from "@/stores/HTTP/Auth/UserStore.js";
+import {useRouter} from "vue-router";
 import {useStorageStore} from "@/stores/HTTP/WMS/StorageStore.js";
 
-const userStore = useUserStore()
 const storageStore = useStorageStore()
 const router = useRouter()
-const route = useRoute()
 onMounted(() => {
   storageStore.GET_WAREHOUSES()
 })
@@ -29,46 +26,36 @@ const handlerClickStorage = async (id) => {
 <style scoped>
 .wms-home-container {
   display: grid;
-  overflow: hidden;
-  grid-template-columns: 1fr;
-  justify-items: center;
+  grid-template-columns: minmax(auto, max-content);
+  grid-auto-flow: row;
+  grid-template-rows: min-content;
+  align-items: start;
+  justify-self: center;
   gap: 5rem;
 }
 
 .wms-input {
   border: 2px double #E32029;
-  font-size: 5rem;
+  font-size: 2rem;
   text-transform: uppercase;
   padding: 10px;
   cursor: pointer;
 }
 
 .wms-input:hover {
-  background-color: #42b983;
+  background-color: #2F2D2B;
 }
 
-.wms-output {
-  border: 2px double #E32029;
-  font-size: 5rem;
-  text-transform: uppercase;
-  padding: 10px;
-  cursor: pointer;
-}
-
-.wms-output:hover {
-  background-color: #42b983;
-}
-
-@media (max-width: 1024px) {
-  .general-page-container {
+@media (max-width: 800px) {
+  .wms-home-container {
     display: grid;
     row-gap: 2rem;
+    padding: 1rem;
   }
 
-  .wms-input, .wms-output {
+  .wms-input {
     font-size: 2rem;
     padding: 10px 50px;
   }
 }
-
 </style>
