@@ -1,16 +1,21 @@
 <template>
   <!-- Скрывающийся navbar для мобильных -->
-  <div class="mobile-header">
-    <div id="navbarToggleExternalContent" class="collapse" data-bs-theme="dark" style="">
-      <div class="bg-dark header-container">
-        <header-nav class="header-navigation"/>
-        <header-search class="header-search"/>
-        <header-profile class="header-profile"/>
+  <div class="mobile-navbar">
+    <div id="navbarToggleExternalContent"
+         class="collapse"
+         data-bs-theme="dark"
+    >
+      <div class="bg-dark navbar-content">
+        <header-nav class="navbar-menu"/>
+        <header-search class="navbar-search"/>
+        <header-profile class="navbar-profile"/>
       </div>
     </div>
     <nav class="navbar navbar-dark bg-dark">
       <div class="container-fluid">
-        <logo-teplomash :height="logoHeight" class="header-logo"/>
+        <div>
+          <logo-teplomash class="navbar-logo"/>
+        </div>
         <button aria-controls="navbarToggleExternalContent" aria-expanded="false" aria-label="Toggle navigation"
                 class="navbar-toggler collapsed" data-bs-target="#navbarToggleExternalContent"
                 data-bs-toggle="collapse" type="button">
@@ -20,60 +25,56 @@
     </nav>
   </div>
   <!-- Основной header для десктопа -->
-  <div class="header-container desktop-header">
-    <logo-teplomash :height="logoHeight" class="header-logo"/>
-    <header-nav class="header-navigation"/>
-    <header-search class="header-search"/>
-    <header-profile class="header-profile"/>
+  <div class="navbar-content desktop-navbar">
+    <logo-teplomash class="navbar-logo"/>
+    <header-nav class="navbar-menu"/>
+    <header-search class="navbar-search"/>
+    <header-profile class="navbar-profile"/>
   </div>
 </template>
 <script setup>
-import HeaderSearch from "@/views/Header/Search/HeaderSearch.vue";
-import HeaderProfile from "@/views/Header/Profile/HeaderProfile.vue";
-import LogoTeplomash from "@/components/UI/LogoTeplomash.vue";
-import HeaderNav from "@/views/Header/Navigation/HeaderNav.vue";
-import {ref} from "vue";
-
-const logoHeight = ref('50px')
+import HeaderSearch from "@/views/Header/Search/NavbarSearch.vue";
+import HeaderProfile from "@/views/Header/Profile/NavbarProfile.vue";
+import LogoTeplomash from "@/components/UI/SVG/svgLogo.vue";
+import HeaderNav from "@/views/Header/Menu/NavbarMenu.vue";
 </script>
 <style scoped>
-.header-container {
+.navbar-content {
   display: grid;
   grid: "logo navigation search profile";
   column-gap: 20px;
-  align-items: center;
-  grid-template-columns: minmax(max-content, 250px) minmax(400px, auto) minmax(300px, auto) auto;
-  grid-template-rows: 60px;
-  padding: 0 50px;
+  grid-template-columns: minmax(240px, auto) minmax(400px, auto) minmax(300px, auto) auto;
+  grid-template-rows: minmax(auto, 60px);
+  padding: 0 3rem;
 }
 
-.header-logo {
+.navbar-logo {
   grid-area: logo;
   display: grid;
+  grid-template-rows: minmax(auto, 50px);
+  align-self: center;
 }
 
-.header-navigation {
+.navbar-menu {
   grid-area: navigation;
-  display: grid;
 }
 
-.header-search {
+.navbar-search {
   grid-area: search;
-  display: grid;
 }
 
-.header-profile {
+.navbar-profile {
   grid-area: profile;
   display: grid;
   justify-items: end;
 }
 
-.mobile-header {
+.mobile-navbar {
   display: none;
 }
 
 @media (max-width: 1350px) {
-  .header-container {
+  .navbar-content {
     grid: "logo navigation profile"
           "search search search";
     grid-template-columns: minmax(max-content, 250px) minmax(400px, auto) auto;
@@ -83,7 +84,7 @@ const logoHeight = ref('50px')
 
 @media (max-width: 1024px) {
   /* Стили для мобильного navbar */
-  .header-container {
+  .navbar-content {
     padding: 0;
     grid: "search"
         "navigation"
@@ -91,21 +92,22 @@ const logoHeight = ref('50px')
     row-gap: 1.7rem;
   }
 
-  .header-search {
+  .navbar-search {
     padding: 20px 20px 0 20px;
   }
 
-  .header-profile {
+  .navbar-profile {
     display: grid;
     justify-items: stretch;
   }
 
-  .desktop-header {
+  .desktop-navbar {
     display: none;
   }
 
-  .mobile-header {
+  .mobile-navbar {
     display: grid;
+    grid-template-rows: minmax(auto, 1fr);
   }
 }
 </style>

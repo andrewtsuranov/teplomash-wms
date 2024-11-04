@@ -62,7 +62,8 @@ export const useUserStore = defineStore('userStore', () => {
             lastName,
             firstName,
             middlename,
-            initials: `${firstName[0]}.${middlename[0]}.`
+            initials: `${firstName[0]}${middlename[0]}`,
+            initialsDot: `${firstName[0]}.${middlename[0]}.`
         }
     })
     const roleUser = computed(() => {

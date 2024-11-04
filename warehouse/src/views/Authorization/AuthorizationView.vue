@@ -13,7 +13,7 @@
 </template>
 <script setup>
 import {RouterView} from 'vue-router'
-import LogoMain from "@/components/UI/LogoTeplomash.vue"
+import LogoMain from "@/components/UI/SVG/svgLogo.vue"
 import {ref} from "vue";
 
 const valuePX = ref('140px')

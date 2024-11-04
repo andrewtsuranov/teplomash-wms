@@ -3,7 +3,7 @@
     <div v-for="item in storageStore.fullListWarehouses"
          class="wms-input"
          @click="handlerClickStorage(item.id)"
-    >Склад Тепломаш {{ item.name }}
+    >Склад {{ item.id }}: {{ item.name }}
     </div>
   </div>
 </template>
@@ -69,6 +69,6 @@ const handlerClickStorage = async (id) => {
     font-size: 2rem;
     padding: 10px 50px;
   }
-
 }
+
 </style>

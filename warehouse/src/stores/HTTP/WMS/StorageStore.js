@@ -8,7 +8,7 @@ import {ref, computed} from "vue"
 const userStore = useUserStore()
 const router = useRouter()
 const kyStd = ky.create({
-    prefixUrl: 'http://38.180.192.229/api/manager/warehouses/',
+    prefixUrl: 'http://38.180.192.229/api/manager/',
     // prefixUrl: 'http://lab:8080/api/manager/',
     retry: 0,
     headers: {

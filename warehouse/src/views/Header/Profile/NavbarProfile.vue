@@ -1,8 +1,8 @@
 <template>
-  <div class="header-profile-container">
+  <div class="profile-container">
     <div class="dropdown d-grid">
       <div class="avatar-mobile" data-bs-toggle="dropdown">
-        <label>Профиль: {{ userData.lastName }} {{ userData.initials }}</label>
+        <label>Профиль: {{ userData.lastName }} {{ userData.initialsDot }}</label>
       </div>
       <BAvatar aria-expanded="false"
                bg-variant="secondary"
@@ -13,7 +13,7 @@
                size="2.7rem"
       />
       <div class="dropdown-menu dropdown-menu-dark">
-        <div class="header-profile-dropdown">
+        <div class="profile-dropdown">
           <div class="profile-name dropdown-header">
             {{ userData.lastName }} {{ userData.firstName }} {{ userData.middlename }} ({{ userRole }})
           </div>
@@ -40,12 +40,12 @@ const logout = () => {
 }
 </script>
 <style scoped>
-.header-profile-container {
+.profile-container {
   display: grid;
   place-items: center;
 }
 
-.header-profile-dropdown {
+.profile-dropdown {
   display: grid;
   row-gap: 0.8rem;
 }
@@ -67,17 +67,12 @@ nav a {
   text-decoration: none;
 }
 
-nav.teplomash-active-exact-link {
-  /*background-color: rgba(255, 255, 255, 0.1);*/
-  color: chocolate;
-}
-
 i {
   font-size: 1.3rem;
 }
 
 @media (max-width: 1024px) {
-  .header-profile-container {
+  .profile-container {
     grid-template-rows: minmax(3rem, max-content);
     background-color: rgba(255, 255, 255, 0.1);
     place-items: stretch;
@@ -87,7 +82,7 @@ i {
     cursor: pointer;
   }
 
-  .header-profile-dropdown {
+  .profile-dropdown {
     display: grid;
   }
 

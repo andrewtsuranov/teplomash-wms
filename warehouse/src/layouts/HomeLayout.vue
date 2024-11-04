@@ -4,13 +4,14 @@
       <header-view/>
     </header>
     <div v-if="userStore.loading">Loading...</div>
+    <div v-else></div>
     <main class="home-layout-main">
       <router-view></router-view>
     </main>
   </div>
 </template>
 <script setup>
-import HeaderView from "@/views/Header/HeaderView.vue";
+import HeaderView from "@/views/Header/NavbarView.vue";
 import {useUserStore} from "@/stores/HTTP/Auth/UserStore.js";
 
 const userStore = useUserStore()
@@ -18,9 +19,8 @@ const userStore = useUserStore()
 <style scoped>
 .home-layout-container {
   display: grid;
-  grid: "homeHeader"
-        "homeMain";
-  grid-template-rows: 60px 1fr;
+  grid-template-columns: 1fr;
+  grid-template-rows: minmax(60px, auto) 1fr;
 }
 
 .home-layout-header {
@@ -28,15 +28,16 @@ const userStore = useUserStore()
   top: 0;
   left: 0;
   right: 0;
-  z-index: 100;
-  grid-area: homeHeader;
-  display: grid;
+  z-index: 1000;
   background: #311617;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
-  grid-template-columns: 1fr;
+  width: 100%;
+  box-shadow: 0 1px 20px rgba(0, 0, 0, 0.8);
 }
 
 .home-layout-main {
-  grid-area: homeMain;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr;
+  padding: 2rem 0;
 }
 </style>
