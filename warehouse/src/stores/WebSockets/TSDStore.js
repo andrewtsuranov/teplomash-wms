@@ -14,24 +14,23 @@ export const useWebSocketStore = defineStore('websocket', () => {
     const reconnectAttempts = ref(0)
     const maxReconnectAttempts = ref(5)
     const reconnectDelay = ref(3000)
-    const onlineUsers = ref(0)
+    const onlineDevices = ref([])
     const lastPongTime = ref(null)
-    const userConnect = ref([])
+    // const userConnect = ref([])
     const privateMessage = ref(null)
     const privateMessageID = ref(null)
     const receivedMessage = ref(null)
 //Getters
     const lastMessage = computed(() => message.value)
     const connectionStatus = computed(() => isConnected.value ? 'В сети' : 'Не в сети')
-    const onlineUsersCount = computed(() => onlineUsers.value)
-    const onlineDeviceId = computed(() => userConnect.value)
     const getPrivateMessage = computed(() => privateMessage.value)
     const getPrivateMessageID = computed(() => privateMessageID.value)
+    const onlineDevicesIdByRole = computed(() => { return onlineDevices.value.filter((device) => device.role === 'LOADER');});
 
 //Actions
     function initWebSocket() {
-        // const wsUrl = `ws//lab:8081/WebSockets/inventory/?token=${userStore.getTokenAccess}`
-        const wsUrl = `ws://38.180.192.229/ws/inventory/?token=${userStore.getTokenAccess}`
+        const wsUrl = `ws://lab:8081/ws/inventory/?token=${userStore.getTokenAccess}`
+        // const wsUrl = `ws://38.180.192.229/ws/inventory/?token=${userStore.getTokenAccess}`
         socket.value = new WebSocket(wsUrl)
         socket.value.onopen = onOpen.bind(this)
         socket.value.onclose = onClose.bind(this)
@@ -78,8 +77,7 @@ export const useWebSocketStore = defineStore('websocket', () => {
             }
             // Обработка сообщения: получение активных пользователей
             if (data.type === 'online_users') {
-                onlineUsers.value = data.users.length
-                userConnect.value = data.users
+                onlineDevices.value = data.users
             }
             // Обработка сообщения: получение приватного ссобщения
             if (data.type === 'private_message') {
@@ -187,19 +185,17 @@ export const useWebSocketStore = defineStore('websocket', () => {
         reconnectAttempts,
         maxReconnectAttempts,
         reconnectDelay,
-        onlineUsers,
-        userConnect,
+        onlineDevices,
         privateMessage,
         privateMessageID,
         receivedMessage,
 //getters
         lastMessage,
         connectionStatus,
-        onlineUsersCount,
         lastPongTime,
-        onlineDeviceId,
         getPrivateMessage,
         getPrivateMessageID,
+        onlineDevicesIdByRole,
 //actions
         initWebSocket,
         onOpen,

@@ -44,7 +44,7 @@ const router = createRouter({
                 {
                     path: 'wms',
                     name: 'WMS',
-                    component: () => import('@/views/Home/WMS/StoragesView.vue')
+                    component: () => import('@/views/Home/WMS/StoragesView.vue'),
                 },
                 {
                     path: 'wms/:id',
@@ -56,8 +56,15 @@ const router = createRouter({
                             name: 'wmsIN',
                             components: {
                                 default: () => import('@/views/Home/WMS/Storage/GReceiptFrom/Data/ReceiptListView.vue'),
-                                TTM: () => import('@/views/Home/WMS/TeplomashTaskManager/TeplomashTaskManagerView.vue')
+                                TTM: () => import('@/views/Home/WMS/TeplomashTaskManager/TeplomashTaskManagerView.vue'),
                             },
+                            children: [
+                                {
+                                    path: ':tsd',
+                                    name: 'taskTsd',
+                                    component: () => import('@/views/Home/WMS/TeplomashTaskManager/Terminal/TTMTerminal.vue'),
+                                },
+                            ]
                         },
                         {
                             path: 'out',

@@ -6,8 +6,8 @@ import {ref, computed} from "vue"
 
 const router = useRouter()
 const kyStd = ky.create({
-    prefixUrl: 'http://38.180.192.229/api/auth/',
-    // prefixUrl: 'http://lab:8080/api/auth/',
+    // prefixUrl: 'http://38.180.192.229/api/auth/',
+    prefixUrl: 'http://lab:8080/api/auth/',
     retry: 0,
 })
 const kyLogin = kyStd.extend({
@@ -186,9 +186,9 @@ export const useUserStore = defineStore('userStore', () => {
         }
     }
 
-    function clearUserData() {
+    function clearFullLocalStorage() {
         user.value = null
-        localStorage.removeItem('userData')
+        localStorage.clear()
         return true
     }
 
@@ -200,11 +200,11 @@ export const useUserStore = defineStore('userStore', () => {
         LOGIN,
         SIGNUP,
         VERIFY,
-        clearUserData,
         getFullNameUser,
         roleUser,
         getTokenAccess,
         getUserId,
         getUserEmail,
+        clearFullLocalStorage,
     }
 })

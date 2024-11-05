@@ -21,6 +21,18 @@
     </nav>
     <!-- Основной контент -->
     <main class="main-content" :style="{ marginTop: navbarHeight + 'px' }">
+              <my-button :disabled="!webSocketStore.isConnected"
+                         @click="webSocketStore.createWarehouse"
+              >Создать склад
+              </my-button>
+              <my-button :disabled="!webSocketStore.isConnected"
+                         @click="webSocketStore.getWarehouse"
+              >Получить склад
+              </my-button>
+              <my-button :disabled="!webSocketStore.isConnected"
+                         @click="webSocketStore.createPallet"
+              >Создать паллету
+              </my-button>
       <div class="grid-container">
         <div v-for="n in 12" :key="n" class="grid-item">
           Контент {{ n }}

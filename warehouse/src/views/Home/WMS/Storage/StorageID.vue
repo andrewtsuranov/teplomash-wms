@@ -37,6 +37,7 @@ import {useStorageStore} from "@/stores/HTTP/WMS/StorageStore.js";
 const userStore = useUserStore()
 const storageStore = useStorageStore()
 const router = useRouter()
+
 </script>
 <style scoped>
 .storage-id-container {
@@ -73,6 +74,7 @@ const router = useRouter()
   display: grid;
   padding: 1rem 5px;
   border: 1px solid #9B9482;
+  border-radius: 1rem;
   text-align: center;
 }
 

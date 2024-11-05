@@ -2,12 +2,12 @@ import {useErrorStore} from "@/stores/Error/ErrorStore.js"
 import {defineStore} from 'pinia'
 import {useUserStore} from "@/stores/HTTP/Auth/UserStore.js";
 import ky from "ky"
-import {ref} from "vue"
+import {computed, ref} from "vue"
 
 const userStore = useUserStore()
 const kyStd = ky.create({
-    prefixUrl: 'http://38.180.192.229/api/manager/',
-    // prefixUrl: 'http://lab:8080/api/manager/',
+    // prefixUrl: 'http://38.180.192.229/api/manager/',
+    prefixUrl: 'http://lab:8080/api/manager/',
     retry: 0,
     headers: {
         Authorization: `Bearer ${userStore.getTokenAccess}`
@@ -20,6 +20,9 @@ export const useStorageStore = defineStore('storageStore', () => {
     const fullListWarehouses = ref(JSON.parse(localStorage.getItem('warehouses')) || null)
     const warehouseData = ref(JSON.parse(localStorage.getItem('warehouseData')) || null)
 //getters
+    const sortedWarehouses = computed(() => {
+        return fullListWarehouses.value.slice().sort((a, b) => a.number - b.number);
+    });
 //actions
     async function GET_WAREHOUSES() {
         loading.value = true;
@@ -65,6 +68,7 @@ export const useStorageStore = defineStore('storageStore', () => {
         fullListWarehouses,
         warehouseData,
 //getters
+        sortedWarehouses,
 //actions
         GET_WAREHOUSES,
         WAREHOUSE_ID,

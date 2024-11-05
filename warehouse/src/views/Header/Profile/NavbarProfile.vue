@@ -36,7 +36,7 @@ const userData = computed(() => userStore.getFullNameUser)
 const userRole = computed(() => userStore.roleUser)
 const logout = () => {
   router.push({name: 'Login'})
-  userStore.clearUserData()
+  userStore.clearFullLocalStorage()
 }
 </script>
 <style scoped>

@@ -25,58 +25,60 @@
         >{{ webSocketStore.reconnectAttempts }}
         </span>
         <span v-if="webSocketStore.isConnected"
-        >Пользователи в сети:
+        >ТСД в сети:
         </span>
-        <span v-if="webSocketStore.isConnected"
+        <span v-if="webSocketStore.isConnected && webSocketStore.onlineDevicesIdByRole.length"
               class="online-users-count"
-        >{{ webSocketStore.onlineUsersCount }}
+        >{{ webSocketStore.onlineDevicesIdByRole.length }}
+        </span>
+        <span v-else-if="webSocketStore.isConnected && !webSocketStore.onlineDevicesIdByRole.length"
+              class="none-users-count"
+        >Нет активных ТСД
         </span>
       </div>
       <div class="ttm-settings-button-group">
         <my-button :disabled="webSocketStore.isConnected"
-                   @click="webSocketStore.initWebSocket"
                    class="my-btn-connect"
+                   @click="webSocketStore.initWebSocket"
         >Connect
         </my-button>
         <my-button :disabled="!webSocketStore.isConnected"
-                   @click="handlerDisconnect"
                    class="my-btn-disconnect"
+                   @click="handlerDisconnect"
         >Disconnect
         </my-button>
-        <!--        <my-button :disabled="!webSocketStore.isConnected"-->
-        <!--                   @click="webSocketStore.createWarehouse"-->
-        <!--        >Создать склад-->
-        <!--        </my-button>-->
-        <!--        <my-button :disabled="!webSocketStore.isConnected"-->
-        <!--                   @click="webSocketStore.getWarehouse"-->
-        <!--        >Получить склад-->
-        <!--        </my-button>-->
-        <!--        <my-button :disabled="!webSocketStore.isConnected"-->
-        <!--                   @click="webSocketStore.createPallet"-->
-        <!--        >Создать паллету-->
-        <!--        </my-button>-->
       </div>
     </div>
     <div class="ttm-tsd">
-      <label v-if="!webSocketStore.isConnected" class="ttm-tsd-name-inactive">Нет активных ТСД</label>
-      <div v-else class="ttm-tsd-active">
-        <label class="ttm-tsd-name-active">Активные ТСД:</label>
-        <div v-for="device in webSocketStore.onlineDeviceId"
-             v-bind:key="device.id"
-             class="ttm-tsd-item-active"
-        >
-          <router-link :to="{ name: 'taskTsd', params: { id: device.id } }"
-                       class="ttm-tsd-item-name"
-          >ТСД №{{ device.id }} ({{ device.email }})
-          </router-link>
+      <label v-if="!webSocketStore.isConnected" class="ttm-tsd-name-offline">Нет соединения с ТСД</label>
+      <div v-else class="ttm-tsd-online">
+        <label class="ttm-tsd-header-online">Активные ТСД:</label>
+        <div v-if="webSocketStore.isConnected && webSocketStore.onlineDevicesIdByRole.length"
+             class="ttm-tsd-list-online">
+          <div v-for="device in webSocketStore.onlineDevicesIdByRole"
+               :key="device.id"
+               class="ttm-tsd-item-online"
+          >
+            <router-link :to="{ name: 'taskTsd', params: { tsd: device.id } }"
+                         class="ttm-tsd-item-name-online"
+            >ТСД №{{ device.id }} ({{ device.email }})
+            </router-link>
+          </div>
+        </div>
+        <div v-if="webSocketStore.isConnected && !webSocketStore.onlineDevicesIdByRole.length"
+             class="ttm-tsd-none-online">
+          <label class="ttm-tsd-none-item-online">Список пуст</label>
         </div>
       </div>
     </div>
-    <div class="ttm-task">
-      <div>
-        <router-view v-if="webSocketStore.isConnected"></router-view>
-        <div v-else>Нет подключения к сети</div>
-        <div v-if="webSocketStore.isConnected && !route.meta.isLoading">Выберите активный ТСД</div>
+    <div class="ttm-terminal">
+      <div class="ttm-terminal-view">
+        <div v-if="!webSocketStore.isConnected" class="ttm-terminal-name-offline">Терминал</div>
+
+        <router-view v-if="webSocketStore.isConnected && route.params.tsd.length"></router-view>
+        <div v-else-if="webSocketStore.isConnected && !route.params.tsd.length"
+             class="ttm-terminal-name-offline"
+        >Выберите активный ТСД</div>
       </div>
     </div>
   </div>
@@ -103,6 +105,7 @@ const handlerDisconnect = () => {
       "settings task"
       "tsd task";
   grid-template-columns: minmax(auto, 1fr) minmax(auto, 1fr);
+  /*grid-template-rows: min-content min-content min-content;*/
   gap: 1rem;
 }
 
@@ -147,6 +150,18 @@ const handlerDisconnect = () => {
   font-size: 1.1rem;
   font-weight: bold;
   color: #4CAF50;
+}
+
+.none-users-count {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #514D4C;
+}
+
+.none-active-tsd {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #514D4C;
 }
 
 .reconnected-count {
@@ -211,6 +226,58 @@ const handlerDisconnect = () => {
   font-size: 1.2rem;
 }
 
+.ttm-tsd-online {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: min-content auto;
+}
+
+.ttm-tsd-name-offline,
+.ttm-terminal-name-offline {
+  display: grid;
+  place-items: center;
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #514D4C;
+}
+
+.ttm-tsd-online {
+
+}
+
+.ttm-tsd-header-online {
+  /*display: grid;*/
+  /*align-items: center;*/
+  color: #4CAF50;
+  font-weight: bold;
+  padding: .5rem 1rem;
+  border-bottom: 1px solid #605039e0;
+}
+
+.ttm-tsd-list-online {
+
+}
+
+.ttm-tsd-item-online {
+
+}
+
+.ttm-tsd-item-name-online {
+
+}
+
+.ttm-tsd-none-online {
+  display: grid;
+  place-items: center;
+}
+
+.ttm-tsd-none-item-online {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #514D4C;
+}
+
+
 .ttm-tsd-name-inactive {
   display: grid;
   grid-template-rows: 1fr;
@@ -220,11 +287,7 @@ const handlerDisconnect = () => {
 }
 
 .ttm-tsd-name-active {
-  display: grid;
-  align-items: center;
-  color: #4CAF50;
-  font-weight: bold;
-  padding: 0 1rem;
+
 }
 
 .ttm-tsd-active {
@@ -258,7 +321,7 @@ const handlerDisconnect = () => {
   color: #ffffffbf;
 }
 
-.ttm-task {
+.ttm-terminal {
   grid-area: task;
   display: grid;
   grid-template-columns: minmax(25rem, 1fr);
@@ -267,7 +330,11 @@ const handlerDisconnect = () => {
   background-color: #2623238f;
   border-radius: 10px;
   overflow-y: auto;
-  align-items: stretch;
+}
+
+.ttm-terminal-view {
+  display: grid;
+
 }
 
 a,

@@ -1,6 +1,6 @@
 <template>
   <div class="ttm-task-container">
-    <div class="ttm-task-active-tsd">Выбран: ТСД №{{ route.params.id }}</div>
+    <div class="ttm-task-active-tsd">Выбран: ТСД №{{ route.params.tsd }}</div>
     <div class="ttm-task-terminal">
       <div>
         <h3>Терминал:</h3>
@@ -21,7 +21,7 @@
       <button id="button-addon2"
               class="btn btn-dark"
               type="button"
-              @click="webSocketStore.sendMessage(message, route.params.id)"
+              @click="webSocketStore.sendMessage(message, route.params.tsd)"
       >Отправить
       </button>
     </div>
@@ -35,6 +35,7 @@ import {ref} from "vue";
 const webSocketStore = useWebSocketStore()
 const route = useRoute()
 const message = ref()
+
 </script>
 <style scoped>
 .ttm-task-container {
