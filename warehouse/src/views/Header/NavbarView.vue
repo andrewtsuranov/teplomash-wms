@@ -48,7 +48,7 @@ const router = useRouter()
   display: grid;
   grid: "logo navigation search profile";
   column-gap: 20px;
-  grid-template-columns: minmax(240px, auto) minmax(400px, auto) minmax(300px, auto) auto;
+  grid-template-columns: minmax(160px, auto) minmax(400px, auto) minmax(300px, auto) auto;
   grid-template-rows: minmax(auto, 60px);
   padding: 0 3rem;
 }

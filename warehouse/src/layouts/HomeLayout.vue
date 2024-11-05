@@ -42,4 +42,18 @@ const userStore = useUserStore()
   grid-template-rows: 1fr;
   padding: 2rem 0;
 }
+
+@media (max-width: 1140px) {
+  .home-layout-container {
+    display: grid;
+    grid-template-rows: minmax(120px, auto) 1fr;
+  }
+}
+
+@media (max-width: 800px) {
+  .home-layout-container {
+    display: grid;
+    grid-template-rows: minmax(60px, auto) 1fr;
+  }
+}
 </style>

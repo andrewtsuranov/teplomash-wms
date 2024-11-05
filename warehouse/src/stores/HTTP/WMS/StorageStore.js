@@ -6,8 +6,8 @@ import {computed, ref} from "vue"
 
 const userStore = useUserStore()
 const kyStd = ky.create({
-    // prefixUrl: 'http://38.180.192.229/api/manager/',
-    prefixUrl: 'http://lab:8080/api/manager/',
+    prefixUrl: 'http://38.180.192.229/api/manager/',
+    // prefixUrl: 'http://lab:8080/api/manager/',
     retry: 0,
     headers: {
         Authorization: `Bearer ${userStore.getTokenAccess}`
@@ -23,6 +23,7 @@ export const useStorageStore = defineStore('storageStore', () => {
     const sortedWarehouses = computed(() => {
         return fullListWarehouses.value.slice().sort((a, b) => a.number - b.number);
     });
+
 //actions
     async function GET_WAREHOUSES() {
         loading.value = true;

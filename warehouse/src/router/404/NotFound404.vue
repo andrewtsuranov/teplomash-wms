@@ -4,7 +4,7 @@
       <h1>Ошибка 404! Страница не найдена!</h1>
       <my-button
           class="not-found-btn"
-          @click="router.push({name: 'General'})"
+          @click="router.push({name: 'Home'})"
       >Вернуться назад
       </my-button>
     </div>
@@ -19,12 +19,18 @@ const router = useRouter()
 <style scoped>
 .not-found-container {
   display: grid;
+  grid-template-columns: minmax(min-content, auto);
+  grid-template-rows: 1fr;
+  justify-content: center;
+  height: 100%;
   /*grid-template-columns: minmax(min-content, auto);*/
-  place-items: center;
 }
 
 .not-found {
   display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr 1fr;
+  align-items: center;
   /*grid-template-columns: minmax(min-content, auto);*/
   row-gap: 40px;
 }

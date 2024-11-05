@@ -7,20 +7,28 @@
     </div>
     <div class="storage-id-actions">
       <router-link class="storage-id-actions-items"
-                   :to="{name: 'wmsIN'}"
+                   :to="{name: 'wmsReceiving'}"
       >Приёмка
       </router-link>
       <router-link class="storage-id-actions-items"
-                   :to="{name: 'wmsOUT'}"
+                   :to="{name: 'wmsShipping'}"
       >Отгрузка
       </router-link>
       <router-link class="storage-id-actions-items"
-                   :to="{name: 'wmsTransfer'}"
-      >Перемещение
+                   :to="{name: 'wmsPicking'}"
+      >Сборка
       </router-link>
       <router-link class="storage-id-actions-items"
-                   :to="{name: 'wmsCheck'}"
+                   :to="{name: 'wmsReturns'}"
+      >Возврат
+      </router-link>
+      <router-link class="storage-id-actions-items"
+                   :to="{name: 'wmsInventory'}"
       >Инвентаризация
+      </router-link>
+      <router-link class="storage-id-actions-items"
+                   :to="{name: 'wmsReporting'}"
+      >Аналитика
       </router-link>
     </div>
     <div class="storage-id-terminal">
@@ -30,24 +38,22 @@
   </div>
 </template>
 <script setup>
-import {useRouter} from "vue-router";
-import {useUserStore} from "@/stores/HTTP/Auth/UserStore.js";
+// import {useRouter} from "vue-router";
+// import {useUserStore} from "@/stores/HTTP/Auth/UserStore.js";
 import {useStorageStore} from "@/stores/HTTP/WMS/StorageStore.js";
-
-const userStore = useUserStore()
+// const userStore = useUserStore()
 const storageStore = useStorageStore()
-const router = useRouter()
-
+// const router = useRouter()
 </script>
 <style scoped>
 .storage-id-container {
   display: grid;
   grid-template-areas:
-      "storageTitle storageTitle"
+      ". storageTitle"
       "storageActions storageTerminal";
   grid-template-columns: minmax(auto, max-content) 1fr;
-  grid-template-rows: min-content;
-  gap: 2rem;
+  grid-template-rows:min-content 1fr;
+  gap: 1.5rem;
   padding: 0 1rem;
 }
 
@@ -55,9 +61,10 @@ const router = useRouter()
   grid-area: storageTitle;
   display: grid;
   grid-template-columns: 1fr;
-  font-size: 1.5rem;
+  font-size: 1.3rem;
   color: #9B9482;
   border-bottom: 1px solid #9B9482;
+  padding-bottom: .2rem;
 }
 
 .storage-id-actions {

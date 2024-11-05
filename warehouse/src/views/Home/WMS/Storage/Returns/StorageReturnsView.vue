@@ -1,5 +1,5 @@
 <template>
-  <h1>Here is gonna be StorageCountingView</h1>
+  <h1>Here is gonna be StorageReturnsView</h1>
 </template>
 <script setup>
 </script>

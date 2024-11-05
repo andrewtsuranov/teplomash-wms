@@ -42,49 +42,63 @@ const router = createRouter({
                     component: () => import('@/views/Home/HomeView.vue'),
                 },
                 {
-                    path: 'wms',
+                    path: 'warehouse',
                     name: 'WMS',
                     component: () => import('@/views/Home/WMS/StoragesView.vue'),
                 },
                 {
-                    path: 'wms/:id',
+                    path: '/warehouse/storage-:id',
                     name: 'WMSStorage',
                     component: () => import('@/views/Home/WMS/Storage/StorageID.vue'),
                     children: [
                         {
-                            path: 'in',
-                            name: 'wmsIN',
+                            path: 'receiving',
+                            name: 'wmsReceiving',
                             components: {
-                                default: () => import('@/views/Home/WMS/Storage/GReceiptFrom/Data/ReceiptListView.vue'),
+                                default: () => import('@/views/Home/WMS/Storage/Receiving/Data/StorageReceivingView.vue'),
                                 TTM: () => import('@/views/Home/WMS/TeplomashTaskManager/TeplomashTaskManagerView.vue'),
+                                props: {TTM: true}
                             },
                             children: [
                                 {
-                                    path: ':tsd',
-                                    name: 'taskTsd',
-                                    component: () => import('@/views/Home/WMS/TeplomashTaskManager/Terminal/TTMTerminal.vue'),
+                                    path: 'tsd#:tsd',
+                                    name: 'TTMTerminal',
+                                    components: {
+                                        default: () => import('@/views/Home/WMS/TeplomashTaskManager/Terminal/TTMTerminal.vue'),
+                                    },
+                                    props: {default: true},
                                 },
                             ]
                         },
                         {
-                            path: 'out',
-                            name: 'wmsOUT',
-                            component: () => import('@/views/Home/WMS/Storage/GShipTo/Data/GoodsShipToView.vue'),
+                            path: 'shipping',
+                            name: 'wmsShipping',
+                            component: () => import('@/views/Home/WMS/Storage/Shipping/Data/StorageShippingView.vue'),
                         },
                         {
-                            path: 'transfer',
-                            name: 'wmsTransfer',
-                            component: () => import('@/views/Home/WMS/Storage/GTransfering/GoodsTransferingView.vue'),
+                            path: 'picking',
+                            name: 'wmsPicking',
+                            component: () => import('@/views/Home/WMS/Storage/Picking/StoragePickingView.vue'),
                         },
                         {
-                            path: 'check',
-                            name: 'wmsCheck',
-                            component: () => import('@/views/Home/WMS/Storage/GCounting/GoodsCountingView.vue'),
+                            path: 'returns',
+                            name: 'wmsReturns',
+                            component: () => import('@/views/Home/WMS/Storage/Returns/StorageReturnsView.vue'),
+                        },
+                        {
+                            path: 'inventory',
+                            name: 'wmsInventory',
+                            component: () => import('@/views/Home/WMS/Storage/Inventory/StorageInventoryView.vue'),
+                        },
+                        {
+                            path: 'reporting',
+                            name: 'wmsReporting',
+                            component: () => import('@/views/Home/WMS/Storage/Reporting/StorageReportingView.vue'),
                         },
                     ]
                 },
                 {
-                    path: '/profile',
+                    path: 'profile',
                     name: 'Profile',
                     component: () => import('@/views/Home/Profile/ProfileView.vue'),
                     meta: {

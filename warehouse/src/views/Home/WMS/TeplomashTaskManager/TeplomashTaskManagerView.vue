@@ -59,7 +59,7 @@
                :key="device.id"
                class="ttm-tsd-item-online"
           >
-            <router-link :to="{ name: 'taskTsd', params: { tsd: device.id } }"
+            <router-link :to="{ name: 'TTMTerminal', params: { tsd: device.id } }"
                          class="ttm-tsd-item-name-online"
             >ТСД №{{ device.id }} ({{ device.email }})
             </router-link>
@@ -74,18 +74,17 @@
     <div class="ttm-terminal">
       <div class="ttm-terminal-view">
         <div v-if="!webSocketStore.isConnected" class="ttm-terminal-name-offline">Терминал</div>
-
-        <router-view v-if="webSocketStore.isConnected && route.params.tsd.length"></router-view>
-        <div v-else-if="webSocketStore.isConnected && !route.params.tsd.length"
+        <router-view v-if="webSocketStore.isConnected && route.params.tsd"></router-view>
+        <div v-if="webSocketStore.isConnected && !route.params.tsd"
              class="ttm-terminal-name-offline"
-        >Выберите активный ТСД</div>
+        >Выберите активный ТСД
+        </div>
       </div>
     </div>
   </div>
 </template>
 <script setup>
 import {useWebSocketStore} from '@/stores/WebSockets/TSDStore.js'
-import {RouterView} from "vue-router";
 import {useRouter, useRoute} from "vue-router";
 import MyButton from "@/components/UI/MyButton.vue"
 
@@ -94,7 +93,7 @@ const router = useRouter()
 const route = useRoute()
 const handlerDisconnect = () => {
   webSocketStore.disconnect()
-  router.push({name: 'wmsIN'})
+  router.push({name: 'wmsReceiving'})
 }
 </script>
 <style scoped>
@@ -242,7 +241,6 @@ const handlerDisconnect = () => {
 }
 
 .ttm-tsd-online {
-
 }
 
 .ttm-tsd-header-online {
@@ -255,15 +253,12 @@ const handlerDisconnect = () => {
 }
 
 .ttm-tsd-list-online {
-
 }
 
 .ttm-tsd-item-online {
-
 }
 
 .ttm-tsd-item-name-online {
-
 }
 
 .ttm-tsd-none-online {
@@ -277,7 +272,6 @@ const handlerDisconnect = () => {
   color: #514D4C;
 }
 
-
 .ttm-tsd-name-inactive {
   display: grid;
   grid-template-rows: 1fr;
@@ -287,7 +281,6 @@ const handlerDisconnect = () => {
 }
 
 .ttm-tsd-name-active {
-
 }
 
 .ttm-tsd-active {
@@ -334,7 +327,6 @@ const handlerDisconnect = () => {
 
 .ttm-terminal-view {
   display: grid;
-
 }
 
 a,

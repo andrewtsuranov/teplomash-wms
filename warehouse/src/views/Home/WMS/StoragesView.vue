@@ -1,10 +1,15 @@
 <template>
   <div class="wms-home-container">
-    <div v-for="item in storageStore.sortedWarehouses"
+    <!--    <div v-for="item in storageStore.fullListWarehouses"-->
+    <!--         :key="item.id"-->
+    <!--         class="wms-input"-->
+    <!--         @click="handlerClickStorage(item.id)"-->
+    <!--    >Склад {{ item.number }}: {{ item.name }}-->
+    <div v-for="item in storageStore.fullListWarehouses"
          :key="item.id"
          class="wms-input"
          @click="handlerClickStorage(item.id)"
-    >Склад {{ item.number }}: {{ item.name }}
+    >Склад {{ item.id }}: {{ item.name }}
     </div>
   </div>
 </template>
@@ -15,14 +20,13 @@ import {useStorageStore} from "@/stores/HTTP/WMS/StorageStore.js";
 
 const storageStore = useStorageStore()
 const router = useRouter()
-
 onMounted(() => {
   storageStore.GET_WAREHOUSES()
 })
 const handlerClickStorage = async (id) => {
   await storageStore.WAREHOUSE_ID(id)
-  router.push({name: 'WMSStorage', params: {id: id}})
-  // localStorage.removeItem('warehouses')
+  await router.push({name: 'WMSStorage', params: {id: id}})
+  localStorage.removeItem('warehouses')
 }
 </script>
 <style scoped>
