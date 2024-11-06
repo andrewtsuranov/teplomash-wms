@@ -52,6 +52,11 @@ const router = createRouter({
                     component: () => import('@/views/Home/WMS/Storage/StorageID.vue'),
                     children: [
                         {
+                            path: 'packing',
+                            name: 'wmsPacking',
+                            component: () => import('@/views/Home/WMS/Storage/Packing/StoragePackingView.vue'),
+                        },
+                        {
                             path: 'receiving',
                             name: 'wmsReceiving',
                             components: {
@@ -61,7 +66,7 @@ const router = createRouter({
                             },
                             children: [
                                 {
-                                    path: 'tsd#:tsd',
+                                    path: 'tsd#:tsdID',
                                     name: 'TTMTerminal',
                                     components: {
                                         default: () => import('@/views/Home/WMS/TeplomashTaskManager/Terminal/TTMTerminal.vue'),

@@ -4,7 +4,7 @@
       <h1>Ошибка 404! Страница не найдена!</h1>
       <my-button
           class="not-found-btn"
-          @click="router.push({name: 'Home'})"
+          @click="router.go(-1)"
       >Вернуться назад
       </my-button>
     </div>

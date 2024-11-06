@@ -1,16 +1,15 @@
 <template>
-  <div class="ttm-task-container">
-    <div class="ttm-task-active-tsd">Выбран: ТСД №{{ route.params.tsd }}</div>
-    <div class="ttm-task-terminal">
-      <div>
-        <h3>Терминал:</h3>
-        <!--        <div>{{sendData.user_id}} {{sendData.text}}</div>-->
-        <div v-if="webSocketStore.receivedMessage?.from_id">{{ webSocketStore.receivedMessage.from_id }}
-          {{ webSocketStore.receivedMessage.message }}
+  <div class="ttm-terminal-container">
+    <div class="ttm-terminal-active-tsd">Выбран: ТСД №{{ route.params.tsdID}} {{props}}</div>
+    <div class="ttm-terminal-view">
+      <div class="ttm-terminal-view-content">
+        <span>Выберите действие:</span>
+        <div v-if="webSocketStore.receivedMessage?.from_id"
+        >{{ webSocketStore.receivedMessage.from_id }} {{ webSocketStore.receivedMessage.message }}
         </div>
       </div>
     </div>
-    <div class="ttm-task-confirmed input-group input-group-lg">
+    <div class="ttm-terminal-confirmed input-group input-group">
       <input v-model="message"
              aria-describedby="button-addon2"
              aria-label="Recipient's username"
@@ -19,9 +18,9 @@
              type="text"
       >
       <button id="button-addon2"
-              class="btn btn-dark"
+              class="btn btn-success"
               type="button"
-              @click="webSocketStore.sendMessage(message, route.params.tsd)"
+              @click="webSocketStore.sendMessage(message, route.params.tsdID)"
       >Отправить
       </button>
     </div>
@@ -35,20 +34,21 @@ import {ref} from "vue";
 const webSocketStore = useWebSocketStore()
 const route = useRoute()
 const message = ref()
-
+const props = defineProps({
+  tsdName: String
+})
+console.log(props.tsdName)
 </script>
 <style scoped>
-.ttm-task-container {
+.ttm-terminal-container {
   display: grid;
-  /*grid-template-rows: minmax(auto, 33.1rem);*/
-  grid-template-columns: minmax(25rem, 1fr);
-  grid-template-rows: 1fr minmax(auto, 27.1rem) auto;
-  /*grid-template-rows: auto 1fr auto;*/
-  row-gap: 1.7rem;
+  grid-template-columns: 1fr;
+  grid-template-rows: min-content 1fr min-content;
+  row-gap: 1rem;
   overflow-y: auto;
 }
 
-.ttm-task-active-tsd {
+.ttm-terminal-active-tsd {
   font-size: 1.5rem;
   background-color: #0000004a;
   border-bottom: 1px solid #605039e0;
@@ -56,17 +56,19 @@ const message = ref()
   place-content: center;
 }
 
-.ttm-task-terminal {
+.ttm-terminal-view {
   display: grid;
-  padding: 1rem;
-  grid-template-columns: 1fr;
+  /*padding: 1rem;*/
+  grid-template-columns: minmax(min-content, 1fr);
   font-size: 1.2rem;
   /*overflow-y: auto;*/
 }
-
-.ttm-task-confirmed {
+.ttm-terminal-view-content {
+  padding: 0 1rem;
 }
 
-@media (max-width: 1024px) {
+
+@media (max-width: 800px) {
+
 }
 </style>

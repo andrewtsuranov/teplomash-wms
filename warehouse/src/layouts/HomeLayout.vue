@@ -41,6 +41,7 @@ const userStore = useUserStore()
   grid-template-columns: 1fr;
   grid-template-rows: 1fr;
   padding: 2rem 0;
+  background-color: #514D4C5E;
 }
 
 @media (max-width: 1140px) {

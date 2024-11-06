@@ -9,7 +9,7 @@
          :key="item.id"
          class="wms-input"
          @click="handlerClickStorage(item.id)"
-    >Склад {{ item.id }}: {{ item.name }}
+    >Склад {{ item.number }}: {{ item.name }}
     </div>
   </div>
 </template>
@@ -34,7 +34,7 @@ const handlerClickStorage = async (id) => {
   display: grid;
   grid-template-columns: minmax(auto, max-content);
   grid-auto-flow: row;
-  grid-template-rows: min-content;
+  grid-auto-rows: min-content;
   align-items: start;
   justify-self: center;
   gap: 5rem;

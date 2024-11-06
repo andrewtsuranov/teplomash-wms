@@ -7,6 +7,10 @@
     </div>
     <div class="storage-id-actions">
       <router-link class="storage-id-actions-items"
+                   :to="{name: 'wmsPacking'}"
+      >Упаковка
+      </router-link>
+      <router-link class="storage-id-actions-items"
                    :to="{name: 'wmsReceiving'}"
       >Приёмка
       </router-link>

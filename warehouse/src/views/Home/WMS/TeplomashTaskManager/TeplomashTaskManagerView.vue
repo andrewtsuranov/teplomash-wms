@@ -27,11 +27,11 @@
         <span v-if="webSocketStore.isConnected"
         >ТСД в сети:
         </span>
-        <span v-if="webSocketStore.isConnected && webSocketStore.onlineDevicesIdByRole.length"
+        <span v-if="webSocketStore.isConnected && webSocketStore.onlineDevices.length"
               class="online-users-count"
-        >{{ webSocketStore.onlineDevicesIdByRole.length }}
+        >{{ webSocketStore.onlineDevices.length }}
         </span>
-        <span v-else-if="webSocketStore.isConnected && !webSocketStore.onlineDevicesIdByRole.length"
+        <span v-else-if="webSocketStore.isConnected && !webSocketStore.onlineDevices.length"
               class="none-users-count"
         >Нет активных ТСД
         </span>
@@ -53,32 +53,30 @@
       <label v-if="!webSocketStore.isConnected" class="ttm-tsd-name-offline">Нет соединения с ТСД</label>
       <div v-else class="ttm-tsd-online">
         <label class="ttm-tsd-header-online">Активные ТСД:</label>
-        <div v-if="webSocketStore.isConnected && webSocketStore.onlineDevicesIdByRole.length"
+        <div v-if="webSocketStore.isConnected && webSocketStore.onlineDevices.length"
              class="ttm-tsd-list-online">
-          <div v-for="device in webSocketStore.onlineDevicesIdByRole"
+          <div v-for="device in webSocketStore.onlineDevices"
                :key="device.id"
                class="ttm-tsd-item-online"
           >
-            <router-link :to="{ name: 'TTMTerminal', params: { tsd: device.id } }"
+            <router-link :to="{ name: 'TTMTerminal', params: {tsdID: device.id}}"
                          class="ttm-tsd-item-name-online"
             >ТСД №{{ device.id }} ({{ device.email }})
             </router-link>
           </div>
         </div>
-        <div v-if="webSocketStore.isConnected && !webSocketStore.onlineDevicesIdByRole.length"
+        <div v-if="webSocketStore.isConnected && !webSocketStore.onlineDevices.length"
              class="ttm-tsd-none-online">
           <label class="ttm-tsd-none-item-online">Список пуст</label>
         </div>
       </div>
     </div>
     <div class="ttm-terminal">
-      <div class="ttm-terminal-view">
-        <div v-if="!webSocketStore.isConnected" class="ttm-terminal-name-offline">Терминал</div>
-        <router-view v-if="webSocketStore.isConnected && route.params.tsd"></router-view>
-        <div v-if="webSocketStore.isConnected && !route.params.tsd"
-             class="ttm-terminal-name-offline"
-        >Выберите активный ТСД
-        </div>
+      <div v-if="!webSocketStore.isConnected" class="ttm-terminal-name-offline">Терминал</div>
+      <router-view v-if="webSocketStore.isConnected && route.params.tsdID"></router-view>
+      <div v-if="webSocketStore.isConnected && !route.params.tsdID"
+           class="ttm-terminal-name-offline"
+      >Выберите активный ТСД
       </div>
     </div>
   </div>
@@ -253,12 +251,33 @@ const handlerDisconnect = () => {
 }
 
 .ttm-tsd-list-online {
+  display: grid;
+  grid-auto-rows: minmax(3rem, max-content);
+
 }
 
 .ttm-tsd-item-online {
+  display: grid;
+  border-bottom: 1px solid #605039e0;
+  background-color: #0000004a;
+  align-items: stretch;
+}
+
+.ttm-tsd-item-online:first-of-type {
+  border-top: none;
 }
 
 .ttm-tsd-item-name-online {
+  display: grid;
+  align-items: center;
+  padding: 0 0.7rem;
+  font-size: 1rem;
+  font-weight: bold;
+  color: #ffffffbf;
+}
+
+.ttm-tsd-item-name-online:hover {
+  background-color: rgba(50, 50, 50, 0.6);
 }
 
 .ttm-tsd-none-online {
@@ -272,53 +291,12 @@ const handlerDisconnect = () => {
   color: #514D4C;
 }
 
-.ttm-tsd-name-inactive {
-  display: grid;
-  grid-template-rows: 1fr;
-  align-items: center;
-  color: gray;
-  padding: 0 1rem;
-}
-
-.ttm-tsd-name-active {
-}
-
-.ttm-tsd-active {
-  display: grid;
-  grid-auto-rows: minmax(3rem, max-content);
-}
-
-.ttm-tsd-item-active {
-  display: grid;
-  border-bottom: 1px solid #605039e0;
-  background-color: #0000004a;
-  align-items: stretch;
-}
-
-.ttm-tsd-item-active:first-of-type {
-  border-top: 1px solid #605039e0;
-}
-
-.ttm-tsd-item-active:hover {
-  cursor: pointer;
-  /*background-color: #4CAF50;*/
-  background-color: rgba(50, 50, 50, 0.6);
-}
-
-.ttm-tsd-item-name {
-  display: grid;
-  align-items: center;
-  padding: 0 0.7rem;
-  font-size: 1rem;
-  font-weight: bold;
-  color: #ffffffbf;
-}
 
 .ttm-terminal {
   grid-area: task;
   display: grid;
-  grid-template-columns: minmax(25rem, 1fr);
-  grid-template-rows: minmax(33.1rem, auto);
+  grid-template-columns: minmax(auto, 1fr);
+  grid-template-rows: minmax(33.1rem, 1fr);
   border: 1px solid #605039e0;
   background-color: #2623238f;
   border-radius: 10px;

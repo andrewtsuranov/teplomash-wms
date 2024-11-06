@@ -25,15 +25,11 @@ export const useWebSocketStore = defineStore('websocket', () => {
     const connectionStatus = computed(() => isConnected.value ? 'В сети' : 'Не в сети')
     const getPrivateMessage = computed(() => privateMessage.value)
     const getPrivateMessageID = computed(() => privateMessageID.value)
-    // const onlineDevicesIdByRole = computed(() => {
-    //     return onlineDevices.value.filter((device) => device.role === 'LOADER');
-    // });
-    const onlineDevicesIdByRole = computed(() => onlineDevices.value);
 
 //Actions
     function initWebSocket() {
-        // const wsUrl = `ws://lab:8081/ws/inventory/?token=${userStore.getTokenAccess}`
-        const wsUrl = `ws://38.180.192.229/ws/inventory/?token=${userStore.getTokenAccess}`
+        const wsUrl = `ws://lab:8081/ws/inventory/?token=${userStore.getTokenAccess}`
+        // const wsUrl = `ws://38.180.192.229/ws/inventory/?token=${userStore.getTokenAccess}`
         socket.value = new WebSocket(wsUrl)
         socket.value.onopen = onOpen.bind(this)
         socket.value.onclose = onClose.bind(this)
@@ -79,8 +75,8 @@ export const useWebSocketStore = defineStore('websocket', () => {
                 return sendPong()
             }
             // Обработка сообщения: получение активных пользователей
-            if (data.type === 'online_users') {
-                onlineDevices.value = data.users
+            if (data.type === 'loaders_connected') {
+                onlineDevices.value = data.loaders
             }
             // Обработка сообщения: получение приватного ссобщения
             if (data.type === 'private_message') {
@@ -198,7 +194,6 @@ export const useWebSocketStore = defineStore('websocket', () => {
         lastPongTime,
         getPrivateMessage,
         getPrivateMessageID,
-        onlineDevicesIdByRole,
 //actions
         initWebSocket,
         onOpen,
