@@ -1,21 +1,58 @@
 <template>
   <div class="wms-packing-container">
     <h1>Упаковка:</h1>
+    <div class="wms-packing-data-product">
+      <div class="date-range-picker">
+        <div class="input-group">
+          <label for="start-date">Начальная дата:</label>
+          <input
+              id="start-date"
+              v-model="startDate"
+              type="date"
+          />
+        </div>
+        <div class="input-group">
+          <label for="time">Время:</label>
+          <input id="time" v-model="selectedTimeStart" type="time"/>
+        </div>
+        <div class="input-group">
+          <label for="end-date">Конечная дата:</label>
+          <input
+              id="end-date"
+              v-model="endDate"
+              type="date"
+          />
+        </div>
+        <div class="input-group">
+          <label for="time">Время:</label>
+          <input id="time" v-model="selectedTimeEnd" type="time"/>
+        </div>
+      </div>
+    </div>
+    <button @click="ERPStore.GET_PRODUCT_BY_DAY(getTimeForERP(startDate, selectedTimeStart),getTimeForERP(endDate, selectedTimeEnd) )">Получить данные</button>
+    {{ getTimeForERP(startDate, selectedTimeStart)}} {{getTimeForERP(endDate, selectedTimeEnd)}}
     <div class="wms-packing-pallet">
       <div v-for="n in 9" :key="n" class="pallet-item">
-        <span class="pallet-name">
-          <span>Зона: А</span>
-          <span>Дата создания: {{ dataYYYYMMDD }}</span>
-         <span>Паллета №{{ n }}</span>
-
-        </span>
-        <span>Длина паллеты: 800мм</span>
-        <span>Тип: Продукция</span>
-        <span>Изделие: КЭВ-9П2021Е</span>
-        <span>Комментарий: Панель из глянцевой нержавеющей стали</span>
-        <span>Кол-во изделий: 9 шт.</span>
+        <div class="pallet-container">
+          <div>
+            <div class="pallet-ID-line-one">
+              <span>Зона: А</span>
+              <span>Дата создания: {{ dataYYYYMMDD }}</span>
+              <span>Паллета №{{ n }}</span>
+            </div>
+            <div class="pallet-ID-line-two">
+              <span>Длина паллеты: 800мм</span>
+              <span>Тип: Продукция</span>
+            </div>
+          </div>
+          <div class="pallet-product">
+            <span>Изделие: КЭВ-9П2021Е</span>
+            <span>Комментарий: Панель из глянцевой нержавеющей стали</span>
+            <span>Кол-во изделий: 9 шт.</span>
+          </div>
+        </div>
+        <div class="pallet-status">Сборка:</div>
         <div class="pallet-qrcode" v-html="qrcode"></div>
-        <div class="pallet-status">Статус/Этапы сборки:</div>
       </div>
     </div>
     <div>
@@ -26,13 +63,36 @@
 <script setup>
 import {onMounted, ref} from 'vue'
 import QRCode from 'qrcode'
+import {useERPStore} from "@/stores/HTTP/WMS/1С/ERPStore.js";
 
-onMounted(() => {
-  generateQR(text.value)
+const ERPStore = useERPStore()
+const startDate = ref('2022-10-05');
+const endDate = ref('2022-10-06');
+const selectedTimeStart = ref('09:00')
+const selectedTimeEnd = ref('22:00')
+
+
+const getTimeForERP = (date , time) => {
+  const dateTime = date +" " + time;
+  const currentDate = new Date(dateTime);
+  const year = currentDate.getFullYear();
+  const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+  const day = String(currentDate.getDate()).padStart(2, '0');
+  const hours = String(currentDate.getHours()).padStart(2, '0');
+  const minutes = String(currentDate.getMinutes()).padStart(2, '0');
+  const seconds = String(currentDate.getSeconds()).padStart(2, '0');
+  return `${year}${month}${day}${hours}${minutes}${seconds}`;
+}
+
+onMounted(async () => {
+  await generateQR(text.value)
+
 })
 const text = ref('[А]-[2024101600]-[П]-[800]-[КЭВ-9П2021Е]-[Панель из глянцевой нержавеющей стали]-[9]')
 const qrcode = ref(null)
 const dataYYYYMMDD = ref(new Date().toISOString().slice(0, 10));
+
+
 const generateQR = async (data) => {
   const opts = {
     errorCorrectionLevel: 'H',
