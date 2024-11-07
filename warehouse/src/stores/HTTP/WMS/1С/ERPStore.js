@@ -7,8 +7,8 @@ import {log} from "qrcode/lib/core/galois-field.js";
 
 const userStore = useUserStore()
 const kyStd = ky.create({
-    // prefixUrl: 'http://38.180.192.229/api/manager/',
-    prefixUrl: 'http://lab/db7/hs/wms/products/',
+    prefixUrl: 'http://38.180.192.229/api/manager/',
+    // prefixUrl: 'http://lab/db7/hs/wms/products/',
     retry: 0,
 })
 const kyCors = kyStd.extend({

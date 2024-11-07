@@ -29,30 +29,38 @@
         </div>
       </div>
     </div>
-    <button @click="ERPStore.GET_PRODUCT_BY_DAY(getTimeForERP(startDate, selectedTimeStart),getTimeForERP(endDate, selectedTimeEnd) )">Получить данные</button>
-    {{ getTimeForERP(startDate, selectedTimeStart)}} {{getTimeForERP(endDate, selectedTimeEnd)}}
+    <button
+        @click="ERPStore.GET_PRODUCT_BY_DAY(getTimeForERP(startDate, selectedTimeStart),getTimeForERP(endDate, selectedTimeEnd) )">
+      Получить данные
+    </button>
+    {{ getTimeForERP(startDate, selectedTimeStart) }} {{ getTimeForERP(endDate, selectedTimeEnd) }}
     <div class="wms-packing-pallet">
-      <div v-for="n in 9" :key="n" class="pallet-item">
-        <div class="pallet-container">
-          <div>
-            <div class="pallet-ID-line-one">
-              <span>Зона: А</span>
-              <span>Дата создания: {{ dataYYYYMMDD }}</span>
-              <span>Паллета №{{ n }}</span>
-            </div>
-            <div class="pallet-ID-line-two">
-              <span>Длина паллеты: 800мм</span>
-              <span>Тип: Продукция</span>
-            </div>
-          </div>
-          <div class="pallet-product">
-            <span>Изделие: КЭВ-9П2021Е</span>
-            <span>Комментарий: Панель из глянцевой нержавеющей стали</span>
-            <span>Кол-во изделий: 9 шт.</span>
-          </div>
+      <div v-for="n in 9" :key="n" class="pallet-item-content">
+        <div class="pallet-item-row-one">
+          <span>Паллета №{{ n }}</span>
+          <span>Дата создания:{{ dataYYYYMMDD }}</span>
         </div>
-        <div class="pallet-status">Сборка:</div>
-        <div class="pallet-qrcode" v-html="qrcode"></div>
+        <div class="pallet-item-row-two"></div>
+        <div class="pallet-item-row-three"></div>
+        <!--        <div class="pallet-ID-line-one">-->
+        <!--          <span>Паллета №</span>-->
+        <!--          {{ n }}-->
+        <!--                  <span>Дата создания:</span>-->
+        <!--          {{ dataYYYYMMDD }}-->
+        <!--          <span>Зона:</span>-->
+        <!--          {{ packingStore.palletData.zoneStorage }}-->
+        <!--          <span>Длина паллеты:</span>-->
+        <!--          {{ packingStore.palletData.dimensions }} мм-->
+        <!--          <div>ID Паллеты</div>-->
+        <!--          <div v-html="qrcode"></div>-->
+        <!--        </div>-->
+        <!--        <div class="pallet-product">-->
+        <!--          <span>Тип: {{ packingStore.palletData.productType }}</span>-->
+        <!--          <span>Изделие: {{ packingStore.palletData.productName }}</span>-->
+        <!--          <span>Комментарий: {{ packingStore.palletData.addInfo }}</span>-->
+        <!--          <span>Кол-во изделий: {{ packingStore.palletData.productQty }} шт.</span>-->
+        <!--        </div>-->
+        <!--        <div class="pallet-status">Сборка:</div>-->
       </div>
     </div>
     <div>
@@ -64,16 +72,16 @@
 import {onMounted, ref} from 'vue'
 import QRCode from 'qrcode'
 import {useERPStore} from "@/stores/HTTP/WMS/1С/ERPStore.js";
+import {usePackingStore} from "@/stores/HTTP/WMS/PackingStore.js";
 
+const packingStore = usePackingStore()
 const ERPStore = useERPStore()
 const startDate = ref('2022-10-05');
 const endDate = ref('2022-10-06');
 const selectedTimeStart = ref('09:00')
 const selectedTimeEnd = ref('22:00')
-
-
-const getTimeForERP = (date , time) => {
-  const dateTime = date +" " + time;
+const getTimeForERP = (date, time) => {
+  const dateTime = date + " " + time;
   const currentDate = new Date(dateTime);
   const year = currentDate.getFullYear();
   const month = String(currentDate.getMonth() + 1).padStart(2, '0');
@@ -83,16 +91,12 @@ const getTimeForERP = (date , time) => {
   const seconds = String(currentDate.getSeconds()).padStart(2, '0');
   return `${year}${month}${day}${hours}${minutes}${seconds}`;
 }
-
 onMounted(async () => {
   await generateQR(text.value)
-
 })
 const text = ref('[А]-[2024101600]-[П]-[800]-[КЭВ-9П2021Е]-[Панель из глянцевой нержавеющей стали]-[9]')
 const qrcode = ref(null)
 const dataYYYYMMDD = ref(new Date().toISOString().slice(0, 10));
-
-
 const generateQR = async (data) => {
   const opts = {
     errorCorrectionLevel: 'H',
@@ -125,14 +129,10 @@ const generateQR = async (data) => {
   padding: 1rem 0;
 }
 
-.pallet-item {
+.pallet-item-content {
   display: grid;
-  grid-template-areas:
-        "palletID palletID"
-        ". ."
-        "status qrcode";
-  grid-template-columns: 1fr min-content;
-  grid-template-rows: min-content min-content 1fr;
+  grid-template-columns: 1fr;
+  grid-template-rows: repeat(auto-fill, 1fr);
   /*border: 2px solid #4CAF50;*/
   border: 2px solid #E8B53F;
   /*border: 2px solid #B01010;*/
@@ -142,16 +142,8 @@ const generateQR = async (data) => {
   min-height: 400px;
 }
 
-.pallet-name {
+.pallet-item-row-one {
   display: grid;
-  grid-area: palletID;
-  /*grid-auto-flow: column;*/
-  grid-template-columns: auto 1fr auto;
-  grid-auto-rows: min-content;
-  font-size: 1.1rem;
-  column-gap: 1rem;
-  justify-items: center;
-  /*overflow: auto;*/
 }
 
 .pallet-qrcode {
