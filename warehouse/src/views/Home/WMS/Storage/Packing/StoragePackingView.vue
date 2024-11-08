@@ -37,6 +37,7 @@
     <div class="wms-packing-pallet">
       <div v-for="n in 9" :key="n" class="pallet-item-content">
         <div class="pallet-item-row-one">
+          <span>Зона:{{ packingStore.palletData.zoneStorage }}</span>
           <span>Паллета №{{ n }}</span>
           <span>Дата создания:{{ dataYYYYMMDD }}</span>
         </div>
@@ -77,9 +78,9 @@ import {usePackingStore} from "@/stores/HTTP/WMS/PackingStore.js";
 const packingStore = usePackingStore()
 const ERPStore = useERPStore()
 const startDate = ref('2022-10-05');
-const endDate = ref('2022-10-06');
+const endDate = ref('2022-10-05');
 const selectedTimeStart = ref('09:00')
-const selectedTimeEnd = ref('22:00')
+const selectedTimeEnd = ref('10:00')
 const getTimeForERP = (date, time) => {
   const dateTime = date + " " + time;
   const currentDate = new Date(dateTime);
@@ -144,6 +145,7 @@ const generateQR = async (data) => {
 
 .pallet-item-row-one {
   display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
 }
 
 .pallet-qrcode {
