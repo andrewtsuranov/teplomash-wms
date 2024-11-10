@@ -1,41 +1,77 @@
 <template>
   <div class="wms-packing-container">
     <h1>Упаковка:</h1>
-    <div class="wms-packing-data-product">
-      <div class="date-range-picker">
-        <div class="input-group">
-          <label for="start-date">Начальная дата:</label>
-          <input
-              id="start-date"
-              v-model="startDate"
-              type="date"
-          />
-        </div>
-        <div class="input-group">
-          <label for="time">Время:</label>
-          <input id="time" v-model="selectedTimeStart" type="time"/>
-        </div>
-        <div class="input-group">
-          <label for="end-date">Конечная дата:</label>
-          <input
-              id="end-date"
-              v-model="endDate"
-              type="date"
-          />
-        </div>
-        <div class="input-group">
-          <label for="time">Время:</label>
-          <input id="time" v-model="selectedTimeEnd" type="time"/>
+    <div class="wms-packing-erp-product">
+      <div class="wms-packing-erp-data">
+        <div class="erp-data-range">
+          <div class="input-group">
+            <label for="start-date">Начальная дата:</label>
+            <input
+                class="start-date"
+                v-model="startDate"
+                type="date"
+            />
+            <input id="time" v-model="selectedTimeStart" type="time"/>
+          </div>
+          <div class="input-group">
+            <label for="end-date">Конечная дата:</label>
+            <input
+                class="end-date"
+                v-model="endDate"
+                type="date"
+            />
+            <input id="time" v-model="selectedTimeEnd" type="time"/>
+          </div>
+          <my-button class="btn-get-erp"
+                     type="button"
+                     @click="ERPStore.GET_PRODUCT_BY_DAY(getTimeForERP(startDate, selectedTimeStart),getTimeForERP(endDate, selectedTimeEnd) )">
+            Получить данные с ERP
+          </my-button>
         </div>
       </div>
+      <div class="in-table-container">
+        <table class="table table-dark table-hover">
+          <thead>
+          <tr>
+            <th scope="col">№</th>
+            <th scope="col">Изделие</th>
+            <th scope="col">Особенности</th>
+            <th scope="col">Заводской номер</th>
+            <th scope="col">Кол-во</th>
+            <th scope="col">Паллета</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr>
+            <th scope="row">1</th>
+            <td>КЭВ-9П2022Е</td>
+            <td>Панель из матовой нержавеющей стали</td>
+            <td>1234567898765</td>
+            <td>9</td>
+            <td>id404</td>
+          </tr>
+          <tr>
+            <th scope="row">2</th>
+            <td>КЭВ-12П3011Е</td>
+            <td>Панель из глянцевой нержавеющей стали</td>
+            <td>1234567898765</td>
+            <td>9</td>
+            <td>id435</td>
+          </tr>
+          <tr>
+            <th scope="row">3</th>
+            <td>КЭВ-24П4023Е</td>
+            <td>Исполнение 30</td>
+            <td>1234567898765</td>
+            <td>9</td>
+            <td>id43</td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
-    <button
-        @click="ERPStore.GET_PRODUCT_BY_DAY(getTimeForERP(startDate, selectedTimeStart),getTimeForERP(endDate, selectedTimeEnd) )">
-      Получить данные
-    </button>
-    {{ getTimeForERP(startDate, selectedTimeStart) }} {{ getTimeForERP(endDate, selectedTimeEnd) }}
     <div class="wms-packing-pallet">
-      <div v-for="n in 9" :key="n" class="pallet-item-content">
+      <div v-for="n in 7" :key="n" class="pallet-item-content">
         <div class="pallet-item-row-one">
           <span>Зона:{{ packingStore.palletData.zoneStorage }}</span>
           <span>Паллета №{{ n }}</span>
@@ -74,6 +110,7 @@ import {onMounted, ref} from 'vue'
 import QRCode from 'qrcode'
 import {useERPStore} from "@/stores/HTTP/WMS/1С/ERPStore.js";
 import {usePackingStore} from "@/stores/HTTP/WMS/PackingStore.js";
+import MyButton from "@/components/UI/MyButton.vue";
 
 const packingStore = usePackingStore()
 const ERPStore = useERPStore()
@@ -122,6 +159,76 @@ const generateQR = async (data) => {
   grid-auto-rows: min-content;
 }
 
+.wms-packing-erp-data {
+  display: grid;
+}
+
+.in-table-container {
+  display: grid;
+  grid-template-columns: minmax(auto, 1fr);
+  grid-template-rows: 1fr;
+  overflow-x: auto;
+}
+
+.erp-data-table {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-auto-rows: minmax(min-content, auto);
+  /*grid-auto-flow: column;*/
+}
+
+.erp-data-table-item {
+  border: 1px solid red;
+}
+
+.wms-packing-erp-product {
+  display: grid;
+  grid-template-columns: minmax(auto, 1fr);
+  grid-template-rows: 1fr;
+}
+
+.date-range-picker {
+  display: grid;
+  grid-template-columns: minmax(auto, 1fr);
+  grid-template-rows: auto 1fr;
+  row-gap: 1rem;
+  padding: 1rem;
+  background-color: #0000004a;
+  border: 1px solid #605039e0;
+  border-radius: 1rem;
+}
+
+.input-group {
+  display: grid;
+  grid-auto-flow: column;
+  column-gap: .1rem;
+  align-items: center;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: 1fr;
+  font-size: 1rem;
+}
+
+input[type="date"] {
+  position: relative;
+  z-index: 1;
+  background-color: #0000004a;
+  border: none;
+  font-size: 1rem;
+  border-radius: .1rem;
+  /*opacity: 0;*/
+  color: blanchedalmond;
+}
+
+input[type="time"] {
+  position: relative;
+  z-index: 1;
+  background-color: #0000004a;
+  border: none;
+  font-size: 1rem;
+  /*opacity: 0;*/
+  color: blanchedalmond;
+}
+
 .wms-packing-pallet {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
@@ -158,5 +265,33 @@ const generateQR = async (data) => {
   padding: .5rem 0;
   border-top: 1px solid red;
   font-size: 1.3rem;
+}
+
+.btn-get-erp {
+  display: grid;
+  max-width: 15rem;
+}
+
+.start-date,
+.end-date {
+  font-size: 1.2rem;
+}
+
+@media (max-width: 800px) {
+  .date-range-picker {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
+    row-gap: 1rem;
+    padding: 1rem;
+    background-color: #0000004a;
+    border: 1px solid #605039e0;
+    border-radius: 1rem;
+  }
+
+  .wms-packing-pallet {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  }
 }
 </style>

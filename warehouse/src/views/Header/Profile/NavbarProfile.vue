@@ -15,9 +15,19 @@
       <div class="dropdown-menu dropdown-menu-dark">
         <div class="profile-dropdown">
           <div class="profile-name dropdown-header">
-            {{ userData.lastName }} {{ userData.firstName }} {{ userData.middlename }} ({{ userRole }})
+            <BAvatar aria-expanded="false"
+                     bg-variant="secondary"
+                     class="btn btn-secondary avatar-dropdown"
+                     data-bs-toggle="dropdown"
+                     :text=userData.initials
+                     text-variant=""
+                     size="2.7rem"
+            />
+            <div>{{ userData.lastName }} {{ userData.firstName }} {{ userData.middlename }}</div>
+            <div>({{ userRole }})</div>
           </div>
-          <router-link class="dropdown-item active" to="/profile">Профиль</router-link>
+          <router-link class="dropdown-item" to="/profile">Профиль</router-link>
+          <router-link class="dropdown-item" to="/admin">Администрирование</router-link>
           <div class="dropdown-item logout-btn" @click="logout">Выход</div>
         </div>
       </div>
@@ -47,7 +57,18 @@ const logout = () => {
 
 .profile-dropdown {
   display: grid;
-  row-gap: 0.8rem;
+  /*row-gap: .8rem;*/
+}
+
+.profile-name {
+  display: grid;
+  grid-template-columns: min-content 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: .5rem;
+}
+
+.avatar-dropdown {
+  grid-row: 1/3;
 }
 
 .avatar-desktop {
@@ -72,6 +93,10 @@ nav a {
 
 i {
   font-size: 1.3rem;
+}
+
+.teplomash-active-exact-link {
+  background-color: #9B9482;
 }
 
 @media (max-width: 800px) {
