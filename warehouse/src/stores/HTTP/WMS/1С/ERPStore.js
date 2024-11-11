@@ -5,6 +5,7 @@ import {ref} from "vue"
 import {useWebSocketStore} from "@/stores/WebSockets/TSDStore.js";
 
 
+
 const kyStd = ky.create({
     prefixUrl: 'http://lab/db7/hs/wms/products/',
     retry: {

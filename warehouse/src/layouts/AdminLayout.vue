@@ -2,9 +2,10 @@
   <div class="datetime-picker-wrapper">
     <!-- Toggle кнопка -->
     <button
-        @click="togglePicker"
         class="toggle-button"
         :class="{ 'active': isPickerVisible }"
+        @click="togglePicker"
+        ref="toggleButton"
     >
             <span class="toggle-icon">
               <svg
@@ -159,12 +160,14 @@ defineProps({
 const emit = defineEmits(['update:range'])
 // Состояния
 const isPickerVisible = ref(false)
+const toggleButton = ref(null)
 const startDate = ref('')
 const startTime = ref('')
 const endDate = ref('')
 const endTime = ref('')
 const errorMessage = ref('')
 const selectedDateRange = ref('')
+const pickerDropdown = ref(null)
 // Вычисляемые значения
 const minDate = computed(() => {
   const today = new Date()
@@ -278,9 +281,8 @@ const applySelection = () => {
     closePicker()
   }
 }
-const pickerDropdown = ref(null)
-useClickOutside(pickerDropdown, (event) => {
-  closePicker(event)
+useClickOutside(pickerDropdown, toggleButton, () => {
+  closePicker()
 })
 </script>
 <style scoped>
@@ -371,7 +373,6 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 .datetime-group {
   display: grid;
   gap: 0.5rem;
-  margin-bottom: 1.5rem;
 }
 
 .datetime-label {
@@ -386,26 +387,24 @@ input[type="time"]::-webkit-calendar-picker-indicator {
   gap: 1rem;
 }
 
-.custom-date,
-.custom-time {
-  position: relative;
-}
-
-.custom-date input,
-.custom-time input {
-  width: 100%;
-  padding: 0.75rem 2.5rem 0.75rem 1rem;
-  border: 2px solid #e2e8f0;
-  border-radius: 8px;
-  font-size: 1rem;
-  background: white;
-  color: #1a202c;
-  transition: all 0.2s ease;
-  cursor: pointer;
-  appearance: none;
-  -webkit-appearance: none;
-}
-
+/*.custom-date,*/
+/*.custom-time {*/
+/*  position: relative;*/
+/*}*/
+/*.custom-date input,*/
+/*.custom-time input {*/
+/*  width: 100%;*/
+/*  padding: 0.75rem 2.5rem 0.75rem 1rem;*/
+/*  border: 2px solid #e2e8f0;*/
+/*  border-radius: 8px;*/
+/*  font-size: 1rem;*/
+/*  background: white;*/
+/*  color: #1a202c;*/
+/*  transition: all 0.2s ease;*/
+/*  cursor: pointer;*/
+/*  appearance: none;*/
+/*  -webkit-appearance: none;*/
+/*}*/
 .custom-date input:hover,
 .custom-time input:hover {
   border-color: #cbd5e0;

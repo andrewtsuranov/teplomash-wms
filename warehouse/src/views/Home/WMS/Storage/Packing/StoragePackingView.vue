@@ -3,74 +3,91 @@
     <h1>Упаковка:</h1>
     <div class="wms-packing-erp-product">
       <div class="wms-packing-erp-data">
-        <div class="erp-data-range">
-          <div class="input-group">
-            <label for="start-date">Начальная дата:</label>
-            <input
-                class="start-date"
-                v-model="startDate"
-                type="date"
-            />
-            <input id="time" v-model="selectedTimeStart" type="time"/>
+        <div>
+          <p class="d-inline-flex">
+            <button class="btn btn-primary"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#collapseExample"
+                    aria-expanded="false"
+                    aria-controls="collapseExample"
+            >
+              Выбрать период
+            </button>
+          </p>
+          <div class="collapse" id="collapseExample">
+            <datetime-picker/>
+            <!--            <div class="erp-data-range">-->
+            <!--              <div class="input-group">-->
+            <!--                <label for="start-date">Начальная дата:</label>-->
+            <!--                <input-->
+            <!--                    class="start-date"-->
+            <!--                    v-model="startDate"-->
+            <!--                    type="date"-->
+            <!--                />-->
+            <!--                <input id="time" v-model="selectedTimeStart" type="time"/>-->
+            <!--              </div>-->
+            <!--              <div class="input-group">-->
+            <!--                <label for="end-date">Конечная дата:</label>-->
+            <!--                <input-->
+            <!--                    class="end-date"-->
+            <!--                    v-model="endDate"-->
+            <!--                    type="date"-->
+            <!--                />-->
+            <!--                <input id="time" v-model="selectedTimeEnd" type="time"/>-->
+            <!--              </div>-->
+            <!--              <my-button class="btn-get-erp"-->
+            <!--                         type="button"-->
+            <!--                         @click="ERPStore.GET_PRODUCT_BY_DAY(getTimeForERP(startDate, selectedTimeStart),getTimeForERP(endDate, selectedTimeEnd) )">-->
+            <!--                Получить данные с ERP-->
+            <!--              </my-button>-->
+            <!--            </div>-->
           </div>
-          <div class="input-group">
-            <label for="end-date">Конечная дата:</label>
-            <input
-                class="end-date"
-                v-model="endDate"
-                type="date"
-            />
-            <input id="time" v-model="selectedTimeEnd" type="time"/>
-          </div>
-          <my-button class="btn-get-erp"
-                     type="button"
-                     @click="ERPStore.GET_PRODUCT_BY_DAY(getTimeForERP(startDate, selectedTimeStart),getTimeForERP(endDate, selectedTimeEnd) )">
-            Получить данные с ERP
-          </my-button>
         </div>
-        <TeplomashTaskManagerView/>
-      </div>
-      <div class="in-table-container">
-        <table class="table table-dark table-hover">
-          <thead>
-          <tr>
-            <th scope="col">№</th>
-            <th scope="col">Изделие</th>
-            <th scope="col">Особенности</th>
-            <th scope="col">Заводской номер</th>
-            <th scope="col">Кол-во</th>
-            <th scope="col">Паллета</th>
-          </tr>
-          </thead>
-          <tbody>
-          <tr>
-            <th scope="row">1</th>
-            <td>КЭВ-9П2022Е</td>
-            <td>Панель из матовой нержавеющей стали</td>
-            <td>1234567898765</td>
-            <td>9</td>
-            <td>id404</td>
-          </tr>
-          <tr>
-            <th scope="row">2</th>
-            <td>КЭВ-12П3011Е</td>
-            <td>Панель из глянцевой нержавеющей стали</td>
-            <td>1234567898765</td>
-            <td>9</td>
-            <td>id435</td>
-          </tr>
-          <tr>
-            <th scope="row">3</th>
-            <td>КЭВ-24П4023Е</td>
-            <td>Исполнение 30</td>
-            <td>1234567898765</td>
-            <td>9</td>
-            <td>id43</td>
-          </tr>
-          </tbody>
-        </table>
+        <erp-one-c class="erp-logo"></erp-one-c>
       </div>
     </div>
+    <div class="in-table-container">
+      <table class="table table-dark table-hover">
+        <thead>
+        <tr>
+          <th scope="col">№</th>
+          <th scope="col">Изделие</th>
+          <th scope="col">Особенности</th>
+          <th scope="col">Заводской номер</th>
+          <th scope="col">Кол-во</th>
+          <th scope="col">Паллета</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+          <th scope="row">1</th>
+          <td>КЭВ-9П2022Е</td>
+          <td>Панель из матовой нержавеющей стали</td>
+          <td>1234567898765</td>
+          <td>9</td>
+          <td>id404</td>
+        </tr>
+        <tr>
+          <th scope="row">2</th>
+          <td>КЭВ-12П3011Е</td>
+          <td>Панель из глянцевой нержавеющей стали</td>
+          <td>1234567898765</td>
+          <td>9</td>
+          <td>id435</td>
+        </tr>
+        <tr>
+          <th scope="row">3</th>
+          <td>КЭВ-24П4023Е</td>
+          <td>Исполнение 30</td>
+          <td>1234567898765</td>
+          <td>9</td>
+          <td>id43</td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+    <TeplomashTaskManagerView/>
     <div class="wms-packing-pallet">
       <div v-for="n in 7" :key="n" class="pallet-item-content">
         <div class="pallet-item-row-one">
@@ -111,8 +128,9 @@ import {onMounted, ref} from 'vue'
 import QRCode from 'qrcode'
 import {useERPStore} from "@/stores/HTTP/WMS/1С/ERPStore.js";
 import {usePackingStore} from "@/stores/HTTP/WMS/PackingStore.js";
-import MyButton from "@/components/UI/MyButton.vue";
 import TeplomashTaskManagerView from "@/views/Home/WMS/TeplomashTaskManager/TeplomashTaskManagerView.vue";
+import ErpOneC from "@/components/UI/SVG/ErpOneС.vue"
+import DatetimePicker from "@/components/UI/DatetimePicker.vue";
 
 const packingStore = usePackingStore()
 const ERPStore = useERPStore()
@@ -159,10 +177,16 @@ const generateQR = async (data) => {
   display: grid;
   grid-template-columns: 1fr;
   grid-auto-rows: min-content;
+  row-gap: 1rem;
 }
 
 .wms-packing-erp-data {
   display: grid;
+  grid-template-columns: 1fr 300px;
+  background-color: #2e2e2e;
+  border: 1px solid #605039e0;
+  border-radius: 1rem;
+  padding: 1rem;
 }
 
 .in-table-container {
@@ -200,6 +224,12 @@ const generateQR = async (data) => {
   border-radius: 1rem;
 }
 
+.erp-logo {
+  display: grid;
+  grid-template-rows: minmax(auto, 200px);
+  justify-items: center;
+}
+
 .input-group {
   display: grid;
   grid-auto-flow: column;
@@ -210,26 +240,7 @@ const generateQR = async (data) => {
   font-size: 1rem;
 }
 
-input[type="date"] {
-  position: relative;
-  z-index: 1;
-  background-color: #0000004a;
-  border: none;
-  font-size: 1rem;
-  border-radius: .1rem;
-  /*opacity: 0;*/
-  color: blanchedalmond;
-}
 
-input[type="time"] {
-  position: relative;
-  z-index: 1;
-  background-color: #0000004a;
-  border: none;
-  font-size: 1rem;
-  /*opacity: 0;*/
-  color: blanchedalmond;
-}
 
 .wms-packing-pallet {
   display: grid;
@@ -280,15 +291,10 @@ input[type="time"] {
 }
 
 @media (max-width: 800px) {
-  .date-range-picker {
+  .wms-packing-erp-data {
     display: grid;
     grid-template-columns: 1fr;
     grid-template-rows: auto 1fr;
-    row-gap: 1rem;
-    padding: 1rem;
-    background-color: #0000004a;
-    border: 1px solid #605039e0;
-    border-radius: 1rem;
   }
 
   .wms-packing-pallet {

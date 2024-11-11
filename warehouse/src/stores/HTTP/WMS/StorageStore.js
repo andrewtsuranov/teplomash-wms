@@ -3,11 +3,11 @@ import {defineStore} from 'pinia'
 import {useUserStore} from "@/stores/HTTP/Auth/UserStore.js";
 import ky from "ky"
 import {computed, ref} from "vue"
+import {requestUrls} from "@/stores/Config/request-urls.js";
 
 const userStore = useUserStore()
 const kyStd = ky.create({
-    // prefixUrl: 'http://38.180.192.229/api/manager/',
-    prefixUrl: 'http://lab:8080/api/manager/',
+    prefixUrl: requestUrls.storage,
     retry: 0,
     headers: {
         Authorization: `Bearer ${userStore.getTokenAccess}`
