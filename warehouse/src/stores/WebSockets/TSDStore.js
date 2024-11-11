@@ -1,10 +1,12 @@
 import {defineStore} from 'pinia'
 import {useUserStore} from '@/stores/HTTP/Auth/UserStore.js'
 import {computed, ref} from "vue";
+import {useERPStore} from "@/stores/HTTP/WMS/1С/ERPStore.js";
 
 export const useWebSocketStore = defineStore('websocket', () => {
 //Подключаем UserStore
     const userStore = useUserStore()
+    const ERPStore = useERPStore()
 //State
     const socket = ref(null)
     const isConnected = ref(false)
@@ -28,8 +30,8 @@ export const useWebSocketStore = defineStore('websocket', () => {
 
 //Actions
     function initWebSocket() {
-        // const wsUrl = `ws://lab:8081/ws/inventory/?token=${userStore.getTokenAccess}`
-        const wsUrl = `ws://38.180.192.229/ws/inventory/?token=${userStore.getTokenAccess}`
+        const wsUrl = `ws://lab:8081/ws/inventory/?token=${userStore.getTokenAccess}`
+        // const wsUrl = `ws://38.180.192.229/ws/inventory/?token=${userStore.getTokenAccess}`
         socket.value = new WebSocket(wsUrl)
         socket.value.onopen = onOpen.bind(this)
         socket.value.onclose = onClose.bind(this)
@@ -120,7 +122,33 @@ export const useWebSocketStore = defineStore('websocket', () => {
             error.value = 'Cannot send message: WebSocket is not connected'
         }
     }
+    // }
+    // {
+    //     'action': 'create_items_bulk',
+    //     'items': [
+    //     {
+    //         'barcode': '0422000208',
+    //         'product': 'КЭВ-32M3,5W2'
+    //     },
+    //     ...
+    // ]
+    // }
 
+
+    function createItemsBulk(array) {
+        console.log(array)
+        const data = {
+            'action': 'create_items_bulk',
+            "items" : array
+        }
+        if (isConnected.value && socket.value && socket.value.readyState === WebSocket.OPEN) {
+            console.log(data)
+            socket.value.send(JSON.stringify(data))
+        } else {
+            console.error('Cannot send message: WebSocket is not connected')
+            error.value = 'Cannot send message: WebSocket is not connected'
+        }
+    }
     function createWarehouse() {
         const data = {
             action: 'create_warehouse',
@@ -205,6 +233,8 @@ export const useWebSocketStore = defineStore('websocket', () => {
         createPallet,
         getWarehouse,
         disconnect,
+        createItemsBulk,
         reconnect,
+
     }
 })

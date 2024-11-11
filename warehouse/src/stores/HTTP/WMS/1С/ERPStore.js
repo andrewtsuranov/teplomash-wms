@@ -2,6 +2,7 @@ import {useErrorStore} from "@/stores/Error/ErrorStore.js"
 import {defineStore} from 'pinia'
 import ky from "ky"
 import {ref} from "vue"
+import {useWebSocketStore} from "@/stores/WebSockets/TSDStore.js";
 
 
 const kyStd = ky.create({
@@ -33,6 +34,7 @@ const kyCors = kyStd.extend({
 })
 export const useERPStore = defineStore('ERPStore', () => {
     const errorStore = useErrorStore()
+    const webSocketStore = useWebSocketStore()
 //state
     const loading = ref(false)
     const productByDay = ref(JSON.parse(localStorage.getItem('productByDay')) || null)
@@ -46,6 +48,7 @@ export const useERPStore = defineStore('ERPStore', () => {
                 .json()
             productByDay.value = response
             localStorage.setItem('productByDay', JSON.stringify(response))
+            webSocketStore.createItemsBulk(response)
             return true
         } catch (err) {
             console.log(err)
@@ -63,5 +66,6 @@ export const useERPStore = defineStore('ERPStore', () => {
 //getters
 //actions
         GET_PRODUCT_BY_DAY,
+
     }
 })

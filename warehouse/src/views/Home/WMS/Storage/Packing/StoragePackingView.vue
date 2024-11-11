@@ -28,6 +28,7 @@
             Получить данные с ERP
           </my-button>
         </div>
+        <TeplomashTaskManagerView/>
       </div>
       <div class="in-table-container">
         <table class="table table-dark table-hover">
@@ -111,6 +112,7 @@ import QRCode from 'qrcode'
 import {useERPStore} from "@/stores/HTTP/WMS/1С/ERPStore.js";
 import {usePackingStore} from "@/stores/HTTP/WMS/PackingStore.js";
 import MyButton from "@/components/UI/MyButton.vue";
+import TeplomashTaskManagerView from "@/views/Home/WMS/TeplomashTaskManager/TeplomashTaskManagerView.vue";
 
 const packingStore = usePackingStore()
 const ERPStore = useERPStore()
