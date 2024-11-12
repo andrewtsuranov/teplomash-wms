@@ -1,6 +1,6 @@
 <template>
   <div class="in-table-container">
-    <table class="table table-dark table-hover">
+    <table class="table-content table table-dark table-hover">
       <thead>
       <tr>
         <th scope="col">№</th>
@@ -45,8 +45,13 @@
 <style scoped>
 .in-table-container {
   display: grid;
-  grid-template-columns: minmax(auto, 1fr);
-  grid-template-rows: 1fr;
+
+  /*grid-template-columns: minmax(auto, 1fr);*/
+  /*grid-template-rows: 500px;*/
   overflow-x: auto;
+}
+.table-content {
+  display: grid;
+
 }
 </style>

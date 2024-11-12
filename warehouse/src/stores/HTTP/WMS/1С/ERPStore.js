@@ -10,7 +10,7 @@ const kyStd = ky.create({
     prefixUrl: 'http://lab/db7/hs/wms/products/',
     retry: {
         limit: 2,
-        methods: ['get'],
+        methods: ['post'],
         statusCodes: [408, 500, 502, 503, 504],
     },
     timeout: 30000,
@@ -45,11 +45,17 @@ export const useERPStore = defineStore('ERPStore', () => {
         loading.value = true;
         errorStore.clearError();
         try {
-            const response = await kyCors(`${startDate}/${endDate}/`)
-                .json()
+            const response = await kyCors.post('', {
+
+                json: {
+                    "DateFrom": startDate,
+                    "DateTo": endDate
+                }
+            }).json()
+            console.log(response)
             productByDay.value = response
             localStorage.setItem('productByDay', JSON.stringify(response))
-            webSocketStore.createItemsBulk(response)
+            // webSocketStore.createItemsBulk(response)
             return true
         } catch (err) {
             console.log(err)

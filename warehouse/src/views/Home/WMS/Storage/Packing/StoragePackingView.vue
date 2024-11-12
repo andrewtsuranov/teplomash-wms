@@ -17,31 +17,6 @@
           </p>
           <div class="collapse" id="collapseExample">
             <datetime-picker/>
-            <!--            <div class="erp-data-range">-->
-            <!--              <div class="input-group">-->
-            <!--                <label for="start-date">Начальная дата:</label>-->
-            <!--                <input-->
-            <!--                    class="start-date"-->
-            <!--                    v-model="startDate"-->
-            <!--                    type="date"-->
-            <!--                />-->
-            <!--                <input id="time" v-model="selectedTimeStart" type="time"/>-->
-            <!--              </div>-->
-            <!--              <div class="input-group">-->
-            <!--                <label for="end-date">Конечная дата:</label>-->
-            <!--                <input-->
-            <!--                    class="end-date"-->
-            <!--                    v-model="endDate"-->
-            <!--                    type="date"-->
-            <!--                />-->
-            <!--                <input id="time" v-model="selectedTimeEnd" type="time"/>-->
-            <!--              </div>-->
-            <!--              <my-button class="btn-get-erp"-->
-            <!--                         type="button"-->
-            <!--                         @click="ERPStore.GET_PRODUCT_BY_DAY(getTimeForERP(startDate, selectedTimeStart),getTimeForERP(endDate, selectedTimeEnd) )">-->
-            <!--                Получить данные с ERP-->
-            <!--              </my-button>-->
-            <!--            </div>-->
           </div>
         </div>
         <erp-one-c class="erp-logo"></erp-one-c>
@@ -53,36 +28,16 @@
         <tr>
           <th scope="col">№</th>
           <th scope="col">Изделие</th>
-          <th scope="col">Особенности</th>
           <th scope="col">Заводской номер</th>
-          <th scope="col">Кол-во</th>
-          <th scope="col">Паллета</th>
+          <th scope="col">Дата</th>
         </tr>
         </thead>
         <tbody>
-        <tr>
-          <th scope="row">1</th>
-          <td>КЭВ-9П2022Е</td>
-          <td>Панель из матовой нержавеющей стали</td>
-          <td>1234567898765</td>
-          <td>9</td>
-          <td>id404</td>
-        </tr>
-        <tr>
-          <th scope="row">2</th>
-          <td>КЭВ-12П3011Е</td>
-          <td>Панель из глянцевой нержавеющей стали</td>
-          <td>1234567898765</td>
-          <td>9</td>
-          <td>id435</td>
-        </tr>
-        <tr>
-          <th scope="row">3</th>
-          <td>КЭВ-24П4023Е</td>
-          <td>Исполнение 30</td>
-          <td>1234567898765</td>
-          <td>9</td>
-          <td>id43</td>
+        <tr v-for="(item, index) in ERPStore.productByDay" :key="index">
+          <th scope="row">{{ index + 1 }}</th>
+          <td>{{ item.product }}</td>
+          <td>{{ item.barcode }}</td>
+          <td>{{ item.date }}</td>
         </tr>
         </tbody>
       </table>
