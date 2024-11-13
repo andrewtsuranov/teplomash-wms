@@ -9,7 +9,7 @@
          :key="item.id"
          class="wms-input"
          @click="handlerClickStorage(item.id)"
-    >Склад {{ item.number }}: {{ item.name }}
+    ><span>{{ item.name }}</span>
     </div>
   </div>
 </template>
@@ -32,11 +32,10 @@ const handlerClickStorage = async (id) => {
 <style scoped>
 .wms-home-container {
   display: grid;
-  grid-template-columns: minmax(auto, max-content);
-  grid-auto-flow: row;
-  grid-auto-rows: min-content;
-  align-items: start;
-  justify-self: center;
+  grid-template-columns: repeat(auto-fit, minmax(auto, 400px));
+  padding: 0 2rem;
+  grid-auto-rows: minmax(auto, 400px);
+  place-content: center;
   gap: 5rem;
 }
 
@@ -46,6 +45,12 @@ const handlerClickStorage = async (id) => {
   text-transform: uppercase;
   padding: 10px;
   cursor: pointer;
+  align-content: center;
+}
+
+.wms-input span {
+  display: grid;
+  justify-items: center;
 }
 
 .wms-input:hover {
