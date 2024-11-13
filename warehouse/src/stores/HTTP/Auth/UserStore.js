@@ -49,12 +49,12 @@ const kyVerifyandRefresh = kyStd.extend({
 })
 export const useUserStore = defineStore('userStore', () => {
     const errorStore = useErrorStore()
-//state
+//---------------------------------------state--------------------------------
     const user = ref(JSON.parse(localStorage.getItem('userData')) || null)
     const loading = ref(false)
     const tempPassword = ref(null)
     // const userUP = ref(null)
-//getters
+//--------------------------------------getters------------------------------
     const isAuthenticated = computed(() => !!user.value)
     const getFullNameUser = computed(() => {
         const [lastName, firstName, middlename] = user.value.user.username.split('_')
@@ -73,8 +73,9 @@ export const useUserStore = defineStore('userStore', () => {
     const getUserId = computed(() => user.value.user.id)
     const getUserEmail = computed(() => user.value.user.email)
 
-//actions
-    async function LOGIN(credentials) {
+//----------------------------------actions--------------------------------
+
+ const LOGIN = async (credentials) => {
         loading.value = true;
         errorStore.clearError();
         try {
@@ -102,7 +103,7 @@ export const useUserStore = defineStore('userStore', () => {
         }
     }
 
-    async function SIGNUP(userData) {
+    const SIGNUP = async (userData) => {
         console.log(userData)
         const errorStore = useErrorStore()
         loading.value = true;
@@ -129,7 +130,7 @@ export const useUserStore = defineStore('userStore', () => {
         }
     }
 
-    // async REQ_CONFIRM(activation_code) {
+    //  const REQ_CONFIRM = async (activation_code) => {
     //     try {
     //         const email = userUP.value.email || JSON.parse(localStorage.getItem('userUP')).email || '{}'
     //         const response = await api
@@ -151,7 +152,7 @@ export const useUserStore = defineStore('userStore', () => {
     //         tempPassword.value = null
     //     }
     // },
-    async function VERIFY(token_access, token_refresh) {
+    const VERIFY = async (token_access, token_refresh) => {
         loading.value = true;
         errorStore.error = null;
         try {
@@ -186,7 +187,7 @@ export const useUserStore = defineStore('userStore', () => {
         }
     }
 
-    function clearFullLocalStorage() {
+    const clearFullLocalStorage = () => {
         user.value = null
         localStorage.clear()
         return true

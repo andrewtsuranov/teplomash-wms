@@ -5,17 +5,17 @@
       <div class="wms-packing-erp-data">
         <div>
           <p class="d-inline-flex">
-            <button class="btn btn-primary"
-                    type="button"
-                    data-bs-toggle="collapse"
-                    data-bs-target="#collapseExample"
+            <button aria-controls="collapseExample"
                     aria-expanded="false"
-                    aria-controls="collapseExample"
+                    class="btn btn-primary"
+                    data-bs-target="#collapseExample"
+                    data-bs-toggle="collapse"
+                    type="button"
             >
               Выбрать период
             </button>
           </p>
-          <div class="collapse" id="collapseExample">
+          <div id="collapseExample" class="collapse">
             <datetime-picker/>
           </div>
         </div>
@@ -23,21 +23,23 @@
       </div>
     </div>
     <div class="in-table-container">
-      <table class="table table-dark table-hover">
+      <table class="table-content table table-dark table-hover">
         <thead>
         <tr>
           <th scope="col">№</th>
           <th scope="col">Изделие</th>
-          <th scope="col">Заводской номер</th>
+          <th scope="col">Кол-во, шт</th>
           <th scope="col">Дата</th>
+<!--          <th scope="col">Время</th>-->
         </tr>
         </thead>
         <tbody>
-        <tr v-for="(item, index) in ERPStore.productByDay" :key="index">
+        <tr v-for="(item, index) in webSocketStore.productUnregistered" :key="index">
           <th scope="row">{{ index + 1 }}</th>
-          <td>{{ item.product }}</td>
-          <td>{{ item.barcode }}</td>
-          <td>{{ item.date }}</td>
+          <td>{{ item.product_type.name }}</td>
+          <td>{{ item.items_count }}</td>
+          <td>{{ item.earliest_date }}</td>
+<!--          <td>{{ item.earliest_date }}</td>-->
         </tr>
         </tbody>
       </table>
@@ -82,6 +84,7 @@
 import {onMounted, ref} from 'vue'
 import QRCode from 'qrcode'
 import {useERPStore} from "@/stores/HTTP/WMS/1С/ERPStore.js";
+import {useWebSocketStore} from "@/stores/WebSockets/WebSocketStore.js";
 import {usePackingStore} from "@/stores/HTTP/WMS/PackingStore.js";
 import TeplomashTaskManagerView from "@/views/Home/WMS/TeplomashTaskManager/TeplomashTaskManagerView.vue";
 import ErpOneC from "@/components/UI/SVG/ErpOneС.vue"
@@ -89,6 +92,7 @@ import DatetimePicker from "@/components/UI/DatetimePicker.vue";
 
 const packingStore = usePackingStore()
 const ERPStore = useERPStore()
+const webSocketStore = useWebSocketStore()
 const startDate = ref('2022-10-05');
 const endDate = ref('2022-10-05');
 const selectedTimeStart = ref('09:00')
@@ -147,8 +151,14 @@ const generateQR = async (data) => {
 .in-table-container {
   display: grid;
   grid-template-columns: minmax(auto, 1fr);
-  grid-template-rows: 1fr;
+  /*grid-template-rows: minmax(auto, 370px);*/
   overflow-x: auto;
+  border-radius: 1rem;
+  max-height: 370px;
+}
+
+.table-content {
+
 }
 
 .erp-data-table {
@@ -194,7 +204,6 @@ const generateQR = async (data) => {
   grid-template-rows: 1fr;
   font-size: 1rem;
 }
-
 
 
 .wms-packing-pallet {

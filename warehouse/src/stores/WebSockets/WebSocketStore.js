@@ -22,6 +22,8 @@ export const useWebSocketStore = defineStore('websocket', () => {
     const privateMessage = ref(null)
     const privateMessageID = ref(null)
     const receivedMessage = ref(null)
+    const productUnregistered = ref(JSON.parse(localStorage.getItem('productUnregistered')) || null)
+    const productTypes = ref(JSON.parse(localStorage.getItem('productTypes')) || null)
 //Getters
     const lastMessage = computed(() => message.value)
     const connectionStatus = computed(() => isConnected.value ? 'В сети' : 'Не в сети')
@@ -47,6 +49,14 @@ export const useWebSocketStore = defineStore('websocket', () => {
         console.log('WebSocket connected')
     }
 
+    function sendPong() {
+        if (isConnected.value && socket.value?.readyState === WebSocket.OPEN) {
+            // Отправляем pong в том же формате, в котором получили ping
+            socket.value.send(JSON.stringify({type: 'pong'}))
+            lastPongTime.value = Date.now()
+        }
+    }
+
     function onClose(event) {
         isConnected.value = false
         console.log(`WebSocket disconnected. Code: ${event.code}, reason: ${event.reason}`)
@@ -54,6 +64,33 @@ export const useWebSocketStore = defineStore('websocket', () => {
             error.value = 'Соединение было разорвано'
             reconnect()
         }
+    }
+
+    function disconnect() {
+        if (socket.value) {
+            socket.value.close()
+            isConnected.value = false
+            console.log('WebSocket disconnected by user')
+        }
+    }
+
+    function reconnect() {
+        if (reconnectAttempts.value < maxReconnectAttempts.value) {
+            reconnectAttempts.value++
+            console.log(`Attempting to reconnect (${reconnectAttempts.value}/${maxReconnectAttempts.value})`)
+            setTimeout(() => {
+                initWebSocket()
+            }, reconnectDelay.value)
+        } else {
+            console.error('Max reconnection attempts reached')
+            reconnectError.value = true
+        }
+    }
+
+    function onError(error) {
+        console.error('WebSocket Error:', error)
+        error.value = 'WebSocket Error occurred'
+        reconnectError.value = true
     }
 
     function onMessage(event) {
@@ -87,25 +124,27 @@ export const useWebSocketStore = defineStore('websocket', () => {
                     message: data.message
                 }
             }
+            //Обработка сообщения: перенос продукции из ERP в БД
+            if (data.type === 'items_created' && data.status === 'success') {
+                getUnregisteredItems()
+                // productByDayGroup.value = data.items
+                // localStorage.setItem('productByDayGroup', JSON.stringify(data.items))
+            }
+            if (data.type === 'unregistered_items' && data.status === 'success') {
+                productUnregistered.value = data.groups
+                localStorage.setItem('productUnregistered', JSON.stringify(data.groups))
+            }
+            if (data.type === 'product_types_list' && data.status === 'success') {
+                productTypes.value = data.products
+                localStorage.setItem('productTypes', JSON.stringify(data.products))
+            }
+            if (data.type === 'product_types_updated' && data.status === 'success') {
+                alert(data.message)
+            }
         } catch (e) {
             console.error('Error parsing WebSocket message:', e)
             error.value = 'Error parsing WebSocket message'
         }
-    }
-
-    function sendPong() {
-        if (isConnected.value && socket.value?.readyState === WebSocket.OPEN) {
-            // Отправляем pong в том же формате, в котором получили ping
-            socket.value.send(JSON.stringify({type: 'pong'}))
-            lastPongTime.value = Date.now()
-            // console.log('Pong sent')
-        }
-    }
-
-    function onError(error) {
-        console.error('WebSocket Error:', error)
-        error.value = 'WebSocket Error occurred'
-        reconnectError.value = true
     }
 
     function sendMessage(message, id) {
@@ -122,33 +161,57 @@ export const useWebSocketStore = defineStore('websocket', () => {
             error.value = 'Cannot send message: WebSocket is not connected'
         }
     }
-    // }
-    // {
-    //     'action': 'create_items_bulk',
-    //     'items': [
-    //     {
-    //         'barcode': '0422000208',
-    //         'product': 'КЭВ-32M3,5W2'
-    //     },
-    //     ...
-    // ]
-    // }
 
-
+//Отправляем запрос на получение сгруппированных незарегестрированных изделий
     function createItemsBulk(array) {
-        console.log(array)
         const data = {
             'action': 'create_items_bulk',
-            "items" : array
+            "items": array
         }
+        console.log(data)
         if (isConnected.value && socket.value && socket.value.readyState === WebSocket.OPEN) {
-            console.log(data)
             socket.value.send(JSON.stringify(data))
         } else {
             console.error('Cannot send message: WebSocket is not connected')
             error.value = 'Cannot send message: WebSocket is not connected'
         }
     }
+
+    const getUnregisteredItems = () => {
+        const data = {
+            "action": "get_unregistered_items"
+        }
+        if (isConnected.value && socket.value && socket.value.readyState === WebSocket.OPEN) {
+            socket.value.send(JSON.stringify(data))
+        } else {
+            console.error('Cannot send message: WebSocket is not connected')
+            error.value = 'Cannot send message: WebSocket is not connected'
+        }
+    }
+    const getProductTypes = () => {
+        const data = {
+            "action": "get_product_types"
+        }
+        if (isConnected.value && socket.value && socket.value.readyState === WebSocket.OPEN) {
+            socket.value.send(JSON.stringify(data))
+        } else {
+            console.error('Cannot send message: WebSocket is not connected')
+            error.value = 'Cannot send message: WebSocket is not connected'
+        }
+    }
+    const updateProductTypes = (array) => {
+        const data = {
+            "action": "update_product_types",
+            "products": array
+        }
+        if (isConnected.value && socket.value && socket.value.readyState === WebSocket.OPEN) {
+            socket.value.send(JSON.stringify(data))
+        } else {
+            console.error('Cannot send message: WebSocket is not connected')
+            error.value = 'Cannot send message: WebSocket is not connected'
+        }
+    }
+
     function createWarehouse() {
         const data = {
             action: 'create_warehouse',
@@ -181,27 +244,6 @@ export const useWebSocketStore = defineStore('websocket', () => {
         }));
     }
 
-    function disconnect() {
-        if (socket.value) {
-            socket.value.close()
-            isConnected.value = false
-            console.log('WebSocket disconnected by user')
-        }
-    }
-
-    function reconnect() {
-        if (reconnectAttempts.value < maxReconnectAttempts.value) {
-            reconnectAttempts.value++
-            console.log(`Attempting to reconnect (${reconnectAttempts.value}/${maxReconnectAttempts.value})`)
-            setTimeout(() => {
-                initWebSocket()
-            }, reconnectDelay.value)
-        } else {
-            console.error('Max reconnection attempts reached')
-            reconnectError.value = true
-        }
-    }
-
     return {
 //state
         socket,
@@ -216,6 +258,8 @@ export const useWebSocketStore = defineStore('websocket', () => {
         privateMessage,
         privateMessageID,
         receivedMessage,
+        productUnregistered,
+        productTypes,
 //getters
         lastMessage,
         connectionStatus,
@@ -235,6 +279,8 @@ export const useWebSocketStore = defineStore('websocket', () => {
         disconnect,
         createItemsBulk,
         reconnect,
-
+        getUnregisteredItems,
+        getProductTypes,
+        updateProductTypes,
     }
 })

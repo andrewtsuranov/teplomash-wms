@@ -27,7 +27,7 @@
   </div>
 </template>
 <script setup>
-import {useWebSocketStore} from '@/stores/WebSockets/TSDStore.js'
+import {useWebSocketStore} from '@/stores/WebSockets/WebSocketStore.js'
 import {useRoute} from 'vue-router'
 import {ref} from "vue";
 

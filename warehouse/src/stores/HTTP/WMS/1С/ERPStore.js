@@ -2,12 +2,10 @@ import {useErrorStore} from "@/stores/Error/ErrorStore.js"
 import {defineStore} from 'pinia'
 import ky from "ky"
 import {ref} from "vue"
-import {useWebSocketStore} from "@/stores/WebSockets/TSDStore.js";
-
-
+import {useWebSocketStore} from "@/stores/WebSockets/WebSocketStore.js";
 
 const kyStd = ky.create({
-    prefixUrl: 'http://lab/db7/hs/wms/products/',
+    prefixUrl: 'http://lab/db7/hs/wms/',
     retry: {
         limit: 2,
         methods: ['post'],
@@ -19,14 +17,14 @@ const kyCors = kyStd.extend({
     hooks: {
         beforeRequest: [
             (request) => {
-            const username = ref('sklad')
-            const password = ref('sklad')
-                request.headers.set('Authorization', `Basic ${btoa(username.value +':'+password.value)}`)
+                const username = ref('sklad')
+                const password = ref('sklad')
+                request.headers.set('Authorization', `Basic ${btoa(username.value + ':' + password.value)}`)
                 request.headers.set('Content-Type', 'application/json')
             }
         ],
         afterResponse: [
-            (request,options,response) => {
+            (request, options, response) => {
                 console.log('Статус ответа:', response.status)
                 return response
             }
@@ -36,26 +34,21 @@ const kyCors = kyStd.extend({
 export const useERPStore = defineStore('ERPStore', () => {
     const errorStore = useErrorStore()
     const webSocketStore = useWebSocketStore()
-//state
+//-------------------------------state---------------------------------
     const loading = ref(false)
-    const productByDay = ref(JSON.parse(localStorage.getItem('productByDay')) || null)
-//getters
-//actions
-    async function GET_PRODUCT_BY_DAY(startDate, endDate) {
+//------------------------------getters-------------------------------
+//-------------------------------actions---------------------------------
+    const GET_PRODUCT_BY_DAY = async (startDate, endDate) => {
         loading.value = true;
         errorStore.clearError();
         try {
-            const response = await kyCors.post('', {
-
+            const response = await kyCors.post('products/', {
                 json: {
                     "DateFrom": startDate,
                     "DateTo": endDate
                 }
             }).json()
-            console.log(response)
-            productByDay.value = response
-            localStorage.setItem('productByDay', JSON.stringify(response))
-            // webSocketStore.createItemsBulk(response)
+            webSocketStore.createItemsBulk(response)
             return true
         } catch (err) {
             console.log(err)
@@ -64,15 +57,44 @@ export const useERPStore = defineStore('ERPStore', () => {
             loading.value = false
         }
     }
-
+    const updateProductsData = async () => {
+        loading.value = true;
+        errorStore.clearError();
+        try {
+            await webSocketStore.getProductTypes()
+            const names = webSocketStore.productTypes.map(obj => obj.name)
+            const response = await kyCors.post('product/detail', {
+                json: names
+            }).json()
+            const collectData = webSocketStore.productTypes.map((item, index) => {
+                if (index >= response.length) {
+                    throw new Error('Массивы имеют разную длину')
+                }
+                const secondItem = response[index]
+                return {
+                    id: item.id,
+                    max_weight: secondItem.weight_gross,
+                    length: secondItem.L,
+                    width: secondItem.W,
+                    height: secondItem.H
+                }
+            })
+            await webSocketStore.updateProductTypes(collectData)
+            return true
+        } catch (err) {
+            console.log(err)
+            throw err
+        } finally {
+            loading.value = false
+        }
+    }
     return {
 //state
         errorStore,
         loading,
-        productByDay,
 //getters
 //actions
         GET_PRODUCT_BY_DAY,
-
+        updateProductsData
     }
 })

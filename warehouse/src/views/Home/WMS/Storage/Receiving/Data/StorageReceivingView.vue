@@ -45,13 +45,9 @@
 <style scoped>
 .in-table-container {
   display: grid;
-
-  /*grid-template-columns: minmax(auto, 1fr);*/
-  /*grid-template-rows: 500px;*/
+  grid-template-columns: minmax(auto, 1fr);
+  grid-template-rows: 1fr;
   overflow-x: auto;
 }
-.table-content {
-  display: grid;
 
-}
 </style>

@@ -19,6 +19,11 @@
             @click="ERPStore.GET_PRODUCT_BY_DAY(dataStart, dataEnd)"
     >Получить данные
     </button>
+    <button class="btn btn-outline-success"
+            type="button"
+            @click="ERPStore.updateProductsData()"
+    >Заполнить хар-ки
+    </button>
   </div>
 </template>
 <script setup>

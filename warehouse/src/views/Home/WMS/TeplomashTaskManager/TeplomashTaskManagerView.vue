@@ -82,7 +82,7 @@
   </div>
 </template>
 <script setup>
-import {useWebSocketStore} from '@/stores/WebSockets/TSDStore.js'
+import {useWebSocketStore} from '@/stores/WebSockets/WebSocketStore.js'
 import {useRouter, useRoute} from "vue-router";
 import MyButton from "@/components/UI/MyButton.vue"
 
