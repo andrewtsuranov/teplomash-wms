@@ -20,30 +20,32 @@
           </div>
         </div>
         <erp-one-c class="erp-logo"></erp-one-c>
+        <div class="in-table-container">
+          <table class="table-content table table-dark table-hover">
+            <thead>
+            <tr>
+              <th scope="col">№</th>
+              <th scope="col">Изделие</th>
+              <th scope="col">Кол-во, шт</th>
+              <th scope="col">Дата</th>
+              <th scope="col">Время</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr v-for="(item, index) in webSocketStore.wsGroupUnregProduct" :key="index">
+              <th scope="row">{{ index + 1 }}</th>
+              <td>{{ item.product_type.name }}</td>
+              <td>{{ item.items_count }}</td>
+              <td>{{ useSplitDateByT(item.earliest_date).date }}</td>
+              <td>{{ useSplitDateByT(item.earliest_date).time }}</td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
+
     </div>
-    <div class="in-table-container">
-      <table class="table-content table table-dark table-hover">
-        <thead>
-        <tr>
-          <th scope="col">№</th>
-          <th scope="col">Изделие</th>
-          <th scope="col">Кол-во, шт</th>
-          <th scope="col">Дата</th>
-<!--          <th scope="col">Время</th>-->
-        </tr>
-        </thead>
-        <tbody>
-        <tr v-for="(item, index) in webSocketStore.productUnregistered" :key="index">
-          <th scope="row">{{ index + 1 }}</th>
-          <td>{{ item.product_type.name }}</td>
-          <td>{{ item.items_count }}</td>
-          <td>{{ item.earliest_date }}</td>
-<!--          <td>{{ item.earliest_date }}</td>-->
-        </tr>
-        </tbody>
-      </table>
-    </div>
+
     <TeplomashTaskManagerView/>
     <div class="wms-packing-pallet">
       <div v-for="n in 7" :key="n" class="pallet-item-content">
@@ -52,8 +54,34 @@
           <span>Паллета №{{ n }}</span>
           <span>Дата создания:{{ dataYYYYMMDD }}</span>
         </div>
-        <div class="pallet-item-row-two"></div>
-        <div class="pallet-item-row-three"></div>
+        <div class="pallet-item-row-two">
+          <svg-eur-one100-mini841/>
+        </div>
+        <div class="pallet-item-row-three">
+          <div class="in-table-item-container">
+            <table class="table-content table table-dark table-hover">
+              <thead>
+              <tr>
+                <th scope="col">№</th>
+                <th scope="col">Изделие</th>
+                <th scope="col">Кол-во, шт</th>
+                <th scope="col">Barcode</th>
+                <th scope="col">Дата выпуска</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr v-for="(item, index) in webSocketStore.wsGroupUnregProduct" :key="index">
+                <th scope="row">{{ index + 1 }}</th>
+                <td>КЭВ-2П1123Е</td>
+                <td>1</td>
+                <td>{{ item.items[0].barcode }}</td>
+                <td>{{ useSplitDateByT(item.items[0].created_at).date }}</td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+
+        </div>
         <!--        <div class="pallet-ID-line-one">-->
         <!--          <span>Паллета №</span>-->
         <!--          {{ n }}-->
@@ -89,6 +117,8 @@ import {usePackingStore} from "@/stores/HTTP/WMS/PackingStore.js";
 import TeplomashTaskManagerView from "@/views/Home/WMS/TeplomashTaskManager/TeplomashTaskManagerView.vue";
 import ErpOneC from "@/components/UI/SVG/ErpOneС.vue"
 import DatetimePicker from "@/components/UI/DatetimePicker.vue";
+import SvgEurOne100Mini841 from "@/components/UI/SVG/svgEurOne100Mini841.vue";
+import {useSplitDateByT} from "@/composables/SpliDateByT.js";
 
 const packingStore = usePackingStore()
 const ERPStore = useERPStore()
@@ -130,6 +160,8 @@ const generateQR = async (data) => {
     qrcode.value = string
   })
 }
+
+
 </script>
 <style scoped>
 .wms-packing-container {
@@ -142,6 +174,7 @@ const generateQR = async (data) => {
 .wms-packing-erp-data {
   display: grid;
   grid-template-columns: 1fr 300px;
+  grid-template-rows: 1fr;
   background-color: #2e2e2e;
   border: 1px solid #605039e0;
   border-radius: 1rem;
@@ -150,13 +183,19 @@ const generateQR = async (data) => {
 
 .in-table-container {
   display: grid;
+  grid-column: 1 / 3;
   grid-template-columns: minmax(auto, 1fr);
-  /*grid-template-rows: minmax(auto, 370px);*/
-  overflow-x: auto;
-  border-radius: 1rem;
+  overflow: auto;
+  border-top: 1px solid red;
   max-height: 370px;
 }
-
+.in-table-item-container {
+  display: grid;
+  grid-template-columns: minmax(auto, 1fr);
+  overflow: auto;
+  border-top: 1px solid red;
+  max-height: 250px;
+}
 .table-content {
 
 }
@@ -222,7 +261,7 @@ const generateQR = async (data) => {
   border: 2px solid #E8B53F;
   /*border: 2px solid #B01010;*/
   padding: 1rem;
-  row-gap: 1rem;
+  row-gap: .5rem;
   border-radius: 1rem;
   min-height: 400px;
 }
@@ -231,7 +270,9 @@ const generateQR = async (data) => {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
 }
-
+.pallet-item-row-two {
+  padding: 1rem;
+}
 .pallet-qrcode {
   grid-area: qrcode;
   align-self: end;
@@ -265,5 +306,18 @@ const generateQR = async (data) => {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
   }
+  .in-table-container {
+    display: grid;
+    grid-column: 1;
+    grid-template-columns: 1fr;
+  }
+  /*.in-table-item-container {*/
+  /*  display: grid;*/
+  /*  grid-template-columns: 1fr;*/
+
+  /*}*/
+
 }
+
+
 </style>

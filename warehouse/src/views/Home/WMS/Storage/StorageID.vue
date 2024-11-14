@@ -130,4 +130,15 @@ a {
     row-gap: 1rem;
   }
 }
+@media (max-width: 1260px) {
+  .storage-id-container {
+    display: grid;
+    grid-template-areas:
+      "storageTitle"
+      "storageActions"
+      "storageTerminal";
+    grid-template-columns: 1fr;
+  }
+
+}
 </style>

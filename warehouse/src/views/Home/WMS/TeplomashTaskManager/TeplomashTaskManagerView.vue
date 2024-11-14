@@ -91,7 +91,6 @@ const router = useRouter()
 const route = useRoute()
 const handlerDisconnect = () => {
   webSocketStore.disconnect()
-  router.push({name: 'wmsReceiving'})
 }
 </script>
 <style scoped>

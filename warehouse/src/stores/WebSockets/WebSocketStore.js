@@ -22,13 +22,17 @@ export const useWebSocketStore = defineStore('websocket', () => {
     const privateMessage = ref(null)
     const privateMessageID = ref(null)
     const receivedMessage = ref(null)
-    const productUnregistered = ref(JSON.parse(localStorage.getItem('productUnregistered')) || null)
+    const wsGroupUnregProduct = ref(JSON.parse(localStorage.getItem('wsGroupUnregProduct')) || null)
     const productTypes = ref(JSON.parse(localStorage.getItem('productTypes')) || null)
 //Getters
     const lastMessage = computed(() => message.value)
     const connectionStatus = computed(() => isConnected.value ? 'В сети' : 'Не в сети')
     const getPrivateMessage = computed(() => privateMessage.value)
     const getPrivateMessageID = computed(() => privateMessageID.value)
+    const splitDateByT = computed(() => {
+         const [date, time] =  wsGroupUnregProduct.value.split('T')
+        return { date, time }
+    })
 
 //Actions
     function initWebSocket() {
@@ -131,8 +135,8 @@ export const useWebSocketStore = defineStore('websocket', () => {
                 // localStorage.setItem('productByDayGroup', JSON.stringify(data.items))
             }
             if (data.type === 'unregistered_items' && data.status === 'success') {
-                productUnregistered.value = data.groups
-                localStorage.setItem('productUnregistered', JSON.stringify(data.groups))
+                wsGroupUnregProduct.value = data.groups
+                localStorage.setItem('wsGroupUnregProduct', JSON.stringify(data.groups))
             }
             if (data.type === 'product_types_list' && data.status === 'success') {
                 productTypes.value = data.products
@@ -258,7 +262,7 @@ export const useWebSocketStore = defineStore('websocket', () => {
         privateMessage,
         privateMessageID,
         receivedMessage,
-        productUnregistered,
+        wsGroupUnregProduct,
         productTypes,
 //getters
         lastMessage,
@@ -266,6 +270,7 @@ export const useWebSocketStore = defineStore('websocket', () => {
         lastPongTime,
         getPrivateMessage,
         getPrivateMessageID,
+        splitDateByT,
 //actions
         initWebSocket,
         onOpen,

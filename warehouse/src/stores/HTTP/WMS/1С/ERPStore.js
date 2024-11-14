@@ -66,19 +66,21 @@ export const useERPStore = defineStore('ERPStore', () => {
             const response = await kyCors.post('product/detail', {
                 json: names
             }).json()
-            const collectData = webSocketStore.productTypes.map((item, index) => {
-                if (index >= response.length) {
-                    throw new Error('Массивы имеют разную длину')
-                }
-                const secondItem = response[index]
+            console.log(response)
+            const collectData = webSocketStore.productTypes.map(item => {
+                const secondItem = response.find(secItem => secItem.name === item.name)
+
+
                 return {
                     id: item.id,
+                    product: item.product,
                     max_weight: secondItem.weight_gross,
                     length: secondItem.L,
                     width: secondItem.W,
                     height: secondItem.H
                 }
             })
+            console.log(collectData)
             await webSocketStore.updateProductTypes(collectData)
             return true
         } catch (err) {
