@@ -39,5 +39,6 @@ const dataEnd = ref('2022-11-10T11:00')
   display: grid;
   grid-template-columns: minmax(auto, 250px);
   row-gap: .5rem;
+  padding-bottom: 1rem;
 }
 </style>

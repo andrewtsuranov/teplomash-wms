@@ -2,7 +2,7 @@
   <div class="svg-container">
     <svg
         class="responsive-svg"
-        preserveAspectRatio="xMidYMid meet"
+        preserveAspectRatio="xMidYMid slice"
         viewBox='0 0 27976 14893.3'
     >
       <g id="Слой_x0020_1">

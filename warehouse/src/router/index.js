@@ -39,29 +39,29 @@ const router = createRouter({
                 {
                     path: '',
                     name: 'Home',
-                    component: () => import('@/views/Home/HomeView.vue'),
+                    component: () => import('@/views/Home/WMSHomeView.vue'),
                 },
                 {
-                    path: 'warehouse',
+                    path: 'warehouses',
                     name: 'WMS',
-                    component: () => import('@/views/Home/WMS/StoragesView.vue'),
+                    component: () => import('@/views/Home/WMS/WarehousesView.vue'),
                 },
                 {
-                    path: '/warehouse/storage-:id',
+                    path: '/warehouse-:id',
                     name: 'WMSStorage',
-                    component: () => import('@/views/Home/WMS/Storage/StorageID.vue'),
+                    component: () => import('@/views/Home/WMS/Process/StorageID.vue'),
                     children: [
                         {
                             path: 'packing',
                             name: 'wmsPacking',
-                            component: () => import('@/views/Home/WMS/Storage/Packing/StoragePackingView.vue'),
+                            component: () => import('@/views/Home/WMS/Process/Packing/StoragePackingView.vue'),
                         },
                         {
                             path: 'receiving',
                             name: 'wmsReceiving',
                             components: {
-                                default: () => import('@/views/Home/WMS/Storage/Receiving/Data/StorageReceivingView.vue'),
-                                TTM: () => import('@/views/Home/WMS/TeplomashTaskManager/TeplomashTaskManagerView.vue'),
+                                default: () => import('@/views/Home/WMS/Process/Receiving/Data/StorageReceivingView.vue'),
+                                TTM: () => import('@/components/TeplomashTaskManager/TeplomashTaskManagerView.vue'),
                                 props: {TTM: true}
                             },
                             children: [
@@ -69,7 +69,7 @@ const router = createRouter({
                                     path: 'tsd#:tsdID',
                                     name: 'TTMTerminal',
                                     components: {
-                                        default: () => import('@/views/Home/WMS/TeplomashTaskManager/Terminal/TTMTerminal.vue'),
+                                        default: () => import('@/components/TeplomashTaskManager/Terminal/TTMTerminal.vue'),
                                     },
                                     props: {default: true},
                                 },
@@ -78,27 +78,27 @@ const router = createRouter({
                         {
                             path: 'shipping',
                             name: 'wmsShipping',
-                            component: () => import('@/views/Home/WMS/Storage/Shipping/Data/StorageShippingView.vue'),
+                            component: () => import('@/views/Home/WMS/Process/Shipping/Data/StorageShippingView.vue'),
                         },
                         {
                             path: 'picking',
                             name: 'wmsPicking',
-                            component: () => import('@/views/Home/WMS/Storage/Picking/StoragePickingView.vue'),
+                            component: () => import('@/views/Home/WMS/Process/Picking/StoragePickingView.vue'),
                         },
                         {
                             path: 'returns',
                             name: 'wmsReturns',
-                            component: () => import('@/views/Home/WMS/Storage/Returns/StorageReturnsView.vue'),
+                            component: () => import('@/views/Home/WMS/Process/Returns/StorageReturnsView.vue'),
                         },
                         {
                             path: 'inventory',
                             name: 'wmsInventory',
-                            component: () => import('@/views/Home/WMS/Storage/Inventory/StorageInventoryView.vue'),
+                            component: () => import('@/views/Home/WMS/Process/Inventory/StorageInventoryView.vue'),
                         },
                         {
                             path: 'reporting',
                             name: 'wmsReporting',
-                            component: () => import('@/views/Home/WMS/Storage/Reporting/StorageReportingView.vue'),
+                            component: () => import('@/views/Home/WMS/Process/Reporting/StorageReportingView.vue'),
                         },
                     ]
                 },

@@ -1,12 +1,10 @@
 import {defineStore} from 'pinia'
 import {useUserStore} from '@/stores/HTTP/Auth/UserStore.js'
 import {computed, ref} from "vue";
-import {useERPStore} from "@/stores/HTTP/WMS/1С/ERPStore.js";
 
 export const useWebSocketStore = defineStore('websocket', () => {
 //Подключаем UserStore
     const userStore = useUserStore()
-    const ERPStore = useERPStore()
 //State
     const socket = ref(null)
     const isConnected = ref(false)
@@ -18,7 +16,6 @@ export const useWebSocketStore = defineStore('websocket', () => {
     const reconnectDelay = ref(3000)
     const onlineDevices = ref([])
     const lastPongTime = ref(null)
-    // const userConnect = ref([])
     const privateMessage = ref(null)
     const privateMessageID = ref(null)
     const receivedMessage = ref(null)
@@ -29,15 +26,11 @@ export const useWebSocketStore = defineStore('websocket', () => {
     const connectionStatus = computed(() => isConnected.value ? 'В сети' : 'Не в сети')
     const getPrivateMessage = computed(() => privateMessage.value)
     const getPrivateMessageID = computed(() => privateMessageID.value)
-    const splitDateByT = computed(() => {
-         const [date, time] =  wsGroupUnregProduct.value.split('T')
-        return { date, time }
-    })
 
 //Actions
     function initWebSocket() {
-        const wsUrl = `ws://lab:8081/ws/inventory/?token=${userStore.getTokenAccess}`
-        // const wsUrl = `ws://38.180.192.229/ws/inventory/?token=${userStore.getTokenAccess}`
+        // const wsUrl = `ws://lab:8081/ws/inventory/?token=${userStore.getTokenAccess}`
+        const wsUrl = `ws://38.180.192.229/ws/inventory/?token=${userStore.getTokenAccess}`
         socket.value = new WebSocket(wsUrl)
         socket.value.onopen = onOpen.bind(this)
         socket.value.onclose = onClose.bind(this)
@@ -118,7 +111,7 @@ export const useWebSocketStore = defineStore('websocket', () => {
                 return sendPong()
             }
             // Обработка сообщения: получение активных пользователей
-            if (data.type === 'loaders_connected') {
+            if (data.type === 'loaders_list') {
                 onlineDevices.value = data.loaders
             }
             // Обработка сообщения: получение приватного ссобщения
@@ -143,6 +136,9 @@ export const useWebSocketStore = defineStore('websocket', () => {
                 localStorage.setItem('productTypes', JSON.stringify(data.products))
             }
             if (data.type === 'product_types_updated' && data.status === 'success') {
+                alert(data.message)
+            }
+            if (data.type === 'без понятия' && data.status === 'success') {
                 alert(data.message)
             }
         } catch (e) {
@@ -215,6 +211,14 @@ export const useWebSocketStore = defineStore('websocket', () => {
             error.value = 'Cannot send message: WebSocket is not connected'
         }
     }
+    const createPalletTask = (payload) => {
+        if (isConnected.value && socket.value && socket.value.readyState === WebSocket.OPEN) {
+            socket.value.send(JSON.stringify(payload))
+        } else {
+            console.error('Cannot send message: WebSocket is not connected')
+            error.value = 'Cannot send message: WebSocket is not connected'
+        }
+    }
 
     function createWarehouse() {
         const data = {
@@ -230,16 +234,16 @@ export const useWebSocketStore = defineStore('websocket', () => {
         }
     }
 
-    function createPallet() {
-        // Создание паллеты
-        socket.value.send(JSON.stringify({
-            action: 'create_pallet',
-            length: 120,
-            abc_class: 'A',
-            xyz_class: 'X',
-            barcode: '1234567890'
-        }));
-    }
+    // function createPallet() {
+    //     // Создание паллеты
+    //     socket.value.send(JSON.stringify({
+    //         action: 'create_pallet',
+    //         length: 120,
+    //         abc_class: 'A',
+    //         xyz_class: 'X',
+    //         barcode: '1234567890'
+    //     }));
+    // }
 
     function getWarehouse() {
         socket.value.send(JSON.stringify({
@@ -270,7 +274,6 @@ export const useWebSocketStore = defineStore('websocket', () => {
         lastPongTime,
         getPrivateMessage,
         getPrivateMessageID,
-        splitDateByT,
 //actions
         initWebSocket,
         onOpen,
@@ -279,7 +282,7 @@ export const useWebSocketStore = defineStore('websocket', () => {
         onError,
         sendMessage,
         createWarehouse,
-        createPallet,
+        // createPallet,
         getWarehouse,
         disconnect,
         createItemsBulk,
@@ -287,5 +290,6 @@ export const useWebSocketStore = defineStore('websocket', () => {
         getUnregisteredItems,
         getProductTypes,
         updateProductTypes,
+        createPalletTask,
     }
 })

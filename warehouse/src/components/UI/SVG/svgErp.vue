@@ -2,7 +2,7 @@
   <div class="svg-container">
     <svg
         viewBox="0 0 80 80"
-        preserveAspectRatio="xMidYMid meet"
+        preserveAspectRatio="xMidYMid slice"
         class="responsive-svg"
     >
       <path class="fill1" d="M6.5 61.5L6.5 31.5 0.5 31.5 0.5 26.5 11.5 26.5 11.5 61.5z"/>

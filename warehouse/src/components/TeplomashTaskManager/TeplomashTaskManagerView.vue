@@ -61,7 +61,7 @@
           >
             <router-link :to="{ name: 'TTMTerminal', params: {tsdID: device.id}}"
                          class="ttm-tsd-item-name-online"
-            >ТСД №{{ device.id }} ({{ device.email }})
+            >ТСД №{{ device.id }} ({{ device.email }}) {{device.is_busy}}
             </router-link>
           </div>
         </div>

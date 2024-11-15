@@ -19,7 +19,7 @@
             <datetime-picker/>
           </div>
         </div>
-        <erp-one-c class="erp-logo"></erp-one-c>
+        <svg-erp class="erp-logo"/>
         <div class="in-table-container">
           <table class="table-content table table-dark table-hover">
             <thead>
@@ -29,6 +29,7 @@
               <th scope="col">Кол-во, шт</th>
               <th scope="col">Дата</th>
               <th scope="col">Время</th>
+              <th scope="col">Действие</th>
             </tr>
             </thead>
             <tbody>
@@ -38,14 +39,18 @@
               <td>{{ item.items_count }}</td>
               <td>{{ useSplitDateByT(item.earliest_date).date }}</td>
               <td>{{ useSplitDateByT(item.earliest_date).time }}</td>
+              <td>
+                <button class="btn btn-success"
+                        @click="handleCreatePallet(item.items, item.product_type.pallet_types)"
+                >Создать паллету
+                </button>
+              </td>
             </tr>
             </tbody>
           </table>
         </div>
       </div>
-
     </div>
-
     <TeplomashTaskManagerView/>
     <div class="wms-packing-pallet">
       <div v-for="n in 7" :key="n" class="pallet-item-content">
@@ -80,27 +85,7 @@
               </tbody>
             </table>
           </div>
-
         </div>
-        <!--        <div class="pallet-ID-line-one">-->
-        <!--          <span>Паллета №</span>-->
-        <!--          {{ n }}-->
-        <!--                  <span>Дата создания:</span>-->
-        <!--          {{ dataYYYYMMDD }}-->
-        <!--          <span>Зона:</span>-->
-        <!--          {{ packingStore.palletData.zoneStorage }}-->
-        <!--          <span>Длина паллеты:</span>-->
-        <!--          {{ packingStore.palletData.dimensions }} мм-->
-        <!--          <div>ID Паллеты</div>-->
-        <!--          <div v-html="qrcode"></div>-->
-        <!--        </div>-->
-        <!--        <div class="pallet-product">-->
-        <!--          <span>Тип: {{ packingStore.palletData.productType }}</span>-->
-        <!--          <span>Изделие: {{ packingStore.palletData.productName }}</span>-->
-        <!--          <span>Комментарий: {{ packingStore.palletData.addInfo }}</span>-->
-        <!--          <span>Кол-во изделий: {{ packingStore.palletData.productQty }} шт.</span>-->
-        <!--        </div>-->
-        <!--        <div class="pallet-status">Сборка:</div>-->
       </div>
     </div>
     <div>
@@ -112,32 +97,19 @@
 import {onMounted, ref} from 'vue'
 import QRCode from 'qrcode'
 import {useERPStore} from "@/stores/HTTP/WMS/1С/ERPStore.js";
+import {useUserStore} from "@/stores/HTTP/Auth/UserStore.js";
 import {useWebSocketStore} from "@/stores/WebSockets/WebSocketStore.js";
 import {usePackingStore} from "@/stores/HTTP/WMS/PackingStore.js";
-import TeplomashTaskManagerView from "@/views/Home/WMS/TeplomashTaskManager/TeplomashTaskManagerView.vue";
-import ErpOneC from "@/components/UI/SVG/ErpOneС.vue"
+import TeplomashTaskManagerView from "@/components/TeplomashTaskManager/TeplomashTaskManagerView.vue";
 import DatetimePicker from "@/components/UI/DatetimePicker.vue";
 import SvgEurOne100Mini841 from "@/components/UI/SVG/svgEurOne100Mini841.vue";
 import {useSplitDateByT} from "@/composables/SpliDateByT.js";
+import SvgErp from "@/components/UI/SVG/svgErp.vue";
 
 const packingStore = usePackingStore()
 const ERPStore = useERPStore()
+const userStore = useUserStore()
 const webSocketStore = useWebSocketStore()
-const startDate = ref('2022-10-05');
-const endDate = ref('2022-10-05');
-const selectedTimeStart = ref('09:00')
-const selectedTimeEnd = ref('10:00')
-const getTimeForERP = (date, time) => {
-  const dateTime = date + " " + time;
-  const currentDate = new Date(dateTime);
-  const year = currentDate.getFullYear();
-  const month = String(currentDate.getMonth() + 1).padStart(2, '0');
-  const day = String(currentDate.getDate()).padStart(2, '0');
-  const hours = String(currentDate.getHours()).padStart(2, '0');
-  const minutes = String(currentDate.getMinutes()).padStart(2, '0');
-  const seconds = String(currentDate.getSeconds()).padStart(2, '0');
-  return `${year}${month}${day}${hours}${minutes}${seconds}`;
-}
 onMounted(async () => {
   await generateQR(text.value)
 })
@@ -160,8 +132,22 @@ const generateQR = async (data) => {
     qrcode.value = string
   })
 }
-
-
+const handleCreatePallet = async (products, palletType) => {
+  const barcodes = products.map(obj => obj.barcode)
+  const data = {
+    "action": "create_pallet",
+    "from_user": 40,
+    "loader_id": 4,
+    "warehouse_id": 1,
+    "data": {
+      "barcodes": barcodes,
+      "length": palletType[0].length,
+      "abc_class": "A",
+      "xyz_class": "X"
+    }
+  }
+ await webSocketStore.createPalletTask(data)
+}
 </script>
 <style scoped>
 .wms-packing-container {
@@ -189,6 +175,7 @@ const generateQR = async (data) => {
   border-top: 1px solid red;
   max-height: 370px;
 }
+
 .in-table-item-container {
   display: grid;
   grid-template-columns: minmax(auto, 1fr);
@@ -196,20 +183,11 @@ const generateQR = async (data) => {
   border-top: 1px solid red;
   max-height: 250px;
 }
+
 .table-content {
 
 }
 
-.erp-data-table {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  grid-auto-rows: minmax(min-content, auto);
-  /*grid-auto-flow: column;*/
-}
-
-.erp-data-table-item {
-  border: 1px solid red;
-}
 
 .wms-packing-erp-product {
   display: grid;
@@ -217,31 +195,11 @@ const generateQR = async (data) => {
   grid-template-rows: 1fr;
 }
 
-.date-range-picker {
-  display: grid;
-  grid-template-columns: minmax(auto, 1fr);
-  grid-template-rows: auto 1fr;
-  row-gap: 1rem;
-  padding: 1rem;
-  background-color: #0000004a;
-  border: 1px solid #605039e0;
-  border-radius: 1rem;
-}
 
 .erp-logo {
   display: grid;
   grid-template-rows: minmax(auto, 200px);
   justify-items: center;
-}
-
-.input-group {
-  display: grid;
-  grid-auto-flow: column;
-  column-gap: .1rem;
-  align-items: center;
-  grid-template-columns: 1fr 1fr 1fr;
-  grid-template-rows: 1fr;
-  font-size: 1rem;
 }
 
 
@@ -270,9 +228,11 @@ const generateQR = async (data) => {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
 }
+
 .pallet-item-row-two {
   padding: 1rem;
 }
+
 .pallet-qrcode {
   grid-area: qrcode;
   align-self: end;
@@ -285,15 +245,6 @@ const generateQR = async (data) => {
   font-size: 1.3rem;
 }
 
-.btn-get-erp {
-  display: grid;
-  max-width: 15rem;
-}
-
-.start-date,
-.end-date {
-  font-size: 1.2rem;
-}
 
 @media (max-width: 800px) {
   .wms-packing-erp-data {
@@ -306,18 +257,13 @@ const generateQR = async (data) => {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
   }
+
   .in-table-container {
     display: grid;
     grid-column: 1;
     grid-template-columns: 1fr;
   }
-  /*.in-table-item-container {*/
-  /*  display: grid;*/
-  /*  grid-template-columns: 1fr;*/
 
-  /*}*/
 
 }
-
-
 </style>
