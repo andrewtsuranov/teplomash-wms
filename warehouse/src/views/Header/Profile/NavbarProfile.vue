@@ -1,8 +1,8 @@
 <template>
   <div class="profile-container">
-    <div class="dropdown d-grid">
+    <div class="dropdown">
       <div class="avatar-mobile" data-bs-toggle="dropdown">
-        <label>Профиль: {{ userData.lastName }} {{ userData.initialsDot }}</label>
+        <span>Профиль: {{ userData.lastName }} {{ userData.initialsDot }}</span>
       </div>
       <BAvatar aria-expanded="false"
                bg-variant="secondary"
@@ -12,9 +12,9 @@
                text-variant=""
                size="2.7rem"
       />
-      <div class="dropdown-menu dropdown-menu-dark">
+      <div class="dropdown-menu dropdown-menu-dark" style="background-color: #2e2e2e">
         <div class="profile-dropdown">
-          <div class="profile-name dropdown-header">
+          <div class="profile-name">
             <BAvatar aria-expanded="false"
                      bg-variant="secondary"
                      class="btn btn-secondary avatar-dropdown"
@@ -26,9 +26,12 @@
             <div>{{ userData.lastName }} {{ userData.firstName }} {{ userData.middlename }}</div>
             <div>({{ userRole }})</div>
           </div>
-          <router-link class="dropdown-item" to="/profile">Профиль</router-link>
-          <router-link class="dropdown-item" to="/admin">Администрирование</router-link>
-          <div class="dropdown-item logout-btn" @click="logout">Выход</div>
+          <router-link class="profile-item" :to="{name:'Profile'}"><span>Профиль</span></router-link>
+          <router-link class="profile-item" :to="{name:'Admin'}"><span>Администрирование</span></router-link>
+          <div class="profile-logout"
+               @click="logout"
+          ><i style="color: red" class="bi bi-box-arrow-right"></i><span>Выйти из профиля</span>
+          </div>
         </div>
       </div>
     </div>
@@ -52,19 +55,24 @@ const logout = () => {
 <style scoped>
 .profile-container {
   display: grid;
-  place-items: center;
 }
 
 .profile-dropdown {
   display: grid;
-  /*row-gap: .8rem;*/
+  grid-template-columns: 1fr;
+  grid-auto-rows: minmax(auto, .8fr);
 }
 
 .profile-name {
   display: grid;
-  grid-template-columns: min-content 1fr;
+  grid-template-columns: auto 250px;
   grid-template-rows: 1fr 1fr;
-  gap: .5rem;
+  align-items: center;
+  padding: 0 0 .5rem 1rem;
+  column-gap: 1rem;
+  row-gap: .5rem;
+  color: #A4A4A4;
+  border-bottom: 1px solid #414141;
 }
 
 .avatar-dropdown {
@@ -82,12 +90,36 @@ const logout = () => {
   display: none;
 }
 
-.logout-btn {
-  border-top: 1px solid grey;
+.profile-item {
+  align-content: center;
+  padding: 0 1rem;
 }
 
-nav a {
-  color: blanchedalmond;
+.profile-item:hover {
+  background-color: #353d48;
+  border-radius: 1rem;
+  cursor: pointer;
+}
+
+.profile-logout {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-rows: 1fr;
+  column-gap: 1rem;
+  padding: 0 1rem;
+  border-top: 1px solid #414141;
+  color: #b9cad9;
+  align-items: center;
+}
+
+.profile-logout:hover {
+  background-color: #84323233;
+  border-radius: 1rem;
+  cursor: pointer;
+}
+
+a {
+  color: #b9cad9;
   text-decoration: none;
 }
 
@@ -103,7 +135,7 @@ i {
   .profile-container {
     grid-template-rows: minmax(3rem, max-content);
     background-color: rgba(255, 255, 255, 0.1);
-    place-items: stretch;
+    align-items: center;
     text-transform: uppercase;
     font-size: 1.3rem;
     font-weight: bold;
@@ -120,10 +152,8 @@ i {
 
   .avatar-mobile {
     display: grid;
-  }
-
-  label {
-    place-self: center;
+    grid-template-rows: 1fr;
+    justify-content: center;
   }
 }
 </style>
