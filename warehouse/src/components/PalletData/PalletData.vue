@@ -15,7 +15,8 @@
       </div>
       <div class="pallet-item-row-three">
         <div class="in-table-item-container">
-          <table class="table-content table table-dark table-hover">
+          <table class="table table-dark table-hover"
+          >
             <thead>
             <tr>
               <th scope="col">№</th>
@@ -98,7 +99,16 @@ onMounted(async () => {
 }
 
 .pallet-item-row-two {
+  display: grid;
+  grid-template-columns: 1fr;
   padding: 1rem;
+}
+
+.pallet-item-row-three {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: minmax(auto, 200px);
+  overflow: auto;
 }
 
 .pallet-qrcode {

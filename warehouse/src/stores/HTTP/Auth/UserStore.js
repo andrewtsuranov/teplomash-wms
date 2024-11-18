@@ -3,7 +3,7 @@ import {useRouter} from "vue-router";
 import {defineStore} from 'pinia'
 import ky from "ky"
 import {ref, computed} from "vue"
-import { requestUrls } from '@/stores/Config/request-urls.js';
+import {requestUrls} from '@/stores/Config/request-urls.js';
 
 const router = useRouter()
 const kyStd = ky.create({
@@ -72,10 +72,8 @@ export const useUserStore = defineStore('userStore', () => {
     const getTokenAccess = computed(() => user.value.access)
     const getUserId = computed(() => user.value.user.id)
     const getUserEmail = computed(() => user.value.user.email)
-
 //----------------------------------actions--------------------------------
-
- const LOGIN = async (credentials) => {
+    const LOGIN = async (credentials) => {
         loading.value = true;
         errorStore.clearError();
         try {
@@ -102,7 +100,6 @@ export const useUserStore = defineStore('userStore', () => {
             loading.value = false
         }
     }
-
     const SIGNUP = async (userData) => {
         console.log(userData)
         const errorStore = useErrorStore()
@@ -129,7 +126,6 @@ export const useUserStore = defineStore('userStore', () => {
             loading.value = false
         }
     }
-
     //  const REQ_CONFIRM = async (activation_code) => {
     //     try {
     //         const email = userUP.value.email || JSON.parse(localStorage.getItem('userUP')).email || '{}'
@@ -186,13 +182,11 @@ export const useUserStore = defineStore('userStore', () => {
             loading.value = false
         }
     }
-
     const clearFullLocalStorage = () => {
         user.value = null
         localStorage.clear()
         return true
     }
-
     return {
         user,
         loading,
