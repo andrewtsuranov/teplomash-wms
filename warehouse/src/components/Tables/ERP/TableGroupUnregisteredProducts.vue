@@ -26,6 +26,7 @@
             <th scope="col">Изделие</th>
             <th scope="col">Кол-во, шт</th>
             <th scope="col">Действие</th>
+            <th scope="col">Печать QR кода</th>
           </tr>
           </thead>
           <tbody>
@@ -39,6 +40,12 @@
               >Создать паллету
               </button>
             </td>
+            <td>
+              <button class="btn btn-success"
+                      @click="printQRCode('Hello World')"
+              >QR code
+              </button>
+            </td>
           </tr>
           </tbody>
         </table>
@@ -50,15 +57,19 @@
 import DatetimePicker from "@/components/UI/DatetimePicker.vue";
 import SvgErp from "@/components/UI/SVG/svgErp.vue";
 import {useWebSocketStore} from "@/stores/WebSockets/WebSocketStore.js";
+import ky from "ky";
 
 const webSocketStore = useWebSocketStore()
+
 const handleCreatePallet = async (products, palletType) => {
+  const getItemCountByGroup = (palletType[0].rows_length*palletType[0].rows_width*palletType[0].rows_height)
   const barcodes = products.map(obj => obj.barcode)
   const data = {
     "action": "create_pallet",
     "from_user": 40,
     "loader_id": 4,
     "warehouse_id": 1,
+    "count": getItemCountByGroup,
     "data": {
       "barcodes": barcodes,
       "length": palletType[0].length,
@@ -68,6 +79,30 @@ const handleCreatePallet = async (products, palletType) => {
   }
   await webSocketStore.createPalletTask(data)
 }
+function generateZPLQRCode(data, size = 6) {
+  return `^FO50,50^BQN,2,${size}^FDQA,${data}^FS`;
+}
+
+
+
+const printQRCode = async (qrData) => {
+  const zplCode = generateZPLQRCode(qrData);
+  try {
+    await ky.post('http://192.168.0.190:9100', {
+      body: zplCode,
+      headers: {
+        'Content-Type': 'application/x-zpl',
+        'Authorization': 'Basic ' + btoa('HT100:1234')
+      },
+    })
+  } catch (error) {
+    console.error('Ошибка печати:', error)
+  }
+}
+
+
+
+
 </script>
 <style scoped>
 .wms-packing-erp-data {
