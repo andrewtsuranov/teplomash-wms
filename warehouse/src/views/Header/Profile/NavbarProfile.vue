@@ -55,6 +55,7 @@ const logout = () => {
 <style scoped>
 .profile-container {
   display: grid;
+  align-items: center;
 }
 
 .profile-dropdown {
@@ -128,7 +129,8 @@ i {
 }
 
 .teplomash-active-exact-link {
-  background-color: #9B9482;
+  background-color: #353d48;
+  border-radius: 1rem;
 }
 
 @media (max-width: 800px) {

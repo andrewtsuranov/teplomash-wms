@@ -134,6 +134,10 @@ const router = createRouter({
             component: () => import('@/router/404/NotFound404.vue')
         }
     ],
+    scrollBehavior() {
+        // всегда прокручивать до верха
+        return {top: 0}
+    },
     linkExactActiveClass: 'teplomash-active-exact-link'
 });
 router.beforeEach(async (to) => {

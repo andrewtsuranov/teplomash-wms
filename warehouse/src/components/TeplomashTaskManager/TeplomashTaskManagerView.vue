@@ -61,7 +61,7 @@
           >
             <router-link :to="{ name: 'TTMTerminal', params: {tsdID: device.id}}"
                          class="ttm-tsd-item-name-online"
-            >ТСД №{{ device.id }} ({{ device.email }}) {{device.is_busy}}
+            >ТСД №{{ device.id }} ({{ device.email }}) {{ device.is_busy }}
             </router-link>
           </div>
         </div>
@@ -83,11 +83,10 @@
 </template>
 <script setup>
 import {useWebSocketStore} from '@/stores/WebSockets/WebSocketStore.js'
-import {useRouter, useRoute} from "vue-router";
+import {useRoute} from "vue-router";
 import MyButton from "@/components/UI/MyButton.vue"
 
 const webSocketStore = useWebSocketStore()
-const router = useRouter()
 const route = useRoute()
 const handlerDisconnect = () => {
   webSocketStore.disconnect()
@@ -252,7 +251,6 @@ const handlerDisconnect = () => {
 .ttm-tsd-list-online {
   display: grid;
   grid-auto-rows: minmax(3rem, max-content);
-
 }
 
 .ttm-tsd-item-online {
@@ -289,7 +287,6 @@ const handlerDisconnect = () => {
   font-weight: bold;
   color: #514D4C;
 }
-
 
 .ttm-terminal {
   grid-area: task;

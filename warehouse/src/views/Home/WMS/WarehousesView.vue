@@ -1,15 +1,11 @@
 <template>
   <div class="wms-home-container">
-    <!--    <div v-for="item in storageStore.fullListWarehouses"-->
-    <!--         :key="item.id"-->
-    <!--         class="wms-input"-->
-    <!--         @click="handlerClickStorage(item.id)"-->
-    <!--    >Склад {{ item.number }}: {{ item.name }}-->
     <div v-for="item in storageStore.fullListWarehouses"
          :key="item.id"
          class="wms-input"
          @click="handlerClickStorage(item.id)"
-    ><span>{{ item.name }}</span>
+    >
+      <span>{{ item.name }}</span>
     </div>
   </div>
 </template>

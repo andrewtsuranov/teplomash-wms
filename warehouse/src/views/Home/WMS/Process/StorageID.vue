@@ -42,12 +42,18 @@
   </div>
 </template>
 <script setup>
-// import {useRouter} from "vue-router";
-// import {useUserStore} from "@/stores/HTTP/Auth/UserStore.js";
 import {useStorageStore} from "@/stores/HTTP/WMS/StorageStore.js";
-// const userStore = useUserStore()
+import {useWebSocketStore} from "@/stores/WebSockets/WebSocketStore.js";
+import {onMounted, onUnmounted} from "vue";
+
+const webSocketStore = useWebSocketStore()
 const storageStore = useStorageStore()
-// const router = useRouter()
+onMounted(async () => {
+  await webSocketStore.initWebSocket()
+})
+onUnmounted(async () => {
+  await webSocketStore.disconnect()
+})
 </script>
 <style scoped>
 .storage-id-container {
@@ -130,6 +136,7 @@ a {
     row-gap: 1rem;
   }
 }
+
 @media (max-width: 1260px) {
   .storage-id-container {
     display: grid;
@@ -139,6 +146,5 @@ a {
       "storageTerminal";
     grid-template-columns: 1fr;
   }
-
 }
 </style>
