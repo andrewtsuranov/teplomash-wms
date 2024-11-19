@@ -22,7 +22,7 @@
         </span>
         <span v-if="webSocketStore.reconnectAttempts > 0"
               class="reconnected-count"
-        >{{ webSocketStore.reconnectAttempts }}
+        >{{ webSocketStore.reconnectAttempts }} из 5
         </span>
         <span v-if="webSocketStore.isConnected"
         >ТСД в сети:
@@ -61,7 +61,7 @@
           >
             <router-link :to="{ name: 'TTMTerminal', params: {tsdID: device.id}}"
                          class="ttm-tsd-item-name-online"
-            >ТСД №{{ device.id }} ({{ device.email }}) {{ device.is_busy }}
+            >ТСД №{{ device.id }} ({{ device.email }}) {{ device.current_task }}
             </router-link>
           </div>
         </div>

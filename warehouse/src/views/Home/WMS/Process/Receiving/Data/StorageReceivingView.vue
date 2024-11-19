@@ -39,8 +39,10 @@
       </tbody>
     </table>
   </div>
+<teplomash-task-manager-view/>
 </template>
 <script setup>
+import TeplomashTaskManagerView from "@/components/TeplomashTaskManager/TeplomashTaskManagerView.vue";
 </script>
 <style scoped>
 .in-table-container {

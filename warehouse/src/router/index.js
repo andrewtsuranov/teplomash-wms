@@ -56,15 +56,21 @@ const router = createRouter({
                             path: 'packing',
                             name: 'wmsPacking',
                             component: () => import('@/views/Home/WMS/Process/Packing/StoragePackingView.vue'),
+                            children: [
+                                {
+                                    path: 'tsd#:tsdID',
+                                    name: 'TTMTerminal',
+                                    components: {
+                                        default: () => import('@/components/TeplomashTaskManager/Terminal/TTMTerminal.vue'),
+                                    },
+                                    props: {default: true},
+                                },
+                            ]
                         },
                         {
                             path: 'receiving',
                             name: 'wmsReceiving',
-                            components: {
-                                default: () => import('@/views/Home/WMS/Process/Receiving/Data/StorageReceivingView.vue'),
-                                TTM: () => import('@/components/TeplomashTaskManager/TeplomashTaskManagerView.vue'),
-                                props: {TTM: true}
-                            },
+                            component: () => import('@/views/Home/WMS/Process/Receiving/Data/StorageReceivingView.vue'),
                             children: [
                                 {
                                     path: 'tsd#:tsdID',

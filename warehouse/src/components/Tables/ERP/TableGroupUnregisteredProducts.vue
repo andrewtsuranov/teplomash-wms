@@ -42,7 +42,7 @@
             </td>
             <td>
               <button class="btn btn-success"
-                      @click="printQRCode('Hello World')"
+                      @click="printingStore.printQRCode('[А]-[2024101600]-[П]-[800]-[КЭВ-9П2021Е]-[Панель из глянцевой нержавеющей стали]-[9]')"
               >QR code
               </button>
             </td>
@@ -57,9 +57,10 @@
 import DatetimePicker from "@/components/UI/DatetimePicker.vue";
 import SvgErp from "@/components/UI/SVG/svgErp.vue";
 import {useWebSocketStore} from "@/stores/WebSockets/WebSocketStore.js";
-import ky from "ky";
+import {usePrintingStore} from "@/stores/HTTP/Printing/PrintingStore.js";
 
 const webSocketStore = useWebSocketStore()
+const printingStore = usePrintingStore()
 
 const handleCreatePallet = async (products, palletType) => {
   const getItemCountByGroup = (palletType[0].rows_length*palletType[0].rows_width*palletType[0].rows_height)
@@ -67,7 +68,8 @@ const handleCreatePallet = async (products, palletType) => {
   const data = {
     "action": "create_pallet",
     "from_user": 40,
-    "loader_id": 4,
+    "description": "Создание паллеты",
+    "loader_id": 43,
     "warehouse_id": 1,
     "count": getItemCountByGroup,
     "data": {
@@ -79,29 +81,6 @@ const handleCreatePallet = async (products, palletType) => {
   }
   await webSocketStore.createPalletTask(data)
 }
-function generateZPLQRCode(data, size = 6) {
-  return `^FO50,50^BQN,2,${size}^FDQA,${data}^FS`;
-}
-
-
-
-const printQRCode = async (qrData) => {
-  const zplCode = generateZPLQRCode(qrData);
-  try {
-    await ky.post('http://192.168.0.190:9100', {
-      body: zplCode,
-      headers: {
-        'Content-Type': 'application/x-zpl',
-        'Authorization': 'Basic ' + btoa('HT100:1234')
-      },
-    })
-  } catch (error) {
-    console.error('Ошибка печати:', error)
-  }
-}
-
-
-
 
 </script>
 <style scoped>
