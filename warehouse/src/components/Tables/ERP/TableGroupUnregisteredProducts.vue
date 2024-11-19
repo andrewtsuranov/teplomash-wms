@@ -35,13 +35,13 @@
             <td>{{ item.product_type.name }}</td>
             <td>{{ item.items_count }}</td>
             <td>
-              <button class="btn btn-success"
+              <button class="btn btn-outline-success"
                       @click="handleCreatePallet(item.items, item.product_type.pallet_types)"
               >Создать паллету
               </button>
             </td>
             <td>
-              <button class="btn btn-success"
+              <button class="btn btn-outline-primary"
                       @click="printingStore.printQRCode('[А]-[2024101600]-[П]-[800]-[КЭВ-9П2021Е]-[Панель из глянцевой нержавеющей стали]-[9]')"
               >QR code
               </button>
@@ -61,9 +61,8 @@ import {usePrintingStore} from "@/stores/HTTP/Printing/PrintingStore.js";
 
 const webSocketStore = useWebSocketStore()
 const printingStore = usePrintingStore()
-
 const handleCreatePallet = async (products, palletType) => {
-  const getItemCountByGroup = (palletType[0].rows_length*palletType[0].rows_width*palletType[0].rows_height)
+  const getItemCountByGroup = (palletType[0].rows_length * palletType[0].rows_width * palletType[0].rows_height)
   const barcodes = products.map(obj => obj.barcode)
   const data = {
     "action": "create_pallet",
@@ -81,7 +80,6 @@ const handleCreatePallet = async (products, palletType) => {
   }
   await webSocketStore.createPalletTask(data)
 }
-
 </script>
 <style scoped>
 .wms-packing-erp-data {

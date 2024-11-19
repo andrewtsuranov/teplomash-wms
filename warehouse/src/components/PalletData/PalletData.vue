@@ -21,8 +21,8 @@
             <tr>
               <th scope="col">№</th>
               <th scope="col">Изделие</th>
-              <th scope="col">Кол-во, шт</th>
-              <th scope="col">Barcode</th>
+              <th scope="col">Кол-во</th>
+              <th scope="col">Штрихкод</th>
               <th scope="col">Дата выпуска</th>
             </tr>
             </thead>
@@ -87,21 +87,28 @@ onMounted(async () => {
   display: grid;
   grid-template-columns: 1fr;
   grid-template-rows: repeat(auto-fill, 1fr);
-  padding: 1rem;
-  row-gap: .5rem;
+  /*padding: 1rem;*/
+  /*row-gap: .5rem;*/
   border-radius: 1rem;
   min-height: 400px;
+  /*background-color: #ecaf0e;*/
 }
 
 .pallet-item-row-one {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
+  /*color: #2e2e2e;*/
+  /*border: 2px solid #ecaf0e;*/
+  font-size: 1.2rem;
+  font-weight: bold;
+  /*border-radius: 1rem;*/
 }
 
 .pallet-item-row-two {
   display: grid;
   grid-template-columns: 1fr;
   padding: 1rem;
+  /*background-color: #2F2D2B;*/
 }
 
 .pallet-item-row-three {
@@ -109,6 +116,8 @@ onMounted(async () => {
   grid-template-columns: 1fr;
   grid-template-rows: minmax(auto, 200px);
   overflow: auto;
+  border-bottom-left-radius: 1rem;
+  border-bottom-right-radius: 1rem;
 }
 
 .pallet-qrcode {
