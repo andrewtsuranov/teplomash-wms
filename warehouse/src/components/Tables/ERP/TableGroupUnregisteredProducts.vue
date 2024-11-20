@@ -26,7 +26,7 @@
             <th scope="col">Изделие</th>
             <th scope="col">Кол-во, шт</th>
             <th scope="col">Действие</th>
-            <th scope="col">Печать QR кода</th>
+            <th scope="col">Печать штрихкода</th>
           </tr>
           </thead>
           <tbody>
@@ -36,14 +36,14 @@
             <td>{{ item.items_count }}</td>
             <td>
               <button class="btn btn-outline-success"
-                      @click="handleCreatePallet(item.items, item.product_type.pallet_types)"
+                      @click="handleCreatePallet(item.items, item.product_type.pallet_types, item.product_type)"
               >Создать паллету
               </button>
             </td>
             <td>
               <button class="btn btn-outline-primary"
-                      @click="printingStore.printQRCode('[А]-[2024101600]-[П]-[800]-[КЭВ-9П2021Е]-[Панель из глянцевой нержавеющей стали]-[9]')"
-              >QR code
+                      @click=printBarcodes(item.items)
+              >Печать Barcode
               </button>
             </td>
           </tr>
@@ -61,18 +61,25 @@ import {usePrintingStore} from "@/stores/HTTP/Printing/PrintingStore.js";
 
 const webSocketStore = useWebSocketStore()
 const printingStore = usePrintingStore()
-const handleCreatePallet = async (products, palletType) => {
+const printBarcodes = async (data) => {
+  for (const obj of data) {
+    await printingStore.printQRCode(obj.barcode)
+    await new Promise(r => setTimeout(r, 500))
+  }
+}
+const handleCreatePallet = async (products, palletType, productName) => {
   const getItemCountByGroup = (palletType[0].rows_length * palletType[0].rows_width * palletType[0].rows_height)
   const barcodes = products.map(obj => obj.barcode)
   const data = {
     "action": "create_pallet",
     "from_user": 40,
-    "description": "Создание паллеты",
-    "loader_id": 43,
+    "description": `Создание паллеты ${productName.name}`,
+    "loader_id": 4,
     "warehouse_id": 1,
     "count": getItemCountByGroup,
     "data": {
       "barcodes": barcodes,
+      "productName": productName.name,
       "length": palletType[0].length,
       "abc_class": "A",
       "xyz_class": "X"

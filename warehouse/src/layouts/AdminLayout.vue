@@ -4,6 +4,7 @@
   </div>
 </template>
 <script setup>
+import SvgEurOne100Mini841 from "@/components/UI/SVG/svgEurOne100Mini841.vue";
 </script>
 <style scoped>
 </style>

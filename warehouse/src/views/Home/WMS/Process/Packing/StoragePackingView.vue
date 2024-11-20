@@ -4,7 +4,6 @@
     <table-group-unregistered-products/>
     <TeplomashTaskManagerView/>
     <pallet-data/>
-    <router-view name="TTMPacking"></router-view>
 
   </div>
 </template>
