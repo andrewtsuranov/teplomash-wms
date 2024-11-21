@@ -76,7 +76,9 @@ const handleCreatePallet = async (products, palletType, productName) => {
     "description": `Создание паллеты ${productName.name}`,
     "loader_id": 4,
     "warehouse_id": 1,
-    "count": getItemCountByGroup,
+    "palletType": palletType[0].name,
+    "zone":"PAC-01",
+    "count": 2,
     "data": {
       "barcodes": barcodes,
       "productName": productName.name,
