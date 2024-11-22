@@ -7,8 +7,6 @@ import {useWebSocketStore} from "@/stores/WebSockets/WebSocketStore.js";
 const kyStd = ky.create({
     prefixUrl: 'http://lab/db7/hs/wms/',
     retry: {
-        limit: 2,
-        methods: ['post'],
         statusCodes: [408, 500, 502, 503, 504],
     },
     timeout: 30000,
@@ -21,6 +19,7 @@ const kyCors = kyStd.extend({
                 const password = ref('sklad')
                 request.headers.set('Authorization', `Basic ${btoa(username.value + ':' + password.value)}`)
                 request.headers.set('Content-Type', 'application/json')
+                request.headers.set('Content-Type', 'text/plain')
             }
         ],
         afterResponse: [

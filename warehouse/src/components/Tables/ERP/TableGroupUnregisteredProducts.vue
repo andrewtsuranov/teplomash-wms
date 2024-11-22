@@ -62,9 +62,14 @@ import {usePrintingStore} from "@/stores/HTTP/Printing/PrintingStore.js";
 const webSocketStore = useWebSocketStore()
 const printingStore = usePrintingStore()
 const printBarcodes = async (data) => {
-  for (const obj of data) {
-    await printingStore.printQRCode(obj.barcode)
-    await new Promise(r => setTimeout(r, 500))
+  try {
+    for (const obj of data) {
+      await printingStore.printQRCode(obj.barcode)
+      await new Promise(r => setTimeout(r, 500))
+    }
+    console.log('Коды успешно отправлены');
+  } catch (error) {
+    console.error('Ошибка при печати кодов:', error);
   }
 }
 const handleCreatePallet = async (products, palletType, productName) => {
@@ -76,11 +81,13 @@ const handleCreatePallet = async (products, palletType, productName) => {
     "description": `Создание паллеты ${productName.name}`,
     "loader_id": 4,
     "warehouse_id": 1,
-    "palletType": palletType[0].name,
-    "zone":"PAC-01",
-    "count": 2,
     "data": {
+      "zone": "PAC-01",
+      "count": 2,
+      "to": [],
+      "from": [],
       "barcodes": barcodes,
+      "palletType": palletType[0].name,
       "productName": productName.name,
       "length": palletType[0].length,
       "abc_class": "A",
