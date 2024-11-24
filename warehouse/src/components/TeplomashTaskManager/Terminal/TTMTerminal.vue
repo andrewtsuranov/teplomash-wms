@@ -1,6 +1,6 @@
 <template>
   <div class="ttm-terminal-container">
-    <div class="ttm-terminal-active-tsd">Выбран: ТСД №{{ route.params.tsdID}} {{props}}</div>
+    <div class="ttm-terminal-active-tsd">Выбран: ТСД №{{ route.params.tsdID }} {{ props }}</div>
     <div class="ttm-terminal-view">
       <div class="ttm-terminal-view-content">
         <span>Выберите действие:</span>
@@ -35,9 +35,24 @@ const webSocketStore = useWebSocketStore()
 const route = useRoute()
 const message = ref()
 const props = defineProps({
-  tsdName: String
+  tsdID: String,
+  processType: {
+    type: String,
+    required: true
+  }
 })
-console.log(props.tsdName)
+console.log(props.tsdID)
+// Использование разной логики в зависимости от processType
+const handleProcess = () => {
+  switch(props.processType) {
+    case 'packing':
+      // Логика для упаковки
+      break;
+    case 'receiving':
+      // Логика для приемки
+      break;
+  }
+}
 </script>
 <style scoped>
 .ttm-terminal-container {
@@ -63,12 +78,11 @@ console.log(props.tsdName)
   font-size: 1.2rem;
   /*overflow-y: auto;*/
 }
+
 .ttm-terminal-view-content {
   padding: 0 1rem;
 }
 
-
 @media (max-width: 800px) {
-
 }
 </style>

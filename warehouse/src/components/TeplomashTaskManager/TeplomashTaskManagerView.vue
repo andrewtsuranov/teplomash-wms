@@ -59,7 +59,7 @@
                :key="device.id"
                class="ttm-tsd-item-online"
           >
-            <router-link :to="{ name: 'TTMTerminal', params: {tsdID: device.id}}"
+            <router-link :to="{ name: 'packingTTM', params: {tsdID: device.id}}"
                          class="ttm-tsd-item-name-online"
             >ТСД №{{ device.id }} ({{ device.email }}) {{ device.current_task }}
             </router-link>
@@ -133,10 +133,12 @@ const handlerDisconnect = () => {
   font-weight: bold;
   font-size: 1.2rem;
 }
+
 .ttm-setting-panel-isConnected span {
   /*font-weight: bold;*/
   font-size: 1.2rem;
 }
+
 .wsSetting-panel-reconnected {
   /*display: grid;*/
   /*grid-column: span 2;*/

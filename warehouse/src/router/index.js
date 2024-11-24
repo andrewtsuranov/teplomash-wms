@@ -58,8 +58,8 @@ const router = createRouter({
                             component: () => import('@/views/Home/WMS/Process/Packing/StoragePackingView.vue'),
                             children: [
                                 {
-                                    path: 'tsd#:tsdID',
-                                    name: 'TTMTerminal',
+                                    path: 'pac-tsd#:tsdID',
+                                    name: 'TTM-packing',
                                     components: {
                                         default: () => import('@/components/TeplomashTaskManager/Terminal/TTMTerminal.vue'),
                                     },
@@ -73,8 +73,8 @@ const router = createRouter({
                             component: () => import('@/views/Home/WMS/Process/Receiving/Data/StorageReceivingView.vue'),
                             children: [
                                 {
-                                    path: 'tsd#:tsdID',
-                                    name: 'TTMTerminal',
+                                    path: 'rec-tsd#:tsdID',
+                                    name: 'TTM',
                                     components: {
                                         default: () => import('@/components/TeplomashTaskManager/Terminal/TTMTerminal.vue'),
                                     },
@@ -140,10 +140,10 @@ const router = createRouter({
             component: () => import('@/router/404/NotFound404.vue')
         }
     ],
-    scrollBehavior() {
-        // всегда прокручивать до верха
-        return {top: 0}
-    },
+    // scrollBehavior() {
+    //     // всегда прокручивать до верха
+    //     return {top: 0}
+    // },
     linkExactActiveClass: 'teplomash-active-exact-link'
 });
 router.beforeEach(async (to) => {

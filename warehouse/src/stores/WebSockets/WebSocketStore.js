@@ -29,8 +29,8 @@ export const useWebSocketStore = defineStore('websocket', () => {
 
 //Actions
     function initWebSocket() {
-        const wsUrl = `ws://lab:8081/ws/inventory/?token=${userStore.getTokenAccess}`
-        // const wsUrl = `ws://38.180.192.229/ws/inventory/?token=${userStore.getTokenAccess}`
+        // const wsUrl = `ws://lab:8081/ws/inventory/?token=${userStore.getTokenAccess}`
+        const wsUrl = `ws://38.180.192.229/ws/inventory/?token=${userStore.getTokenAccess}`
         socket.value = new WebSocket(wsUrl)
         socket.value.onopen = onOpen.bind(this)
         socket.value.onclose = onClose.bind(this)
@@ -111,7 +111,7 @@ export const useWebSocketStore = defineStore('websocket', () => {
                 return sendPong()
             }
             // Обработка сообщения: получение активных пользователей
-            if (data.type === 'loaders_list_notification') {
+            if (data.type === 'loaders_list') {
                 onlineDevices.value = data.loaders
             }
             // Обработка сообщения: получение приватного ссобщения
