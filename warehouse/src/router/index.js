@@ -58,12 +58,11 @@ const router = createRouter({
                             component: () => import('@/views/Home/WMS/Process/Packing/StoragePackingView.vue'),
                             children: [
                                 {
-                                    path: 'pac-tsd#:tsdID',
+                                    path: 'pac-tsd',
                                     name: 'TTM-packing',
                                     components: {
                                         default: () => import('@/components/TeplomashTaskManager/Terminal/TTMTerminal.vue'),
                                     },
-                                    props: {default: true},
                                 },
                             ]
                         },
@@ -73,12 +72,11 @@ const router = createRouter({
                             component: () => import('@/views/Home/WMS/Process/Receiving/Data/StorageReceivingView.vue'),
                             children: [
                                 {
-                                    path: 'rec-tsd#:tsdID',
+                                    path: 'rec-tsd',
                                     name: 'TTM',
                                     components: {
                                         default: () => import('@/components/TeplomashTaskManager/Terminal/TTMTerminal.vue'),
                                     },
-                                    props: {default: true},
                                 },
                             ]
                         },

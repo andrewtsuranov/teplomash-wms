@@ -119,13 +119,9 @@ import SvgErp from "@/components/UI/SVG/svgErp.vue";
 import {useWebSocketStore} from "@/stores/WebSockets/WebSocketStore.js";
 import {usePrintingStore} from "@/stores/HTTP/Printing/PrintingStore.js";
 import {useNumbersOnlyWithoutDot} from "@/composables/NumbersOnlyWithoutDot.js";
-import {ref, onMounted} from "vue";
-import bootstrap from "bootstrap/dist/js/bootstrap.bundle";
-import 'bootstrap/dist/css/bootstrap.min.css';
-import 'bootstrap/dist/js/bootstrap.bundle.min.js';
+import {ref} from "vue";
 
 const count = ref(1)
-const closeModal = ref(null)
 const webSocketStore = useWebSocketStore()
 const printingStore = usePrintingStore()
 const handleCreatePallet = async (products, palletType, productName) => {
@@ -160,25 +156,13 @@ const decrement = () => {
     count.value--;
   }
 }
-
 const handPrintingLabel = async () => {
   try {
-    // Ждем завершения операции печати
-    await printingStore.printQRCode('Привет Мир!', 1); // Пример с count = 1
-    if (closeModal.value) {
-      // Если ссылка на модальное окно существует, то закрываем его
-      const modal =  new bootstrap.Modal(closeModal.value);
-      await modal.hide(); // Программно закрыть окно
-    }
+    await printingStore.printQRCode('Привет Мир!', 1)
   } catch (error) {
     console.error('Ошибка при печати:', error);
   }
 }
-onMounted(() => {
-  // Инициализация модального окна при монтировании компонента
-  closeModal.value = document.getElementById('settingsPrintModal');
-  console.log(closeModal.value)
-});
 </script>
 <style scoped>
 .wms-packing-erp-data {
@@ -214,7 +198,7 @@ onMounted(() => {
 
 .printer-settings-container {
   display: grid;
-  grid-template-columns: 1fr 2fr;
+  grid-template-columns: minmax(auto, 1fr) 1fr;
   grid-auto-rows: 1fr;
   align-items: center;
   row-gap: 1rem;
@@ -222,7 +206,7 @@ onMounted(() => {
 
 .counter {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-columns: minmax(3rem, auto) 1fr minmax(3rem, auto);
   font-size: 1.2rem;
   /*align-items: center;*/
 }
@@ -230,10 +214,10 @@ onMounted(() => {
 .counter button {
   height: 100%;
   border: 1px solid #514D4C;
-
 }
 
 .counter input {
+  display: grid;
   text-align: center;
   border: 1px solid #514D4C;
   outline: none;
@@ -251,6 +235,11 @@ onMounted(() => {
     display: grid;
     grid-column: 1;
     grid-template-columns: 1fr;
+  }
+
+  .printer-settings-container {
+    display: grid;
+    grid-template-columns:1fr;
   }
 }
 </style>

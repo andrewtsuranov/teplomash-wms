@@ -4,7 +4,9 @@ import {defineStore} from 'pinia'
 import {ref} from "vue"
 
 export const usePackingStore = defineStore('packingStore', () => {
+    const loading = ref(false)
     const errorStore = useErrorStore()
+    const selectedTSD = ref(JSON.parse(localStorage.getItem('selectedTSD')) || null)
     const dataYYYYMMDD = ref(new Date().toISOString().slice(0, 10));
 //state
     const palletData = {
@@ -26,7 +28,6 @@ export const usePackingStore = defineStore('packingStore', () => {
         sent: 'Отправлена на склад',
         error: "Ошибка действия",
     }
-    const loading = ref(false)
     // const packingData = ref(JSON.parse(localStorage.getItem('packingData')) || null)
 //getters
 //actions
@@ -37,6 +38,7 @@ export const usePackingStore = defineStore('packingStore', () => {
         // packingData,
         palletData,
         palletStatus,
+        selectedTSD,
 //getters
 //actions
     }

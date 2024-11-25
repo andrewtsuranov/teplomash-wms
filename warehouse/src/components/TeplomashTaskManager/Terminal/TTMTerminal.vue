@@ -1,6 +1,6 @@
 <template>
   <div class="ttm-terminal-container">
-    <div class="ttm-terminal-active-tsd">Выбран: ТСД №{{ route.params.tsdID }} {{ props }}</div>
+    <div class="ttm-terminal-active-tsd">Выбран: ТСД №{{ packingStore.selectedTSD }}</div>
     <div class="ttm-terminal-view">
       <div class="ttm-terminal-view-content">
         <span>Выберите действие:</span>
@@ -9,50 +9,33 @@
         </div>
       </div>
     </div>
-    <div class="ttm-terminal-confirmed input-group input-group">
-      <input v-model="message"
-             aria-describedby="button-addon2"
-             aria-label="Recipient's username"
-             class="form-control"
-             placeholder="Отправить сообщение..."
-             type="text"
-      >
-      <button id="button-addon2"
-              class="btn btn-success"
-              type="button"
-              @click="webSocketStore.sendMessage(message, route.params.tsdID)"
-      >Отправить
-      </button>
-    </div>
+<!--    <div class="ttm-terminal-confirmed input-group input-group">-->
+    <!--      <input v-model="message"-->
+    <!--             aria-describedby="button-addon2"-->
+    <!--             aria-label="Recipient's username"-->
+    <!--             class="form-control"-->
+    <!--             placeholder="Отправить сообщение..."-->
+    <!--             type="text"-->
+    <!--      >-->
+    <!--      <button id="button-addon2"-->
+    <!--              class="btn btn-success"-->
+    <!--              type="button"-->
+    <!--              @click="webSocketStore.sendMessage(message, packingStore.selectedTSD)"-->
+    <!--      >Отправить-->
+    <!--      </button>-->
+    <!--    </div>-->
   </div>
 </template>
 <script setup>
 import {useWebSocketStore} from '@/stores/WebSockets/WebSocketStore.js'
 import {useRoute} from 'vue-router'
 import {ref} from "vue";
+import {usePackingStore} from "@/stores/HTTP/WMS/PackingStore.js";
 
+const packingStore = usePackingStore()
 const webSocketStore = useWebSocketStore()
 const route = useRoute()
 const message = ref()
-const props = defineProps({
-  tsdID: String,
-  processType: {
-    type: String,
-    required: true
-  }
-})
-console.log(props.tsdID)
-// Использование разной логики в зависимости от processType
-const handleProcess = () => {
-  switch(props.processType) {
-    case 'packing':
-      // Логика для упаковки
-      break;
-    case 'receiving':
-      // Логика для приемки
-      break;
-  }
-}
 </script>
 <style scoped>
 .ttm-terminal-container {

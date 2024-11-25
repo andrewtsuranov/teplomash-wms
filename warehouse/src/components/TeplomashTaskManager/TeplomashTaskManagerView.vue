@@ -59,7 +59,7 @@
                :key="device.id"
                class="ttm-tsd-item-online"
           >
-            <router-link :to="{ name: 'packingTTM', params: {tsdID: device.id}}"
+            <router-link :to="selectedTsd(device.id)"
                          class="ttm-tsd-item-name-online"
             >ТСД №{{ device.id }} ({{ device.email }}) {{ device.current_task }}
             </router-link>
@@ -73,8 +73,8 @@
     </div>
     <div class="ttm-terminal">
       <div v-if="!webSocketStore.isConnected" class="ttm-terminal-name-offline">Терминал</div>
-      <router-view v-if="webSocketStore.isConnected && route.params.tsdID"></router-view>
-      <div v-if="webSocketStore.isConnected && !route.params.tsdID"
+      <router-view v-if="webSocketStore.isConnected && packingStore.selectedTSD"></router-view>
+      <div v-if="webSocketStore.isConnected && !packingStore.selectedTSD"
            class="ttm-terminal-name-offline"
       >Выберите активный ТСД
       </div>
@@ -83,13 +83,19 @@
 </template>
 <script setup>
 import {useWebSocketStore} from '@/stores/WebSockets/WebSocketStore.js'
-import {useRoute} from "vue-router";
 import MyButton from "@/components/UI/MyButton.vue"
+import {usePackingStore} from "@/stores/HTTP/WMS/PackingStore.js";
+import router from "@/router/index.js";
 
 const webSocketStore = useWebSocketStore()
-const route = useRoute()
+const packingStore = usePackingStore()
 const handlerDisconnect = () => {
   webSocketStore.disconnect()
+}
+const selectedTsd = (tsdId) => {
+  console.log(tsdId)
+  localStorage.setItem('selectedTsd', JSON.stringify(tsdId))
+  router.push({name: 'TTM-packing', params: {tsdId: tsdId}})
 }
 </script>
 <style scoped>
