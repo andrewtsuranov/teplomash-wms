@@ -41,10 +41,70 @@
               </button>
             </td>
             <td>
-              <button class="btn btn-outline-primary"
-                      @click=printBarcodes(item.items)
+              <button class="btn btn-outline-primary" data-bs-target="#settingsPrintModal" data-bs-toggle="modal"
+                      @click=printingStore.getZPLPrinters()
               >Печать Barcode
               </button>
+              <!-- Modal -->
+              <div id="settingsPrintModal" aria-hidden="true" aria-labelledby="settingsPrintModal" class="modal fade"
+                   data-bs-theme="dark" tabindex="-1">
+                <div class="modal-dialog  modal-dialog-centered">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h1 id="settingsPrintLabel" class="modal-title fs-5">Параметры печати</h1>
+                      <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+                    </div>
+                    <div class="modal-body">
+                      <div class="printer-settings-container">
+                        <label>Сетевой принтер:</label>
+                        <div>
+                          <select
+                              v-model="printingStore.selectedPrinter"
+                              aria-label="Выберите принтер"
+                              class="form-select"
+                          >
+                            <option disabled value="">Выберите принтер...</option>
+                            <option
+                                v-for="(print, ip) in printingStore.printersList?.printers"
+                                :key="ip"
+                                :value="print"
+                            >
+                              {{ print.model }} ({{ print.name }})
+                            </option>
+                          </select>
+                        </div>
+                        <label>Тип печати:</label>
+                        <select class="form-select">
+                          <option>QR код</option>
+                          <option disabled>Штрихкод (code-128)</option>
+                        </select>
+                        <label>Кол-во этикеток:</label>
+                        <div class="counter">
+                          <button @click="decrement">&ndash;</button>
+                          <input v-model.number.trim="count" min="1" v-on:keypress="useNumbersOnlyWithoutDot"/>
+                          <button @click="increment">+</button>
+                        </div>
+                        <label>Статус: печати:</label>
+                        <div v-if="printingStore.printStatus?.status" :style="'color: green;' ">Отправлено на печать
+                        </div>
+                        <div v-else>Ожидание</div>
+                      </div>
+                    </div>
+                    <div class="modal-footer">
+                      <button class="btn btn-outline-secondary"
+                              data-bs-dismiss="modal"
+                              type="button"
+                      >Отменить
+                      </button>
+                      <button class="btn btn-outline-info"
+                              type="button"
+                              @click="handPrintingLabel()"
+                      >Печать
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </td>
           </tr>
           </tbody>
@@ -58,20 +118,16 @@ import DatetimePicker from "@/components/UI/DatetimePicker.vue";
 import SvgErp from "@/components/UI/SVG/svgErp.vue";
 import {useWebSocketStore} from "@/stores/WebSockets/WebSocketStore.js";
 import {usePrintingStore} from "@/stores/HTTP/Printing/PrintingStore.js";
+import {useNumbersOnlyWithoutDot} from "@/composables/NumbersOnlyWithoutDot.js";
+import {ref, onMounted} from "vue";
+import bootstrap from "bootstrap/dist/js/bootstrap.bundle";
+import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
+const count = ref(1)
+const closeModal = ref(null)
 const webSocketStore = useWebSocketStore()
 const printingStore = usePrintingStore()
-const printBarcodes = async (data) => {
-  try {
-    for (const obj of data) {
-      await printingStore.printQRCode(obj.barcode)
-      await new Promise(r => setTimeout(r, 500))
-    }
-    console.log('Коды успешно отправлены');
-  } catch (error) {
-    console.error('Ошибка при печати кодов:', error);
-  }
-}
 const handleCreatePallet = async (products, palletType, productName) => {
   const getItemCountByGroup = (palletType[0].rows_length * palletType[0].rows_width * palletType[0].rows_height)
   const barcodes = products.map(obj => obj.barcode)
@@ -96,6 +152,33 @@ const handleCreatePallet = async (products, palletType, productName) => {
   }
   await webSocketStore.createPalletTask(data)
 }
+const increment = () => {
+  count.value++;
+}
+const decrement = () => {
+  if (count.value > 1) {
+    count.value--;
+  }
+}
+
+const handPrintingLabel = async () => {
+  try {
+    // Ждем завершения операции печати
+    await printingStore.printQRCode('Привет Мир!', 1); // Пример с count = 1
+    if (closeModal.value) {
+      // Если ссылка на модальное окно существует, то закрываем его
+      const modal =  new bootstrap.Modal(closeModal.value);
+      await modal.hide(); // Программно закрыть окно
+    }
+  } catch (error) {
+    console.error('Ошибка при печати:', error);
+  }
+}
+onMounted(() => {
+  // Инициализация модального окна при монтировании компонента
+  closeModal.value = document.getElementById('settingsPrintModal');
+  console.log(closeModal.value)
+});
 </script>
 <style scoped>
 .wms-packing-erp-data {
@@ -127,6 +210,34 @@ const handleCreatePallet = async (products, palletType, productName) => {
   display: grid;
   grid-template-rows: minmax(auto, 200px);
   justify-items: center;
+}
+
+.printer-settings-container {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  grid-auto-rows: 1fr;
+  align-items: center;
+  row-gap: 1rem;
+}
+
+.counter {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  font-size: 1.2rem;
+  /*align-items: center;*/
+}
+
+.counter button {
+  height: 100%;
+  border: 1px solid #514D4C;
+
+}
+
+.counter input {
+  text-align: center;
+  border: 1px solid #514D4C;
+  outline: none;
+  background: none;
 }
 
 @media (max-width: 800px) {
