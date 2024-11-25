@@ -111,7 +111,7 @@ export const useWebSocketStore = defineStore('websocket', () => {
                 return sendPong()
             }
             // Обработка сообщения: получение активных пользователей
-            if (data.type === 'loaders_list_notification') {
+            if (data.type === 'loaders_list') {
                 onlineDevices.value = data.loaders
             }
             // Обработка сообщения: получение приватного ссобщения

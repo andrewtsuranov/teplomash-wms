@@ -1,5 +1,33 @@
 import {defineStore} from 'pinia'
-import {reactive, ref} from "vue"
+import {ref} from "vue"
+import ky from "ky";
+import {requestUrls} from "@/stores/Config/request-urls.js";
+import {useErrorStore} from "@/stores/Error/ErrorStore.js";
+import {useUserStore} from '@/stores/HTTP/Auth/UserStore.js'
+
+const userStore = useUserStore()
+const kyStd = ky.create({
+    prefixUrl: requestUrls.storage,
+    retry: 0,
+    headers: {
+        Authorization: `Bearer ${userStore.getTokenAccess}`
+    },
+})
+const kyPrint = kyStd.extend({
+    hooks: {
+        afterResponse: [
+            async (request, options, response) => {
+                if (response.status === 401) {
+                    const errorStore = useErrorStore()
+                    errorStore.setError({
+                        status: response.status,
+                        message: 'Ошибка авторизации! Пользователь не авторизован, требуется регистрация!'
+                    })
+                }
+            }
+        ]
+    }
+})
 //     ^XA                          // Начало этикетки
 //     ^FO50,50                     // Позиция QR-кода
 //     ^BQN,2,5                     // QR-код
@@ -11,99 +39,67 @@ import {reactive, ref} from "vue"
 export const usePrintingStore = defineStore('printingStore',
     () => {
 //state
-        const urlPrinterIP = reactive({
-            ip: 'http://192.168.0.190',
-            port: 9100
-        })
-
-        const qrCodeZPL = (body) => {
-            return `^XA^FO20,30^BQN,2,7,H,7,Q,S,7^FDQM,${body}^FS^XZ`
+        const errorStore = useErrorStore()
+        const loading = ref(false)
+        const printersList = ref(null)
+        const printStatus = ref(null)
+        const selectedPrinter = ref('')
+        const selectedQuantity = ref(1)
+        const qrCodeZPL = (body, qty) => {
+            return `^XA^FO20,30^BQN,2,7,H,7,Q,S,7^FDQM,${body}^FS^PQ${qty}^XZ`
         }
-        const code128ZPL = (body) => {
-            return `^XA^FO20,100^BY4^BCN,200,Y,N,N^FD${body}^FS^XZ`
+        const code128ZPL = (body, qty) => {
+            return `^XA^FO20,100^BY4^BCN,200,Y,N,N^FD${body}^FS^PQ${qty}^XZ`
         }
         const test = () => {
             return '~WC'
         }
 //getters
 //actions
-        function printQRCode(method = 'POST', timeout = 3000, data) {
-            return new Promise((resolve, reject) => {
-                const xhr= new XMLHttpRequest();
-
-                // Открываем запрос
-                xhr.open(method, `${urlPrinterIP.ip}:${urlPrinterIP.port}`, true);
-
-                // Обработчик ответа
-                xhr.onreadystatechange = function () {
-                    if (xhr.readyState === 4) { // 4 - запрос завершен
-                        if (xhr.status >= 200 && xhr.status < 300) {
-                            resolve(xhr.responseText); // Успешный ответ
-                        } else {
-                            reject(new Error(`Ошибка: ${xhr.status}`)); // Ошибка сервера
-                        }
-                    }
-                };
-
-                // Обработчик ошибки
-                xhr.onerror = function () {
-                    reject(new Error('Ошибка сети'));
-                };
-
-                // Настройка таймера для отмены запроса
-                const timer = setTimeout(() => {
-                    xhr.abort(); // Отменяем запрос
-                    reject(new Error('Запрос отменен из-за таймаута'));
-                }, timeout);
-
-                // Очистка таймера при успешном выполнении запроса
-                xhr.onload = function () {
-                    clearTimeout(timer);
-                };
-
-                // Отправка запроса
-                xhr.send(qrCodeZPL(data));
-            });
+        const getZPLPrinters = async () => {
+            loading.value = true;
+            errorStore.clearError();
+            try {
+                const response = await kyPrint('printers/list_printers/').json()
+                printersList.value = response
+                return true
+            } catch (err) {
+                console.log(err)
+                throw err
+            } finally {
+                loading.value = false
+            }
         }
-
-
-
-
-
-
-//         const printQRCode = (data) => {
-//             if (activeXhr.value) {
-//                 activeXhr.value = null
-//             }
-//             activeXhr.value = new XMLHttpRequest()
-//             activeXhr.value.open('POST', `${urlPrinterIP.ip}:${urlPrinterIP.port}`, true)
-//             activeXhr.value.setRequestHeader('Content-Type', 'text/plain')
-//             return new Promise((resolve, reject) => {
-//                 activeXhr.value.onreadystatechange = function () {
-//                     if (activeXhr.value.readyState === 4) {
-//                         if (activeXhr.value.status === 200) {
-//                             resolve('Успешно отправлено');
-//                         } else {
-//                             reject(new Error(`Ошибка отправки: ${activeXhr.value.statusText}`));
-//                         }
-//                     }
-//                 };
-//                 activeXhr.value.onerror = function () {
-//                     reject(new Error('Ошибка соединения с принтером'));
-//                 };
-//                 activeXhr.value.ontimeout = function () {
-//                     reject(new Error('Превышено время ожидания ответа от принтера'));
-//                 };
-//                 activeXhr.value.timeout = 5000; // Устанавливаем таймаут (5 секунд)
-//                 activeXhr.value.send('^XA^XZ')
-//                 activeXhr.value.send(qrCodeZPL(data))
-//             });
-//         }
+        const printQRCode = async (data, count) => {
+            loading.value = true;
+            errorStore.clearError();
+            const zplData = {
+                "printer": selectedPrinter.value.name,
+                "text": qrCodeZPL(data, count)
+            }
+            try {
+                const response = await kyPrint
+                    .post('printers/print_label/',{json:zplData})
+                    .json()
+                printStatus.value = response
+                return true
+            } catch (err) {
+                console.log(err)
+                throw err
+            } finally {
+                loading.value = false
+            }
+        }
+//
         return {
 //state
-            urlPrinterIP,
+            printersList,
+            selectedPrinter,
+            selectedQuantity,
+            printStatus,
 //getters
 //actions
+            getZPLPrinters,
             printQRCode,
             qrCodeZPL,
             code128ZPL,
