@@ -1,15 +1,15 @@
 <template>
   <div class="ttm-terminal-container">
-    <div class="ttm-terminal-active-tsd">Выбран: ТСД №{{ packingStore.selectedTSD }}</div>
+    <div class="ttm-terminal-active-tsd">Выбран: ТСД № {{ tsdID }}</div>
     <div class="ttm-terminal-view">
       <div class="ttm-terminal-view-content">
-        <span>Выберите действие:</span>
-        <div v-if="webSocketStore.receivedMessage?.from_id"
-        >{{ webSocketStore.receivedMessage.from_id }} {{ webSocketStore.receivedMessage.message }}
+        <span>Статус:</span>
+        <div v-if="webSocketStore.transactionStatus?.assigned_to === Number(tsdID)"
+        >{{ webSocketStore.transactionStatus?.status }}
         </div>
       </div>
     </div>
-<!--    <div class="ttm-terminal-confirmed input-group input-group">-->
+    <!--    <div class="ttm-terminal-confirmed input-group input-group">-->
     <!--      <input v-model="message"-->
     <!--             aria-describedby="button-addon2"-->
     <!--             aria-label="Recipient's username"-->
@@ -28,14 +28,15 @@
 </template>
 <script setup>
 import {useWebSocketStore} from '@/stores/WebSockets/WebSocketStore.js'
-import {useRoute} from 'vue-router'
-import {ref} from "vue";
 import {usePackingStore} from "@/stores/HTTP/WMS/PackingStore.js";
+import {useUserStore} from "@/stores/HTTP/Auth/UserStore.js";
 
+const userStore = useUserStore()
 const packingStore = usePackingStore()
 const webSocketStore = useWebSocketStore()
-const route = useRoute()
-const message = ref()
+defineProps({
+  tsdID: String
+})
 </script>
 <style scoped>
 .ttm-terminal-container {

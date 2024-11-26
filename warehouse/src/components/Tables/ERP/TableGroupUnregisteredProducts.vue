@@ -119,6 +119,9 @@ import SvgErp from "@/components/UI/SVG/svgErp.vue";
 import {useWebSocketStore} from "@/stores/WebSockets/WebSocketStore.js";
 import {usePrintingStore} from "@/stores/HTTP/Printing/PrintingStore.js";
 import {useNumbersOnlyWithoutDot} from "@/composables/NumbersOnlyWithoutDot.js";
+import {usePackingStore} from "@/stores/HTTP/WMS/PackingStore.js";
+
+const packingStore = usePackingStore()
 import {ref} from "vue";
 
 const count = ref(1)
@@ -131,7 +134,7 @@ const handleCreatePallet = async (products, palletType, productName) => {
     "action": "create_pallet",
     "from_user": 40,
     "description": `Создание паллеты ${productName.name}`,
-    "loader_id": 4,
+    "loader_id": packingStore.selectedTSD,
     "warehouse_id": 1,
     "data": {
       "zone": "PAC-01",

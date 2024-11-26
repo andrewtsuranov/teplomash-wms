@@ -1,5 +1,6 @@
 import {createRouter, createWebHistory} from 'vue-router'
 import {useUserStore} from "@/stores/HTTP/Auth/UserStore.js";
+import {usePackingStore} from "@/stores/HTTP/WMS/PackingStore.js";
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -58,11 +59,12 @@ const router = createRouter({
                             component: () => import('@/views/Home/WMS/Process/Packing/StoragePackingView.vue'),
                             children: [
                                 {
-                                    path: 'pac-tsd',
+                                    path: 'pac-tsd#:tsdID',
                                     name: 'TTM-packing',
                                     components: {
                                         default: () => import('@/components/TeplomashTaskManager/Terminal/TTMTerminal.vue'),
                                     },
+                                    props: {default: true}
                                 },
                             ]
                         },
@@ -166,6 +168,8 @@ router.beforeEach(async (to) => {
     if (userStore.isAuthenticated && !!to.meta.guestOnly) {
         return {name: 'Home'}
     }
+
+
 })
 router.onError((error) => {
     console.error('Ошибка роутинга:', error)

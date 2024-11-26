@@ -21,16 +21,20 @@ export const useWebSocketStore = defineStore('websocket', () => {
     const receivedMessage = ref(null)
     const wsGroupUnregProduct = ref(JSON.parse(localStorage.getItem('wsGroupUnregProduct')) || null)
     const productTypes = ref(JSON.parse(localStorage.getItem('productTypes')) || null)
+    const transactionStatus = ref(JSON.parse(localStorage.getItem('transactionStatus')) || null)
 //Getters
     const lastMessage = computed(() => message.value)
     const connectionStatus = computed(() => isConnected.value ? 'В сети' : 'Не в сети')
     const getPrivateMessage = computed(() => privateMessage.value)
     const getPrivateMessageID = computed(() => privateMessageID.value)
+    const foundIdUser = computed((itemId) => {
+        return onlineDevices.value.find(item => item.id === itemId)
+    })
 
 //Actions
     function initWebSocket() {
-        // const wsUrl = `ws://lab:8081/ws/inventory/?token=${userStore.getTokenAccess}`
-        const wsUrl = `ws://38.180.192.229/ws/inventory/?token=${userStore.getTokenAccess}`
+        const wsUrl = `ws://lab:8081/ws/inventory/?token=${userStore.getTokenAccess}`
+        // const wsUrl = `ws://38.180.192.229/ws/inventory/?token=${userStore.getTokenAccess}`
         socket.value = new WebSocket(wsUrl)
         socket.value.onopen = onOpen.bind(this)
         socket.value.onclose = onClose.bind(this)
@@ -137,6 +141,11 @@ export const useWebSocketStore = defineStore('websocket', () => {
             }
             if (data.type === 'product_types_updated' && data.status === 'success') {
                 alert(data.message)
+            }
+            if (data.type === 'transaction_update') {
+                transactionStatus.value = data.transaction
+                localStorage.setItem('productTypes', JSON.stringify(data.products))
+
             }
             if (data.type === 'без понятия' && data.status === 'success') {
                 alert(data.message)
@@ -267,12 +276,14 @@ export const useWebSocketStore = defineStore('websocket', () => {
         receivedMessage,
         wsGroupUnregProduct,
         productTypes,
+        transactionStatus,
 //getters
         lastMessage,
         connectionStatus,
         lastPongTime,
         getPrivateMessage,
         getPrivateMessageID,
+        foundIdUser,
 //actions
         initWebSocket,
         onOpen,

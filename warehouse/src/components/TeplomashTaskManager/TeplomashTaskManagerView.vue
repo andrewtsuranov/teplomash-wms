@@ -54,13 +54,15 @@
       <div v-else class="ttm-tsd-online">
         <label class="ttm-tsd-header-online">Активные ТСД:</label>
         <div v-if="webSocketStore.isConnected && webSocketStore.onlineDevices.length"
-             class="ttm-tsd-list-online">
+             class="ttm-tsd-list-online"
+        >
           <div v-for="device in webSocketStore.onlineDevices"
                :key="device.id"
                class="ttm-tsd-item-online"
           >
-            <router-link :to="selectedTsd(device.id)"
+            <router-link :to="{name: 'TTM-packing', params: {tsdID: device.id }}"
                          class="ttm-tsd-item-name-online"
+                         @click="packingStore.setSelectedTSD(device.id)"
             >ТСД №{{ device.id }} ({{ device.email }}) {{ device.current_task }}
             </router-link>
           </div>
@@ -73,8 +75,8 @@
     </div>
     <div class="ttm-terminal">
       <div v-if="!webSocketStore.isConnected" class="ttm-terminal-name-offline">Терминал</div>
-      <router-view v-if="webSocketStore.isConnected && packingStore.selectedTSD"></router-view>
-      <div v-if="webSocketStore.isConnected && !packingStore.selectedTSD"
+      <router-view v-if="webSocketStore.isConnected && route.params.tsdID"></router-view>
+      <div v-if="webSocketStore.isConnected && !route.params.tsdID"
            class="ttm-terminal-name-offline"
       >Выберите активный ТСД
       </div>
@@ -85,18 +87,17 @@
 import {useWebSocketStore} from '@/stores/WebSockets/WebSocketStore.js'
 import MyButton from "@/components/UI/MyButton.vue"
 import {usePackingStore} from "@/stores/HTTP/WMS/PackingStore.js";
-import router from "@/router/index.js";
+import {useRouter, useRoute} from "vue-router";
 
+const router = useRouter()
+const route = useRoute()
 const webSocketStore = useWebSocketStore()
 const packingStore = usePackingStore()
 const handlerDisconnect = () => {
   webSocketStore.disconnect()
 }
-const selectedTsd = (tsdId) => {
-  console.log(tsdId)
-  localStorage.setItem('selectedTsd', JSON.stringify(tsdId))
-  router.push({name: 'TTM-packing', params: {tsdId: tsdId}})
-}
+
+
 </script>
 <style scoped>
 .teplomash-task-manager-container {
