@@ -95,7 +95,7 @@ ul li {
 .welcome-btn {
   display: grid;
   text-align: center;
-  color: #bc985f;
+  color: blanchedalmond;
 }
 
 .glow-on-hover:before {
