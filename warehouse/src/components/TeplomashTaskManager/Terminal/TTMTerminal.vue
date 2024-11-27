@@ -2,12 +2,17 @@
   <div class="ttm-terminal-container">
     <div class="ttm-terminal-active-tsd">Выбран: ТСД № {{ tsdID }}</div>
     <div class="ttm-terminal-view">
-      <div class="ttm-terminal-view-content">
-        <span>Статус:</span>
+        <div class="ttm-terminal-view-status">
+        <span>Текущая задача:</span>
         <div v-if="webSocketStore.transactionStatus?.assigned_to === Number(tsdID)"
-        >{{ webSocketStore.transactionStatus?.status }}
+        >{{ webSocketStore.transactionStatus?.transaction_type }}
         </div>
-      </div>
+          <span>Текущая задача:</span>
+          <div v-if="webSocketStore.transactionStatus?.assigned_to === Number(tsdID)"
+          >{{ webSocketStore.transactionStatus?.status }}
+          </div>
+        </div>
+
     </div>
     <!--    <div class="ttm-terminal-confirmed input-group input-group">-->
     <!--      <input v-model="message"-->
@@ -57,14 +62,18 @@ defineProps({
 
 .ttm-terminal-view {
   display: grid;
-  /*padding: 1rem;*/
-  grid-template-columns: minmax(min-content, 1fr);
+  grid-template-columns: minmax(auto, 1fr);
   font-size: 1.2rem;
+  padding: 0 1rem;
   /*overflow-y: auto;*/
 }
 
-.ttm-terminal-view-content {
-  padding: 0 1rem;
+.ttm-terminal-view-status {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-auto-rows: 1fr;
+  column-gap: 1rem;
+
 }
 
 @media (max-width: 800px) {

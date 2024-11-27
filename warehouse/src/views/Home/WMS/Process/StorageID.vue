@@ -37,7 +37,6 @@
     </div>
     <div class="storage-id-terminal">
       <router-view></router-view>
-      <router-view name="TTM"/>
     </div>
   </div>
 </template>

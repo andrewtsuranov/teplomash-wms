@@ -20,7 +20,7 @@ export const useWebSocketStore = defineStore('websocket', () => {
     const privateMessageID = ref(null)
     const receivedMessage = ref(null)
     const wsGroupUnregProduct = ref(JSON.parse(localStorage.getItem('wsGroupUnregProduct')) || null)
-    const productTypes = ref(JSON.parse(localStorage.getItem('productTypes')) || null)
+    // const productTypes = ref(JSON.parse(localStorage.getItem('productTypes')) || null)
     const transactionStatus = ref(JSON.parse(localStorage.getItem('transactionStatus')) || null)
 //Getters
     const lastMessage = computed(() => message.value)
@@ -139,9 +139,9 @@ export const useWebSocketStore = defineStore('websocket', () => {
                 productTypes.value = data.products
                 localStorage.setItem('productTypes', JSON.stringify(data.products))
             }
-            if (data.type === 'product_types_updated' && data.status === 'success') {
-                alert(data.message)
-            }
+            // if (data.type === 'product_types_updated' && data.status === 'success') {
+            //     alert(data.message)
+            // }
             if (data.type === 'transaction_update') {
                 transactionStatus.value = data.transaction
                 localStorage.setItem('productTypes', JSON.stringify(data.products))
@@ -275,7 +275,7 @@ export const useWebSocketStore = defineStore('websocket', () => {
         privateMessageID,
         receivedMessage,
         wsGroupUnregProduct,
-        productTypes,
+        // productTypes,
         transactionStatus,
 //getters
         lastMessage,
