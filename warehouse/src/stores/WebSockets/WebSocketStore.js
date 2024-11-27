@@ -1,10 +1,12 @@
 import {defineStore} from 'pinia'
 import {useUserStore} from '@/stores/HTTP/Auth/UserStore.js'
 import {computed, ref} from "vue";
+import {useTransactionStore} from "@/stores/WebSockets/transactionStore.js";
 
 export const useWebSocketStore = defineStore('websocket', () => {
 //Подключаем UserStore
     const userStore = useUserStore()
+    const transactionStore = useTransactionStore()
 //State
     const socket = ref(null)
     const isConnected = ref(false)
@@ -143,8 +145,7 @@ export const useWebSocketStore = defineStore('websocket', () => {
             //     alert(data.message)
             // }
             if (data.type === 'transaction_update') {
-                transactionStatus.value = data.transaction
-                localStorage.setItem('productTypes', JSON.stringify(data.products))
+                transactionStore.addTransaction(data.transaction)
             }
             if (data.type === 'без понятия' && data.status === 'success') {
                 alert(data.message)
