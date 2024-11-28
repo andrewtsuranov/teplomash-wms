@@ -17,10 +17,16 @@
         <input id="floatingPassword"
                class="form-control"
                placeholder="Password"
-               type="password"
+               :type="passwordType"
                v-model="form.password"
         >
         <label for="floatingPassword">Пароль</label>
+        <button class="toggle-btn"
+                type="button"
+                @click="togglePasswordVisibility"
+        >
+          <i :class="passwordIconClass"></i>
+        </button>
       </div>
       <div v-if="error" class="alert alert-danger" role="alert">
         {{ error.message }}
@@ -57,20 +63,20 @@
   <!--        :disabled="loading"-->
   <!--        type="password"-->
   <!--    />-->
-<!--      <div v-if="error" class="alert alert-danger" role="alert">-->
-<!--        {{ error.message }}-->
-<!--      </div>-->
-<!--      <div class="group-btn-login">-->
-<!--        <my-button-->
-<!--            type="submit"-->
-<!--            id="show-modal"-->
-<!--            :disabled="loading"-->
-<!--        >{{ loading ? 'Обработка...' : 'Вход' }}-->
-<!--        </my-button>-->
-<!--        <my-button form="" @click="handleSignup">-->
-<!--          Регистрация-->
-<!--        </my-button>-->
-<!--      </div>-->
+  <!--      <div v-if="error" class="alert alert-danger" role="alert">-->
+  <!--        {{ error.message }}-->
+  <!--      </div>-->
+  <!--      <div class="group-btn-login">-->
+  <!--        <my-button-->
+  <!--            type="submit"-->
+  <!--            id="show-modal"-->
+  <!--            :disabled="loading"-->
+  <!--        >{{ loading ? 'Обработка...' : 'Вход' }}-->
+  <!--        </my-button>-->
+  <!--        <my-button form="" @click="handleSignup">-->
+  <!--          Регистрация-->
+  <!--        </my-button>-->
+  <!--      </div>-->
   <!--  </form>-->
 </template>
 <script setup>
@@ -80,7 +86,9 @@ import {useErrorStore} from "@/stores/Error/ErrorStore.js";
 import MyButton from "@/components/UI/MyButton.vue";
 import MyInput from "@/components/UI/MyInput.vue";
 import {useRouter} from 'vue-router'
+import {usePasswordToggle} from "@/composables/passwordToggle.js";
 
+const {passwordType, passwordIconClass, togglePasswordVisibility} = usePasswordToggle()
 const router = useRouter()
 const userStore = useUserStore()
 const errorStore = useErrorStore()
@@ -110,7 +118,7 @@ const handleSignup = async () => {
 .login-form {
   display: grid;
   grid-template-columns: 1fr;
-  grid-auto-rows: 1fr ;
+  grid-auto-rows: min-content;
   row-gap: 2rem;
 }
 
@@ -120,9 +128,39 @@ const handleSignup = async () => {
   column-gap: 1.2rem;
 }
 
+.alert {
+  margin: 0;
+}
+
+.bi-eye-slash,
+.bi-eye::before {
+  font-size: 1.5rem;
+}
+
+.toggle-btn {
+  margin: 0;
+  padding: 0;
+  position: absolute;
+  right: 1.5rem;
+  top: 50%;
+  transform: translateY(-48%);
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
 .error-message {
   color: #E32029;
   color: #E32029;
+}
+
+.form-control {
+  font-size: 1.2rem;
+}
+
+input[type="password"] {
+  font-size: 2.5rem; /* Скрываем текст */
+  letter-spacing: -0.3rem
 }
 
 @media (max-width: 1024px) {

@@ -3,7 +3,7 @@ import {useRouter} from "vue-router";
 import {defineStore} from 'pinia'
 import ky from "ky"
 import {ref, computed} from "vue"
-import {requestUrls} from '@/stores/Config/request-urls.js';
+import {requestUrls} from '@/stores/request-urls.js';
 
 const router = useRouter()
 const kyStd = ky.create({

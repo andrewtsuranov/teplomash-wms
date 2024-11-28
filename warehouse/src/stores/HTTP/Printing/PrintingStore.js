@@ -1,7 +1,7 @@
 import {defineStore} from 'pinia'
 import {ref} from "vue"
 import ky from "ky";
-import {requestUrls} from "@/stores/Config/request-urls.js";
+import {requestUrls} from "@/stores/request-urls.js";
 import {useErrorStore} from "@/stores/Error/ErrorStore.js";
 import {useUserStore} from '@/stores/HTTP/Auth/UserStore.js'
 

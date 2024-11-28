@@ -3,7 +3,7 @@ import {defineStore} from 'pinia'
 import {useUserStore} from "@/stores/HTTP/Auth/UserStore.js";
 import ky from "ky"
 import {computed, ref} from "vue"
-import {requestUrls} from "@/stores/Config/request-urls.js";
+import {requestUrls} from "@/stores/request-urls.js";
 
 const userStore = useUserStore()
 const kyStd = ky.create({
