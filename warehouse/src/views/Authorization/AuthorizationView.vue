@@ -7,11 +7,10 @@
       <span style="font-size: 1.1rem; text-align: start">Разработана для сотрудников складских помещений Тепломаш&reg; с целью оптимизации процессов поиска, комплектации
         и хранения товарной номенклатуры.</span>
     </div>
-    <RouterView class="authorization"/>
+    <router-view class="authorization"></router-view>
   </div>
 </template>
 <script setup>
-import {RouterView} from 'vue-router'
 import LogoMain from "@/components/UI/SVG/svgLogo.vue"
 </script>
 <style scoped>

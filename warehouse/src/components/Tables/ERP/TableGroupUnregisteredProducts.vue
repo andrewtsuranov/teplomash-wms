@@ -12,6 +12,13 @@
           >
             Выбрать период
           </button>
+          <button aria-controls="collapseExample"
+                  aria-expanded="false"
+                  type="button"
+                  @click="webSocketStore.getTransactionData(400, true, true)"
+          >
+            Тест
+          </button>
         </p>
         <div id="collapseExample" class="collapse">
           <datetime-picker/>

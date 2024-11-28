@@ -126,28 +126,28 @@ export const useUserStore = defineStore('userStore', () => {
             loading.value = false
         }
     }
-    //  const REQ_CONFIRM = async (activation_code) => {
-    //     try {
-    //         const email = userUP.value.email || JSON.parse(localStorage.getItem('userUP')).email || '{}'
-    //         const response = await api
-    //             .post('activate/', {json: {activation_code, email}})
-    //             .json()
-    //         if (response.message) {
-    //             if (tempPassword.value) {
-    //                 await LOGIN(email, tempPassword.value)
-    //             } else {
-    //                 errorStore.Error = "Не удалось выполнить автоматический вход. Пожалуйста, войдите вручную."
-    //             }
-    //         }
-    //         return response
-    //     } catch (err) {
-    //         errorStore.Error = err.message
-    //         throw err;
-    //     } finally {
-    //         loading.value = false
-    //         tempPassword.value = null
-    //     }
-    // },
+     const REQ_CONFIRM = async (activation_code) => {
+        try {
+            const email = userUP.value.email || JSON.parse(localStorage.getItem('userUP')).email || '{}'
+            const response = await api
+                .post('activate/', {json: {activation_code, email}})
+                .json()
+            if (response.message) {
+                if (tempPassword.value) {
+                    await LOGIN(email, tempPassword.value)
+                } else {
+                    errorStore.Error = "Не удалось выполнить автоматический вход. Пожалуйста, войдите вручную."
+                }
+            }
+            return response
+        } catch (err) {
+            errorStore.Error = err.message
+            throw err;
+        } finally {
+            loading.value = false
+            tempPassword.value = null
+        }
+    }
     const VERIFY = async (token_access, token_refresh) => {
         loading.value = true;
         errorStore.error = null;
@@ -195,6 +195,7 @@ export const useUserStore = defineStore('userStore', () => {
         LOGIN,
         SIGNUP,
         VERIFY,
+        REQ_CONFIRM,
         getFullNameUser,
         roleUser,
         getTokenAccess,

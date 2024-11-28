@@ -13,17 +13,17 @@ const router = createRouter({
                 {
                     path: '',
                     name: 'Login',
-                    component: () => import('@/views/Authorization/SignIn/SignInView.vue'),
+                    component: () => import('@/views/Authorization/Login/LoginFormView.vue'),
                 },
                 {
-                    path: '/signup',
-                    name: 'Signup',
-                    component: () => import('@/views/Authorization/SignUp/SignUpView.vue'),
+                    path: '/registration',
+                    name: 'Registration',
+                    component: () => import('@/views/Authorization/Registration/RegistrationFormView.vue'),
                 },
                 {
-                    path: '/signup/confirm',
+                    path: '/registration/confirm',
                     name: 'Confirmation',
-                    component: () => import('@/views/Authorization/SignUp/SignUpCodeEmailView.vue'),
+                    component: () => import('@/views/Authorization/Registration/SignUpCodeEmailView.vue'),
                 },
             ],
         },

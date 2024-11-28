@@ -38,24 +38,25 @@ export const useERPStore = defineStore('ERPStore', () => {
 //------------------------------getters-------------------------------
 //-------------------------------actions---------------------------------
     const GET_PRODUCT_BY_DAY = async (startDate, endDate) => {
-        webSocketStore.getUnregisteredItems()
-        // loading.value = true;
-        // errorStore.clearError();
-        // try {
-        //     const response = await kyCors.post('products/', {
-        //         json: {
-        //             "DateFrom": startDate,
-        //             "DateTo": endDate
-        //         }
-        //     }).json()
-        //     webSocketStore.createItemsBulk(response)
-        //     return true
-        // } catch (err) {
-        //     console.log(err)
-        //     throw err
-        // } finally {
-        //     loading.value = false
-        // }
+
+        loading.value = true;
+        errorStore.clearError();
+        try {
+            const response = await kyCors.post('products/', {
+                json: {
+                    "DateFrom": startDate,
+                    "DateTo": endDate
+                }
+            }).json()
+            webSocketStore.createItemsBulk(response)
+            webSocketStore.getUnregisteredItems()
+            return true
+        } catch (err) {
+            console.log(err)
+            throw err
+        } finally {
+            loading.value = false
+        }
     }
     const updateProductsData = async () => {
         loading.value = true;
