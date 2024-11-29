@@ -86,7 +86,7 @@ import {useErrorStore} from "@/stores/Error/ErrorStore.js";
 import MyButton from "@/components/UI/MyButton.vue";
 import MyInput from "@/components/UI/MyInput.vue";
 import {useRouter} from 'vue-router'
-import {usePasswordToggle} from "@/composables/passwordToggle.js";
+import {usePasswordToggle} from "@/composables/Validations/usePasswordToggle.js";
 
 const {passwordType, passwordIconClass, togglePasswordVisibility} = usePasswordToggle()
 const router = useRouter()
@@ -159,14 +159,13 @@ const handleSignup = async () => {
 }
 
 input[type="password"] {
-  font-size: 2.5rem; /* Скрываем текст */
-  letter-spacing: -0.3rem
+  font-size: 1.5rem;
 }
 
-@media (max-width: 1024px) {
+@media (max-width: 800px) {
   .group-btn-login {
     grid-template-columns: 1fr;
-    row-gap: 20px;
+    row-gap: 1rem;
   }
 }
 </style>

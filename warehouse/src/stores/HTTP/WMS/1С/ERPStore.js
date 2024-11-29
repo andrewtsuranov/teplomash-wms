@@ -1,8 +1,8 @@
-import {useErrorStore} from "@/stores/Error/ErrorStore.js"
 import {defineStore} from 'pinia'
 import ky from "ky"
 import {ref} from "vue"
 import {useWebSocketStore} from "@/stores/WebSockets/WebSocketStore.js";
+import {useErrorStore} from "@/stores/Error/ErrorStore.js"
 
 const kyStd = ky.create({
     prefixUrl: 'http://lab/db7/hs/wms/',
@@ -33,31 +33,9 @@ const kyCors = kyStd.extend({
 export const useERPStore = defineStore('ERPStore', () => {
     const errorStore = useErrorStore()
     const webSocketStore = useWebSocketStore()
-//-------------------------------state---------------------------------
     const loading = ref(false)
-//------------------------------getters-------------------------------
-//-------------------------------actions---------------------------------
-    const GET_PRODUCT_BY_DAY = async (startDate, endDate) => {
 
-        loading.value = true;
-        errorStore.clearError();
-        try {
-            const response = await kyCors.post('products/', {
-                json: {
-                    "DateFrom": startDate,
-                    "DateTo": endDate
-                }
-            }).json()
-            webSocketStore.createItemsBulk(response)
-            webSocketStore.getUnregisteredItems()
-            return true
-        } catch (err) {
-            console.log(err)
-            throw err
-        } finally {
-            loading.value = false
-        }
-    }
+
     const updateProductsData = async () => {
         loading.value = true;
         errorStore.clearError();
@@ -92,12 +70,8 @@ export const useERPStore = defineStore('ERPStore', () => {
         }
     }
     return {
-//state
         errorStore,
         loading,
-//getters
-//actions
-        GET_PRODUCT_BY_DAY,
-        updateProductsData
+        updateProductsData,
     }
 })

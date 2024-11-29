@@ -35,9 +35,9 @@ export const useWebSocketStore = defineStore('websocket', () => {
 
 //Actions
     function initWebSocket() {
-        // const wsUrl = `ws://lab:8081/ws/inventory/?token=${userStore.getTokenAccess}`
+        const wsUrl = `ws://lab:8081/ws/inventory/?token=${userStore.getTokenAccess}`
         // const wsUrl = `ws://192.168.1.144/ws/inventory/?token=${userStore.getTokenAccess}`
-        const wsUrl = `ws://38.180.192.229/ws/inventory/?token=${userStore.getTokenAccess}`
+        // const wsUrl = `ws://38.180.192.229/ws/inventory/?token=${userStore.getTokenAccess}`
         socket.value = new WebSocket(wsUrl)
         socket.value.onopen = onOpen.bind(this)
         socket.value.onclose = onClose.bind(this)
@@ -301,6 +301,7 @@ export const useWebSocketStore = defineStore('websocket', () => {
         foundIdUser,
 //actions
         initWebSocket,
+        getUnregisteredItems,
         onOpen,
         onClose,
         onMessage,
@@ -312,7 +313,6 @@ export const useWebSocketStore = defineStore('websocket', () => {
         disconnect,
         createItemsBulk,
         reconnect,
-        getUnregisteredItems,
         getProductTypes,
         updateProductTypes,
         createPalletTask,

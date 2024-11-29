@@ -19,24 +19,6 @@
 <!--  </div>-->
   <form class="login-wrapper" @submit.prevent="handleSignup">
     <h2>Заполните регистрационную форму</h2>
-    <div class="form-floating mb-3">
-      <input id="floatingInput" class="form-control" placeholder="name@example.com" type="email">
-      <label for="floatingInput">email* ___@teplomash.ru</label>
-    </div>
-    <div class="form-floating">
-      <input id="floatingPassword"
-             :type="passwordType"
-             class="form-control"
-             placeholder="Введите пароль"
-      >
-      <label for="floatingPassword">Введите пароль</label>
-      <button class="toggle-btn"
-              type="button"
-              @click="togglePasswordVisibility"
-      >
-        <i :class="passwordIconClass"></i>
-      </button>
-    </div>
     <my-input
         v-model="uSurname"
         maxlength="64"
@@ -64,28 +46,64 @@
         title="Введите отчество.."
         type="text"
     />
-    <my-select
-        v-model="form.role"
-        :options="role_options"
-        required
-    />
-    <my-input
-        v-model="form.email"
-        maxlength="50"
-        pattern="^\S+@teplomash.ru"
-        placeholder="email* ___@teplomash.ru"
-        required
-        size="64"
-        title="Пожалуйста, используйте корпоративный адрес почты"
-        type="email"
-    />
-    <my-input
-        v-model="password"
-        minlength="8"
-        placeholder="пароль*"
-        required
-        type="password"
-    />
+      <input
+          type="email"
+          id="emailInput"
+          v-model="emailValidation.email.value"
+          @blur="emailValidation.validateEmail"
+          :class="['form-control', emailValidation.emailValidationClass.value]"
+          placeholder="Введите корпоративный email"
+          required
+      >
+      <div
+          v-if="emailValidation.emailError.value"
+          class="invalid-feedback"
+      >
+        {{ emailValidation.emailError.value }}
+      </div>
+
+<!--    <my-input-->
+<!--        v-model="form.email"-->
+<!--        maxlength="50"-->
+<!--        pattern="^\S+@teplomash.ru"-->
+<!--        placeholder="email* ___@teplomash.ru"-->
+<!--        required-->
+<!--        size="64"-->
+<!--        title="Пожалуйста, используйте корпоративный адрес почты"-->
+<!--        type="email"-->
+<!--    />-->
+<!--    <my-input-->
+<!--        v-model="password"-->
+<!--        minlength="8"-->
+<!--        placeholder="пароль*"-->
+<!--        required-->
+<!--        type="password"-->
+<!--    />-->
+    <div class="form-floating">
+      <input
+          :type="passwordType"
+          id="floatingPassword"
+          class="form-control"
+          v-model="passwordValidation.password.value"
+          @blur="passwordValidation.validatePassword"
+          :class="['form-control', passwordValidation.passwordValidationClass.value]"
+          placeholder="Введите пароль"
+          required
+      >
+      <label for="floatingPassword">Пароль</label>
+    <button class="toggle-btn"
+            type="button"
+            @click="togglePasswordVisibility"
+    >
+      <i :class="passwordIconClass"></i>
+    </button>
+      <div
+          v-if="passwordValidation.passwordError.value"
+          class="invalid-feedback"
+      >
+        {{ passwordValidation.passwordError.value }}
+      </div>
+    </div>
     <my-input
         v-model="repassword"
         minlength="8"
@@ -106,27 +124,27 @@ import MyInput from "@/components/UI/MyInput.vue";
 import MyButton from "@/components/UI/MyButton.vue"
 import {computed, ref} from "vue";
 import MySelect from "@/components/UI/MySelect.vue"
-import {usePasswordToggle} from "@/composables/passwordToggle.js";
+import {usePasswordToggle} from "@/composables/Validations/usePasswordToggle.js";
+import {useEmailValidation} from "@/composables/Validations/useEmailValidation.js";
+import {usePasswordValidation} from "@/composables/Validations/usePasswordValidation.js";
 
+const passwordValidation = usePasswordValidation()
+const emailValidation = useEmailValidation()
 const userStore = useUserStore()
 const {passwordType, passwordIconClass, togglePasswordVisibility} = usePasswordToggle()
 const uName = ref('')
 const uSurname = ref('')
 const uMidname = ref('')
-const role = ref('')
 const email = ref('')
 const password = ref('')
 const repassword = ref('')
-const role_options = [
-  {name: 'Грузчик', value: "LOADER"},
-  {name: 'Диспетчер', value: "MANAGER"}
-]
+
 const username = computed(() => {
   return `${uSurname.value}_${uName.value}_${uMidname.value}`
 })
 const form = ref({
   email: email.value,
-  role: role.value,
+  role: 'MANAGER',
   password: (repassword.value === password.value) ? password.value : ''
 })
 const handleSignup = () => {
@@ -150,13 +168,28 @@ const handleSignup = () => {
   gap: 15px;
   color: black;
 }
+.bi-eye-slash,
+.bi-eye::before {
+  font-size: 1.5rem;
+  /*color: red;*/
+}
+
 .toggle-btn {
+  margin: 0;
+  padding: 0;
   position: absolute;
-  right: 10px;
+  right: 2.5rem;
   top: 50%;
-  transform: translateY(-50%);
+  transform: translateY(-48%);
   background: none;
   border: none;
   cursor: pointer;
+}
+.form-control {
+  font-size: 1.2rem;
+}
+
+input[type="password"] {
+  font-size: 1.5rem;
 }
 </style>
