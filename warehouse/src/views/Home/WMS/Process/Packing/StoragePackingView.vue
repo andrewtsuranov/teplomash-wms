@@ -1,7 +1,7 @@
 <template>
   <div class="wms-packing-container">
     <h1>Упаковка:</h1>
-    <table-group-unregistered-products/>
+    <e-r-p-view/>
     <TeplomashTaskManagerView/>
     <pallet-data/>
 
@@ -9,8 +9,8 @@
 </template>
 <script setup>
 import TeplomashTaskManagerView from "@/components/TeplomashTaskManager/TeplomashTaskManagerView.vue";
-import TableGroupUnregisteredProducts from "@/components/Tables/ERP/TableGroupUnregisteredProducts.vue";
 import PalletData from "@/components/PalletData/PalletData.vue";
+import ERPView from "@/views/Home/WMS/Process/Packing/Data/ERPView.vue";
 </script>
 <style scoped>
 .wms-packing-container {

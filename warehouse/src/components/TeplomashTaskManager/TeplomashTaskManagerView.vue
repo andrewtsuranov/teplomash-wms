@@ -63,7 +63,7 @@
             <router-link :to="{name: 'TTM-packing', params: {tsdID: device.id }}"
                          class="ttm-tsd-item-name-online"
                          @click="packingStore.setSelectedTSD(device.id)"
-            >ТСД №{{ device.id }} ({{ device.email }}) {{ device.current_task }}
+            >{{ device.username}} {{ device.current_task }}
             </router-link>
           </div>
         </div>

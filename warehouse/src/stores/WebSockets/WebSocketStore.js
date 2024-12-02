@@ -33,6 +33,7 @@ export const useWebSocketStore = defineStore('websocket', () => {
         return onlineDevices.value.find(item => item.id === itemId)
     })
 
+
 //Actions
     function initWebSocket() {
         const wsUrl = `ws://lab:8081/ws/inventory/?token=${userStore.getTokenAccess}`
