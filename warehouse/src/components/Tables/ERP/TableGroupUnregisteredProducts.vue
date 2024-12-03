@@ -11,7 +11,7 @@
       </tr>
       </thead>
       <tbody>
-      <tr v-for="(item, index) in webSocketStore.wsGroupUnregProduct" :key="index">
+      <tr v-for="(item, index) in filter" :key="index">
         <modal-detail-unregisterd-product/>
         <th scope="row">{{ index + 1 }}</th>
         <td data-bs-target="#modalDetailUnregisteredProduct" data-bs-toggle="modal"
@@ -79,12 +79,14 @@
                   <button class="btn btn-outline-secondary"
                           data-bs-dismiss="modal"
                           type="button"
-                  >Отменить
+                  >
+                    Отменить
                   </button>
                   <button class="btn btn-outline-info"
                           type="button"
                           @click="handPrintingLabel()"
-                  >Печать
+                  >
+                    Печать
                   </button>
                 </div>
               </div>
@@ -107,6 +109,9 @@ import {computed, onMounted, ref} from "vue";
 
 import ModalDetailUnregisterdProduct from "@/components/Tables/ERP/ModalDetailUnregisterdProduct.vue";
 
+defineProps({
+  filter: Object
+})
 const webSocketStore = useWebSocketStore()
 const packingStore = usePackingStore()
 const loading = computed(() => webSocketStore.loading)

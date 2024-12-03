@@ -5,7 +5,7 @@
         <button
             class="btn btn-outline-info"
             type="button"
-            @click=""
+            @click="webSocketStore.getUnregisteredItems()"
         >
           TEST (Загрузить данные)
         </button>
@@ -16,6 +16,39 @@
           TEST (Получить транзакцию)
         </button>
       </div>
+      <div class="erp-settings-filter">
+        <div class="form-check">
+          <input class="form-check-input"
+                 type="radio"
+                 name="flexRadioDefault"
+                 id="flexRadioDefault1"
+                 value="КЭВ-6П1264Е"
+                 v-model="selectedOption"
+                 checked
+          >
+          <label class="form-check-label"
+                 for="flexRadioDefault1"
+          >
+            КЭВ-6П1264Е (TEST Default)
+          </label>
+        </div>
+        <div class="form-check">
+          <input
+              class="form-check-input"
+              type="radio"
+              name="flexRadioDefault"
+              value="all"
+              v-model="selectedOption"
+              id="flexRadioDefault2"
+          >
+          <label
+              class="form-check-label"
+              for="flexRadioDefault2"
+          >
+            Показать все данные
+          </label>
+        </div>
+      </div>
       <div class="erp-settings-info">
         <div class="alert alert-secondary m-0" data-bs-theme="dark" role="alert">
           <i class="bi bi-info-circle" style="padding-right: 1rem"></i>
@@ -24,15 +57,26 @@
       </div>
     </div>
     <svg-logo-erp class="erp-logo"/>
-    <table-group-unregistered-products/>
+    <table-group-unregistered-products :filter = "displayedProducts"/>
   </div>
 </template>
 <script setup>
 import TableGroupUnregisteredProducts from "@/components/Tables/ERP/TableGroupUnregisteredProducts.vue";
 import SvgLogoErp from "@/components/UI/SVG/svgLogoErp.vue";
 import {useWebSocketStore} from "@/stores/WebSockets/WebSocketStore.js";
+import {ref, computed} from "vue";
 
 const webSocketStore = useWebSocketStore()
+const selectedOption = ref('КЭВ-6П1264Е')
+const displayedProducts = computed(() => {
+  if (selectedOption.value === 'all') {
+    return webSocketStore.wsGroupUnregProduct
+  } else {
+    return webSocketStore.wsGroupUnregProduct.filter(product =>
+        product.product_type.name === selectedOption.value)
+  }
+})
+
 </script>
 <style scoped>
 .wms-packing-erp-data {
