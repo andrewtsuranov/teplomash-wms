@@ -72,7 +72,7 @@ import SvgLogoErp from "@/components/UI/SVG/svgLogoErp.vue";
 import {useWebSocketStore} from "@/stores/WebSockets/WebSocketStore.js";
 import {useUserStore} from "@/stores/HTTP/UserStore.js";
 import {usePackingStore} from "@/stores/HTTP/PackingStore.js";
-import {ref, computed} from "vue";
+import {ref, computed, onMounted} from "vue";
 
 const packingStore = usePackingStore()
 const userStore = useUserStore()
@@ -82,7 +82,7 @@ const displayedProducts = computed(() => {
   if (selectedOption.value === 'all') {
     return webSocketStore.wsGroupUnregProduct
   } else {
-    return webSocketStore.wsGroupUnregProduct.filter(product =>
+    return webSocketStore.wsGroupUnregProduct?.filter(product =>
         product.product_type.name === selectedOption.value)
   }
 })
@@ -99,8 +99,20 @@ const handleCheckPallet = async () => {
       "barcodes": []
     }
   }
-  await webSocketStore.checkPalletTask(data)
+  try {
+    await webSocketStore.checkPalletTask(data)
+  } catch (e) {
+  }
 }
+onMounted(async () => {
+  try {
+    if (webSocketStore.isConnected) {
+      await webSocketStore.getUnregisteredItems()
+    }
+  } catch (e) {
+    console.log(e)
+  }
+})
 </script>
 <style scoped>
 .wms-packing-erp-data {
@@ -153,7 +165,6 @@ const handleCheckPallet = async () => {
   column-gap: 2rem;
   align-content: end;
 }
-
 
 @media (max-width: 800px) {
   .wms-packing-erp-data {

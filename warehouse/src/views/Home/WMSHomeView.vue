@@ -2,14 +2,14 @@
   <div class="home-view">
     <div class="welcome-text">
       <h3>
-        Приветствуем Вас, {{ userStore.getFullNameUser.firstName }} {{ userStore.getFullNameUser.middlename }}!
+        Приветствуем Вас, {{ userStore.getFullNameUser?.firstName }} {{ userStore.getFullNameUser?.middleName }}!
       </h3>
       <p>Тепломаш&reg; Warehouse Management System (WMS) — это информационная система, предназначенная для
-         автоматизации
-         управления складскими процессами и инфраструктурой склада в целом.
+        автоматизации
+        управления складскими процессами и инфраструктурой склада в целом.
       </p>
       <ul> Система состоит из аппаратной и
-           программной части:
+        программной части:
         <li>
           Под аппаратной подразумеваются терминалы сбора данных (ТСД), серверы для хранения информации и
           другое оборудование, применение которого необходимо для автоматизированной работы складского комплекса.
@@ -35,6 +35,24 @@ import {useUserStore} from "@/stores/HTTP/UserStore.js";
 
 const userStore = useUserStore()
 const router = useRouter()
+import {onMounted} from "vue";
+import {useWebSocketStore} from "@/stores/WebSockets/WebSocketStore.js";
+import {useErrorStore} from "@/stores/Error/ErrorStore.js";
+
+const errorStore = useErrorStore()
+const webSocketStore = useWebSocketStore()
+onMounted(async () => {
+  try {
+    await webSocketStore.initWebSocket()
+  } catch (e) {
+    console.log(e)
+    errorStore.setError({
+      status: e.response?.status || 500,
+      message: 'Ошибка соединения WebSocket'
+    })
+    throw e
+  }
+})
 </script>
 <style scoped>
 .home-view {
@@ -105,7 +123,6 @@ ul li {
   position: absolute;
   top: -2px;
   left: -2px;
-
   background-size: 400%;
   z-index: -1;
   filter: blur(10px);

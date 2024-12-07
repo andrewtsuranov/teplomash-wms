@@ -257,6 +257,7 @@ export const useWebSocketStore = defineStore('websocket', () => {
             error.value = 'Cannot send message: WebSocket is not connected'
         }
     }
+
     const checkPalletTask = (payload) => {
         if (isConnected.value && socket.value && socket.value.readyState === WebSocket.OPEN) {
             socket.value.send(JSON.stringify(payload))

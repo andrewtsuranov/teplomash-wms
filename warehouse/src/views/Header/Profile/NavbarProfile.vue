@@ -1,10 +1,10 @@
 <template>
   <div class="profile-container">
-    <div class="dropdown">
+    <div v-if="userStore.user" class="dropdown">
       <div class="avatar-mobile" data-bs-toggle="dropdown">
-        <span>Профиль: {{ userStore.getFullNameUser.lastName }} {{ userStore.getFullNameUser.initialsDot }}</span>
+        <span>Профиль: {{ userStore.getFullNameUser?.lastName }} {{ userStore.getFullNameUser?.initialsDot }}</span>
       </div>
-      <BAvatar :text=userStore.getFullNameUser.initials
+      <BAvatar :text=userStore.getFullNameUser?.initials
                aria-expanded="false"
                bg-variant="secondary"
                class="btn btn-secondary avatar-desktop"
@@ -15,7 +15,7 @@
       <div class="dropdown-menu dropdown-menu-dark" style="background-color: #2e2e2e">
         <div class="profile-dropdown">
           <div class="profile-name">
-            <BAvatar :text=userStore.getFullNameUser.initials
+            <BAvatar :text=userStore.getFullNameUser?.initials
                      aria-expanded="false"
                      bg-variant="secondary"
                      class="btn btn-secondary avatar-dropdown"
@@ -23,10 +23,10 @@
                      size="2.7rem"
                      text-variant=""
             />
-            <div>{{ userStore.getFullNameUser.lastName }} {{ userStore.getFullNameUser.firstName }}
-                 {{ userStore.getFullNameUser.middleName }}
+            <div>{{ userStore.getFullNameUser?.lastName }} {{ userStore.getFullNameUser?.firstName }}
+              {{ userStore.getFullNameUser?.middleName }}
             </div>
-            <div>({{ userStore.roleUser }})</div>
+            <div>({{ userStore?.roleUser }})</div>
           </div>
           <router-link :to="{name:'Profile'}" class="profile-item"><span>Профиль</span></router-link>
           <router-link :to="{name:'Admin'}" class="profile-item"><span>Администрирование</span></router-link>
@@ -43,17 +43,22 @@
 import {useUserStore} from "@/stores/HTTP/UserStore.js";
 import {useRouter} from 'vue-router'
 import {BAvatar} from "bootstrap-vue-next";
+import {useErrorStore} from "@/stores/Error/ErrorStore.js";
 
+const errorStore = useErrorStore()
 const router = useRouter()
 const userStore = useUserStore()
 const logout = async () => {
   try {
-    if (localStorage.length) {
-      userStore.clearFullLocalStorage()
-    }
-    await router.push({ name: 'Login' })
+    userStore.clearUserData();
+    localStorage.clear()
+    await router.push({name: 'Login'});
   } catch (error) {
     console.error('Ошибка при выходе:', error)
+    errorStore.setError({
+      status: error.response?.status,
+      message: 'Произошла ошибка при выходе из системы.'
+    })
   }
 }
 </script>

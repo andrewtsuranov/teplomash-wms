@@ -11,14 +11,6 @@
 <script setup>
 import {RouterView} from 'vue-router'
 import FooterView from "@/views/Footer/FooterView.vue";
-import {onMounted, onUnmounted} from "vue";
-import {useWebSocketStore} from "@/stores/WebSockets/WebSocketStore.js";
-
-const webSocketStore = useWebSocketStore()
-
-onMounted(() => {
-  webSocketStore.initWebSocket()
-})
 </script>
 <style>
 .router-link,

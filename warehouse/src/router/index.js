@@ -1,6 +1,5 @@
 import {createRouter, createWebHistory} from 'vue-router'
 import {useUserStore} from "@/stores/HTTP/UserStore.js";
-import {usePackingStore} from "@/stores/HTTP/PackingStore.js";
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -49,14 +48,46 @@ const router = createRouter({
                     component: () => import('@/views/Home/WMS/WarehousesView.vue'),
                 },
                 {
-                    path: 'warehouse/:id?',
+                    path: 'warehouse/:alias',
                     name: 'WMSProcess',
                     component: () => import('@/views/Home/WMS/Process/WarehouseProcess.vue'),
+                    props: true,
                     children: [
                         {
                             path: 'packing',
                             name: 'wmsPackingZone',
-                            component: () => import('@/views/Home/WMS/Process/Packing/PackingZones.vue')
+                            component: () => import('@/views/Home/WMS/Process/ProcessZones.vue'),
+                            props: {process: 'Упаковка', processRouteName: 'wmsPacking'}
+                        },
+                        {
+                            path: 'receiving',
+                            name: 'wmsReceivingZone',
+                            component: () => import('@/views/Home/WMS/Process/ProcessZones.vue'),
+                            props: {process: 'Приёмка', processRouteName: 'wmsReceiving'}
+                        },
+                        {
+                            path: 'storage',
+                            name: 'wmsStorageZone',
+                            component: () => import('@/views/Home/WMS/Process/ProcessZones.vue'),
+                            props: {process: 'Хранение', processRouteName: 'wmsStorage'}
+                        },
+                        {
+                            path: 'picking',
+                            name: 'wmsPickingZone',
+                            component: () => import('@/views/Home/WMS/Process/ProcessZones.vue'),
+                            props: {process: 'Ассортимент', processRouteName: 'wmsPicking'}
+                        },
+                        {
+                            path: 'shipping',
+                            name: 'wmsShippingZone',
+                            component: () => import('@/views/Home/WMS/Process/ProcessZones.vue'),
+                            props: {process: 'Отгрузка', processRouteName: 'wmsShipping'}
+                        },
+                        {
+                            path: 'returns',
+                            name: 'wmsDefectZone',
+                            component: () => import('@/views/Home/WMS/Process/ProcessZones.vue'),
+                            props: {process: 'Брак', processRouteName: 'wmsDefect'}
                         },
                         {
                             path: 'packing/:code',
@@ -75,7 +106,7 @@ const router = createRouter({
                             ]
                         },
                         {
-                            path: 'receiving',
+                            path: 'receiving/:code',
                             name: 'wmsReceiving',
                             component: () => import('@/views/Home/WMS/Process/Receiving/Data/StorageReceivingView.vue'),
                             children: [
@@ -89,19 +120,24 @@ const router = createRouter({
                             ]
                         },
                         {
-                            path: 'shipping',
-                            name: 'wmsShipping',
-                            component: () => import('@/views/Home/WMS/Process/Shipping/Data/StorageShippingView.vue'),
+                            path: 'storage:/code',
+                            name: 'wmsStorage',
+                            component: () => import('@/views/Home/WMS/Process/Storage/StorageView.vue'),
                         },
                         {
-                            path: 'picking',
+                            path: 'picking:/code',
                             name: 'wmsPicking',
                             component: () => import('@/views/Home/WMS/Process/Picking/StoragePickingView.vue'),
                         },
                         {
-                            path: 'returns',
-                            name: 'wmsReturns',
-                            component: () => import('@/views/Home/WMS/Process/Returns/StorageReturnsView.vue'),
+                            path: 'shipping/:code',
+                            name: 'wmsShipping',
+                            component: () => import('@/views/Home/WMS/Process/Shipping/Data/StorageShippingView.vue'),
+                        },
+                        {
+                            path: 'defect/:code',
+                            name: 'wmsDefect',
+                            component: () => import('@/views/Home/WMS/Process/Defect/StorageDefectView.vue'),
                         },
                         {
                             path: 'inventory',
@@ -152,31 +188,48 @@ const router = createRouter({
     // },
     linkExactActiveClass: 'teplomash-active-exact-link'
 });
-router.beforeEach(async (to) => {
-    const userStore = useUserStore()
-    if (!!to.meta.requiresAuth && userStore.isAuthenticated) {
-        try {
-            // Проверяем валидность токенов
-            const isValid = await userStore.VERIFY(userStore.user.access, userStore.user.refresh)
-            // Если верификация не прошла, отправляем на логин
-            if (!isValid) {
-                userStore.clearUserData() // Метод очистки данных пользователя
-                return {name: 'Login'}
+router.beforeEach(async (to, from, next) => {
+        const userStore = useUserStore()
+        const redirectToLogin = (next) => {
+            next({name: 'Login'});
+        }
+        if (to.meta.requiresAuth) {
+            if (userStore.isAuthenticated) {
+                try {
+                    // Проверяем валидность токенов
+                    const isValid = await userStore.VERIFY(
+                        userStore.user.access,
+                        userStore.user.refresh
+                    )
+                    if (isValid) {
+                        next() // Всё в порядке, продолжаем навигацию
+                    } else {
+                        // Токены невалидны, очищаем данные и перенаправляем на Login
+                        console.error("Токены невалидны"); // Или другое сообщение
+                        userStore.clearUserData();
+                        redirectToLogin(next)
+                    }
+                } catch (error) {
+                    console.error("Ошибка при проверке токенов:", error);
+                    if (error.response && error.response.status === 401) {
+                        console.error('Токены просрочены');
+                    }
+                    userStore.clearUserData();
+                    return redirectToLogin(next)
+                }
+            } else {
+                // Пользователь не авторизован, перенаправляем на Login
+                redirectToLogin(next)
             }
-        } catch (error) {
-            userStore.clearUserData()
-            return {name: 'Login'}
+        } else if (userStore.isAuthenticated && to.meta.guestOnly) {
+            // Пользователь авторизован, но пытается перейти на гостевую страницу
+            next({name: "Home"});
+        } else {
+            // Остальные случаи
+            next();
         }
     }
-    if (!!to.meta.requiresAuth && !userStore.isAuthenticated) {
-        return {name: 'Login'}
-    }
-    if (userStore.isAuthenticated && !!to.meta.guestOnly) {
-        return {name: 'Home'}
-    }
-
-
-})
+)
 router.onError((error) => {
     console.error('Ошибка роутинга:', error)
 })

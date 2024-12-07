@@ -6,6 +6,7 @@ import {useUserStore} from "@/stores/HTTP/UserStore.js";
 import {requestUrls} from "@/stores/request-urls.js";
 import {useGroupByKey} from "@/composables/useGroupByKey.js";
 import {useCustomSortByKey} from "@/composables/useCustomSortByKey.js";
+import {useTransliterate} from "@/composables/useTransliterate.js";
 
 const userStore = useUserStore()
 const kyStd = ky.create({
@@ -23,7 +24,7 @@ export const useWarehouseStore = defineStore('warehouseStore', () => {
     const warehouseData = ref(JSON.parse(localStorage.getItem('warehouseData')) || null)
     const allZoneTypes = ref(null)
     const warehouseZoneTypeById = ref(JSON.parse(localStorage.getItem('warehouseZoneTypeById')) || null)
-    const fullListWarehousesZoneType = ref(null)
+    const warehouseAliasMap = ref({})
 //getters
     const getWarehouseId = computed(() => {
         return warehouseData.value.id
@@ -46,10 +47,12 @@ export const useWarehouseStore = defineStore('warehouseStore', () => {
             const response = await kyStd('warehouses/').json()
             allWarehouses.value = response
             localStorage.setItem('warehouses', JSON.stringify(response))
+            errorStore.clearError()
             return true
-        } catch (err) {
-            console.log(err)
-            throw err
+        } catch (e) {
+            errorStore.setError(e)
+            console.log(e)
+            throw e
         } finally {
             loading.value = false
         }
@@ -61,11 +64,15 @@ export const useWarehouseStore = defineStore('warehouseStore', () => {
             const response = await kyStd(`warehouses/${id}/`)
                 .json()
             warehouseData.value = response
+            const alias = useTransliterate(response.name).toLowerCase().replace(/\s+/g, '-');
+            warehouseAliasMap.value = {[response.id]: alias}; // Создаём объект с одним ключом (id склада)
             localStorage.setItem('warehouseData', JSON.stringify(response))
+            errorStore.clearError()
             return true
-        } catch (err) {
-            console.log(err)
-            throw err
+        } catch (e) {
+            console.log(e)
+            errorStore.setError(e)
+            throw e
         } finally {
             loading.value = false
         }
@@ -75,10 +82,12 @@ export const useWarehouseStore = defineStore('warehouseStore', () => {
         errorStore.clearError();
         try {
             allZoneTypes.value = await kyStd('warehouse-zone-types/').json()
+            errorStore.clearError()
             return true
-        } catch (err) {
-            console.log(err)
-            throw err
+        } catch (e) {
+            console.log(e)
+            errorStore.setError(e)
+            throw e
         } finally {
             loading.value = false
         }
@@ -92,24 +101,26 @@ export const useWarehouseStore = defineStore('warehouseStore', () => {
             }).json()
             warehouseZoneTypeById.value = response
             localStorage.setItem('warehouseZoneTypeById', JSON.stringify(response))
+            await GET_ALl_ZONE_TYPES()
+            errorStore.clearError()
             return true
-        } catch (err) {
-            console.log(err)
-            throw err
+        } catch (e) {
+            console.log(e)
+            errorStore.setError(e)
+            throw e
         } finally {
             loading.value = false
         }
     }
-
     return {
 //state
         errorStore,
         loading,
         allWarehouses,
         warehouseData,
-        fullListWarehousesZoneType,
         allZoneTypes,
         warehouseZoneTypeById,
+        warehouseAliasMap,
 //getters
         groupByZone,
         customSortByZone,

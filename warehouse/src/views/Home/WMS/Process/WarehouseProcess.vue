@@ -1,16 +1,26 @@
 <template>
   <div class="storage-id-container">
     <div class="storage-id-title">
-      <div>Склад {{ warehouseStore.warehouseData.number }}: {{ warehouseStore.warehouseData.name }},
-           {{ warehouseStore.warehouseData.address }} [ Ёмкость: {{ warehouseStore.warehouseData.max_capacity }} ячеек ]
+      <div>Склад {{ warehouseStore.warehouseData?.number }}: {{ warehouseStore.warehouseData?.name }},
+        {{ warehouseStore.warehouseData?.address }} [ Ёмкость: {{ warehouseStore.warehouseData?.max_capacity }} ячеек ]
       </div>
     </div>
-    <div  class="storage-id-actions">
-
-      <router-link v-for="(process, index) in warehouseStore.customSortByZone"
-                   :to="{name: 'wmsPackingZone'}"
-                   class="storage-id-actions-items"
-      > {{index}}
+    <div v-if="warehouseStore.loading"
+         class="spinner-border text-warning"
+         role="status"
+    >
+      <span class="visually-hidden">Loading...</span>
+    </div>
+    <div v-else
+         class="storage-id-actions"
+    >
+      <router-link
+          v-for="(zones, process) in warehouseStore.customSortByZone"
+          :key="process"
+          :to="{ name: getRouteName(process) }"
+          class="storage-id-actions-items"
+      >
+        {{ process }}
       </router-link>
       <router-link :to="{name: 'wmsInventory'}"
                    class="storage-id-actions-items"
@@ -28,18 +38,43 @@
 </template>
 <script setup>
 import {useWarehouseStore} from "@/stores/HTTP/WarehouseStore.js";
-import {onMounted, onUnmounted} from "vue";
+import {computed, onMounted} from "vue";
+import {useErrorStore} from "@/stores/Error/ErrorStore.js";
+
 defineProps({
   id: Number
 })
+const errorStore = useErrorStore()
 const warehouseStore = useWarehouseStore()
-onMounted( async () => {
-  await warehouseStore.GET_ALl_ZONE_TYPES()
-  await warehouseStore.GET_WAREHOUSES_ZONE_BY_ID({
-    warehouse_id: warehouseStore.getWarehouseId
-  })
+const getRouteName = computed(() => (process) => {
+  switch (process) {
+    case "Упаковка":
+      return "wmsPackingZone";
+    case "Приёмка":
+      return "wmsReceivingZone";
+    case "Хранение":
+      return "wmsStorageZone";
+    case "Ассортимент":
+      return "wmsPickingZone";
+    case "Отгрузка":
+      return "wmsShippingZone";
+    case "Брак":
+      return "wmsDefectZone";
+    default:
+      return "wmsPackingZone"; // Или какой-то дефолтный маршрут
+  }
+});
+onMounted(async () => {
+  try {
+    await warehouseStore.GET_WAREHOUSES_ZONE_BY_ID({
+      warehouse_id: warehouseStore.getWarehouseId
+    })
+  } catch (e) {
+    console.log(e)
+    errorStore.setError('Ошибка в WarehouseProcess')
+    throw e
+  }
 })
-
 </script>
 <style scoped>
 .storage-id-container {

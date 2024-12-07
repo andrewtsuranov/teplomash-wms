@@ -1,9 +1,9 @@
-import {useErrorStore} from "@/stores/Error/ErrorStore.js"
-import {useRouter} from "vue-router";
 import {defineStore} from 'pinia'
-import ky from "ky"
+import {useRouter} from "vue-router";
 import {ref, computed} from "vue"
 import {requestUrls} from '@/stores/request-urls.js';
+import {useErrorStore} from "@/stores/Error/ErrorStore.js"
+import ky from "ky"
 
 const router = useRouter()
 const kyStd = ky.create({
@@ -17,9 +17,10 @@ const kyLogin = kyStd.extend({
                 if (response.status === 401) {
                     const errorStore = useErrorStore()
                     errorStore.setError({
-                        status: response.status,
-                        message: 'Ошибка авторизации! Пользователь не авторизован, требуется регистрация!'
-                    })
+                            status: response.status,
+                            message: 'Ошибка авторизации! Пользователь не авторизован, требуется регистрация!'
+                        }
+                    )
                 }
             }
         ]
@@ -56,21 +57,20 @@ export const useUserStore = defineStore('userStore', () => {
 //getters
     const isAuthenticated = computed(() => !!user.value)
     const getFullNameUser = computed(() => {
-        const [lastName, firstName, middleName] = user.value.user.username.split('_')
+        if (!user.value) return null;
+        const [lastName, firstName, middleName] = user.value.user.username.split('_');
         return {
             lastName,
             firstName,
-            middleName: middleName,
+            middleName,
             initials: `${firstName[0]}${middleName[0]}`,
-            initialsDot: `${firstName[0]}.${middleName[0]}.`
-        }
-    })
-    const roleUser = computed(() => {
-        return user.value.user.role
-    })
-    const getTokenAccess = computed(() => user.value.access)
-    const getUserId = computed(() => user.value.user.id)
-    const getUserEmail = computed(() => user.value.user.email)
+            initialsDot: `${firstName[0]}.${middleName[0]}.`,
+        };
+    });
+    const roleUser = computed(() => user.value?.user?.role);
+    const getTokenAccess = computed(() => user.value?.access);
+    const getUserId = computed(() => user.value?.user?.id);
+    const getUserEmail = computed(() => user.value?.user?.email);
 //actions
     const LOGIN = async (credentials) => {
         loading.value = true;
@@ -82,19 +82,19 @@ export const useUserStore = defineStore('userStore', () => {
             user.value = response
             localStorage.setItem('userData', JSON.stringify(response))
             return true
-        } catch (err) {
-            if (err.response?.status === 401) {
+        } catch (e) {
+            if (e.response?.status === 401) {
                 errorStore.setError({
-                    status: err.response?.status,
+                    status: e.response?.status,
                     message: 'Ошибка авторизации! Проверьте правильность введённых данных или зарегистрируйтесь!'
                 })
             } else {
                 errorStore.setError({
-                    status: err.response?.status || 500,
+                    status: e.response?.status || 500,
                     message: 'Ошибка авторизации! Произошла ошибка при загрузке данных, попробуйте позже!'
                 })
             }
-            throw err
+            throw e
         } finally {
             loading.value = false
         }
@@ -125,7 +125,7 @@ export const useUserStore = defineStore('userStore', () => {
             loading.value = false
         }
     }
-     const REQ_CONFIRM = async (activation_code, email) => {
+    const REQ_CONFIRM = async (activation_code, email) => {
         try {
             // const email = userUP.value?.email || JSON.parse(localStorage.getItem('userUP')).email || '{}'
             const response = await kyStd
@@ -173,7 +173,6 @@ export const useUserStore = defineStore('userStore', () => {
                     return false
                 }
             }
-            // eslint-disable-next-line no-unreachable
         } catch (err) {
             errorStore.error = err.message
             return false
@@ -181,10 +180,9 @@ export const useUserStore = defineStore('userStore', () => {
             loading.value = false
         }
     }
-    const clearFullLocalStorage = () => {
-        localStorage.clear()
+    const clearUserData = () => {
         user.value = null
-        return true
+        tempPassword.value = null
     }
     return {
         user,
@@ -200,6 +198,6 @@ export const useUserStore = defineStore('userStore', () => {
         getTokenAccess,
         getUserId,
         getUserEmail,
-        clearFullLocalStorage,
+        clearUserData,
     }
 })

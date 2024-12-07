@@ -62,7 +62,7 @@
                     <label>Тип печати:</label>
                     <select class="form-select"
                             v-model="printingStore.selectedLabelTemplate"
-                        >
+                    >
                       <option disabled value="">Выберите шаблон этикетки...</option>
                       <option
                           v-for="(label, id) in printingStore.labelTemplatesList"
@@ -105,7 +105,7 @@
         <td>
           <button class="btn btn-outline-primary"
                   @click="ERPStore.getItemUnregProductByID(index)"
-          >Раскрыть список {{ERPStore.getListItemBarcode}}
+          >Раскрыть список {{ ERPStore.getListItemBarcode }}
           </button>
         </td>
       </tr>
@@ -154,7 +154,11 @@ const handleCreatePallet = async (products, palletType, productName) => {
       "xyz_class": "X"
     }
   }
-  await webSocketStore.createPalletTask(data)
+  try {
+    await webSocketStore.createPalletTask(data)
+  } catch (e) {
+    console.log(e)
+  }
 }
 const handlerPrint = () => {
   printingStore.getZPLPrinters()
@@ -175,8 +179,6 @@ const handPrintingLabel = async () => {
     console.error('Ошибка при печати:', error);
   }
 }
-
-
 </script>
 <style scoped>
 .wms-packing-erp-data {
@@ -197,7 +199,6 @@ const handPrintingLabel = async () => {
   border-top: 1px solid red;
   max-height: 370px;
 }
-
 
 .erp-logo {
   display: grid;
@@ -254,7 +255,6 @@ const handPrintingLabel = async () => {
   column-gap: 2rem;
   align-content: end;
 }
-
 
 @media (max-width: 800px) {
   .wms-packing-erp-data {
