@@ -1,5 +1,5 @@
 import {defineStore} from 'pinia'
-import {useUserStore} from '@/stores/HTTP/Auth/UserStore.js'
+import {useUserStore} from '@/stores/HTTP/UserStore.js'
 import {computed, ref} from "vue";
 import {useTransactionStore} from "@/stores/WebSockets/transactionStore.js";
 
@@ -258,7 +258,14 @@ export const useWebSocketStore = defineStore('websocket', () => {
             error.value = 'Cannot send message: WebSocket is not connected'
         }
     }
-
+    const checkPalletTask = (payload) => {
+        if (isConnected.value && socket.value && socket.value.readyState === WebSocket.OPEN) {
+            socket.value.send(JSON.stringify(payload))
+        } else {
+            console.error('Cannot send message: WebSocket is not connected')
+            error.value = 'Cannot send message: WebSocket is not connected'
+        }
+    }
     // function createPallet() {
     //     // Создание паллеты
     //     socket.value.send(JSON.stringify({
@@ -318,5 +325,6 @@ export const useWebSocketStore = defineStore('websocket', () => {
         updateProductTypes,
         createPalletTask,
         getTransactionData,
+        checkPalletTask,
     }
 })

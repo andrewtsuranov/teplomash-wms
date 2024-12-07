@@ -8,6 +8,7 @@
         <th scope="col">Кол-во, шт</th>
         <th scope="col">Действие</th>
         <th scope="col">Печать штрихкода</th>
+        <th scope="col">Дополнительно</th>
       </tr>
       </thead>
       <tbody>
@@ -15,7 +16,7 @@
         <modal-detail-unregisterd-product/>
         <th scope="row">{{ index + 1 }}</th>
         <td data-bs-target="#modalDetailUnregisteredProduct" data-bs-toggle="modal"
-            @click="ERPStore.getItemUnregisteredProduct(index)">
+            @click="ERPStore.getIDUnregProduct(index)">
           {{ item.product_type.name }}
         </td>
         <td>{{ item.items_count }}</td>
@@ -27,7 +28,7 @@
         </td>
         <td>
           <button class="btn btn-outline-primary" data-bs-target="#settingsPrintModal" data-bs-toggle="modal"
-                  @click=printingStore.getZPLPrinters()
+                  @click="handlerPrint"
           >Печать Barcode
           </button>
           <!-- Modal -->
@@ -59,9 +60,17 @@
                       </select>
                     </div>
                     <label>Тип печати:</label>
-                    <select class="form-select">
-                      <option>QR код</option>
-                      <option disabled>Штрихкод (code-128)</option>
+                    <select class="form-select"
+                            v-model="printingStore.selectedLabelTemplate"
+                        >
+                      <option disabled value="">Выберите шаблон этикетки...</option>
+                      <option
+                          v-for="(label, id) in printingStore.labelTemplatesList"
+                          :key="id"
+                          :value="label.code"
+                      >
+                        {{ label.name }}
+                      </option>
                     </select>
                     <label>Кол-во этикеток:</label>
                     <div class="counter">
@@ -93,37 +102,42 @@
             </div>
           </div>
         </td>
+        <td>
+          <button class="btn btn-outline-primary"
+                  @click="ERPStore.getItemUnregProductByID(index)"
+          >Раскрыть список {{ERPStore.getListItemBarcode}}
+          </button>
+        </td>
       </tr>
       </tbody>
     </table>
   </div>
 </template>
 <script setup>
+import {useUserStore} from "@/stores/HTTP/UserStore.js";
 import {useWebSocketStore} from "@/stores/WebSockets/WebSocketStore.js";
-import {usePrintingStore} from "@/stores/HTTP/Printing/PrintingStore.js";
+import {usePrintingStore} from "@/stores/HTTP/PrintingStore.js";
 import {useNumbersOnlyWithoutDot} from "@/composables/NumbersOnlyWithoutDot.js";
-import {usePackingStore} from "@/stores/HTTP/WMS/PackingStore.js";
-import {useERPStore} from "@/stores/HTTP/WMS/1С/ERPStore.js";
-
+import {usePackingStore} from "@/stores/HTTP/PackingStore.js";
+import {useERPStore} from "@/stores/HTTP/ERPStore.js";
 import {computed, onMounted, ref} from "vue";
-
 import ModalDetailUnregisterdProduct from "@/components/Tables/ERP/ModalDetailUnregisterdProduct.vue";
 
 defineProps({
   filter: Object
 })
+const userStore = useUserStore()
+const ERPStore = useERPStore()
 const webSocketStore = useWebSocketStore()
 const packingStore = usePackingStore()
-const loading = computed(() => webSocketStore.loading)
-const count = ref(1)
 const printingStore = usePrintingStore()
-const ERPStore = useERPStore()
+// const loading = computed(() => webSocketStore.loading)
+const count = ref(1)
 const handleCreatePallet = async (products, palletType, productName) => {
-  const getItemCountByGroup = (palletType[0].rows_length * palletType[0].rows_width * palletType[0].rows_height)
   const barcodes = products.map(obj => obj.barcode)
   const data = {
     "action": "create_pallet",
-    "from_user": 40,
+    "from_user": userStore.getUserId,
     "description": `Создание паллеты ${productName.name}`,
     "loader_id": packingStore.selectedTSD,
     "warehouse_id": 1,
@@ -142,6 +156,10 @@ const handleCreatePallet = async (products, palletType, productName) => {
   }
   await webSocketStore.createPalletTask(data)
 }
+const handlerPrint = () => {
+  printingStore.getZPLPrinters()
+  printingStore.getLabelTemplate()
+}
 const increment = () => {
   count.value++;
 }
@@ -152,14 +170,13 @@ const decrement = () => {
 }
 const handPrintingLabel = async () => {
   try {
-    await printingStore.printQRCode('Привет Мир!', 1)
+    await printingStore.printQRCode('[A]-[202412500]-[П]-[1667]-[КЭВ-6П1264Е]-[2]')
   } catch (error) {
     console.error('Ошибка при печати:', error);
   }
 }
-onMounted(async () => {
-  await webSocketStore.getUnregisteredItems()
-})
+
+
 </script>
 <style scoped>
 .wms-packing-erp-data {

@@ -12,7 +12,7 @@
 </template>
 <script setup>
 import HeaderView from "@/views/Header/NavbarView.vue";
-import {useUserStore} from "@/stores/HTTP/Auth/UserStore.js";
+import {useUserStore} from "@/stores/HTTP/UserStore.js";
 
 const userStore = useUserStore()
 </script>

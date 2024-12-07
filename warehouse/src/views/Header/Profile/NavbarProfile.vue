@@ -2,35 +2,37 @@
   <div class="profile-container">
     <div class="dropdown">
       <div class="avatar-mobile" data-bs-toggle="dropdown">
-        <span>Профиль: {{ userData.lastName }} {{ userData.initialsDot }}</span>
+        <span>Профиль: {{ userStore.getFullNameUser.lastName }} {{ userStore.getFullNameUser.initialsDot }}</span>
       </div>
-      <BAvatar aria-expanded="false"
+      <BAvatar :text=userStore.getFullNameUser.initials
+               aria-expanded="false"
                bg-variant="secondary"
                class="btn btn-secondary avatar-desktop"
                data-bs-toggle="dropdown"
-               :text=userData.initials
-               text-variant=""
                size="2.7rem"
+               text-variant=""
       />
       <div class="dropdown-menu dropdown-menu-dark" style="background-color: #2e2e2e">
         <div class="profile-dropdown">
           <div class="profile-name">
-            <BAvatar aria-expanded="false"
+            <BAvatar :text=userStore.getFullNameUser.initials
+                     aria-expanded="false"
                      bg-variant="secondary"
                      class="btn btn-secondary avatar-dropdown"
                      data-bs-toggle="dropdown"
-                     :text=userData.initials
-                     text-variant=""
                      size="2.7rem"
+                     text-variant=""
             />
-            <div>{{ userData.lastName }} {{ userData.firstName }} {{ userData.middlename }}</div>
-            <div>({{ userRole }})</div>
+            <div>{{ userStore.getFullNameUser.lastName }} {{ userStore.getFullNameUser.firstName }}
+                 {{ userStore.getFullNameUser.middleName }}
+            </div>
+            <div>({{ userStore.roleUser }})</div>
           </div>
-          <router-link class="profile-item" :to="{name:'Profile'}"><span>Профиль</span></router-link>
-          <router-link class="profile-item" :to="{name:'Admin'}"><span>Администрирование</span></router-link>
+          <router-link :to="{name:'Profile'}" class="profile-item"><span>Профиль</span></router-link>
+          <router-link :to="{name:'Admin'}" class="profile-item"><span>Администрирование</span></router-link>
           <div class="profile-logout"
                @click="logout"
-          ><i style="color: red" class="bi bi-box-arrow-right"></i><span>Выйти из профиля</span>
+          ><i class="bi bi-box-arrow-right" style="color: red"></i><span>Выйти из профиля</span>
           </div>
         </div>
       </div>
@@ -38,18 +40,21 @@
   </div>
 </template>
 <script setup>
-import {useUserStore} from "@/stores/HTTP/Auth/UserStore.js";
+import {useUserStore} from "@/stores/HTTP/UserStore.js";
 import {useRouter} from 'vue-router'
-import {computed} from "vue";
 import {BAvatar} from "bootstrap-vue-next";
 
 const router = useRouter()
 const userStore = useUserStore()
-const userData = computed(() => userStore.getFullNameUser)
-const userRole = computed(() => userStore.roleUser)
-const logout = () => {
-  router.push({name: 'Login'})
-  userStore.clearFullLocalStorage()
+const logout = async () => {
+  try {
+    if (localStorage.length) {
+      userStore.clearFullLocalStorage()
+    }
+    await router.push({ name: 'Login' })
+  } catch (error) {
+    console.error('Ошибка при выходе:', error)
+  }
 }
 </script>
 <style scoped>

@@ -36,7 +36,7 @@ const kySignup = kyStd.extend({
         ],
     }
 })
-const kyVerifyandRefresh = kyStd.extend({
+const kyVerifyAndRefresh = kyStd.extend({
     hooks: {
         afterResponse: [
             async (request, options, response) => {
@@ -49,21 +49,20 @@ const kyVerifyandRefresh = kyStd.extend({
 })
 export const useUserStore = defineStore('userStore', () => {
     const errorStore = useErrorStore()
-//---------------------------------------state--------------------------------
+//state
     const user = ref(JSON.parse(localStorage.getItem('userData')) || null)
     const loading = ref(false)
     const tempPassword = ref(null)
-    // const userUP = ref(null)
-//--------------------------------------getters------------------------------
+//getters
     const isAuthenticated = computed(() => !!user.value)
     const getFullNameUser = computed(() => {
-        const [lastName, firstName, middlename] = user.value.user.username.split('_')
+        const [lastName, firstName, middleName] = user.value.user.username.split('_')
         return {
             lastName,
             firstName,
-            middlename,
-            initials: `${firstName[0]}${middlename[0]}`,
-            initialsDot: `${firstName[0]}.${middlename[0]}.`
+            middleName: middleName,
+            initials: `${firstName[0]}${middleName[0]}`,
+            initialsDot: `${firstName[0]}.${middleName[0]}.`
         }
     })
     const roleUser = computed(() => {
@@ -72,7 +71,7 @@ export const useUserStore = defineStore('userStore', () => {
     const getTokenAccess = computed(() => user.value.access)
     const getUserId = computed(() => user.value.user.id)
     const getUserEmail = computed(() => user.value.user.email)
-//----------------------------------actions--------------------------------
+//actions
     const LOGIN = async (credentials) => {
         loading.value = true;
         errorStore.clearError();
@@ -116,7 +115,7 @@ export const useUserStore = defineStore('userStore', () => {
             }
             const loginSuccess = await LOGIN(loginCredentials)
             if (loginSuccess) {
-                router.push('/')
+                await router.push('/')
                 return true
             }
         } catch (err) {
@@ -126,10 +125,10 @@ export const useUserStore = defineStore('userStore', () => {
             loading.value = false
         }
     }
-     const REQ_CONFIRM = async (activation_code) => {
+     const REQ_CONFIRM = async (activation_code, email) => {
         try {
-            const email = userUP.value.email || JSON.parse(localStorage.getItem('userUP')).email || '{}'
-            const response = await api
+            // const email = userUP.value?.email || JSON.parse(localStorage.getItem('userUP')).email || '{}'
+            const response = await kyStd
                 .post('activate/', {json: {activation_code, email}})
                 .json()
             if (response.message) {
@@ -154,14 +153,14 @@ export const useUserStore = defineStore('userStore', () => {
         try {
             // Проверяем access token
             try {
-                await kyVerifyandRefresh
+                await kyVerifyAndRefresh
                     .post('token/verify/', {json: {token: token_access}})
                     .json()
                 return true
             } catch {
                 // Если access token невалидный, пробуем refresh
                 try {
-                    const refreshResponse = await kyVerifyandRefresh
+                    const refreshResponse = await kyVerifyAndRefresh
                         .post('token/refresh/', {json: {refresh: token_refresh}})
                         .json()
                     // Обновляем access token в userData в localStorage
@@ -183,8 +182,8 @@ export const useUserStore = defineStore('userStore', () => {
         }
     }
     const clearFullLocalStorage = () => {
-        user.value = null
         localStorage.clear()
+        user.value = null
         return true
     }
     return {

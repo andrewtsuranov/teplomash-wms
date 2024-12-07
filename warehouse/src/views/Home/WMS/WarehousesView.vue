@@ -1,28 +1,33 @@
 <template>
   <div class="wms-home-container">
-    <div v-for="item in storageStore.fullListWarehouses"
-         :key="item.id"
+    <div v-for="warehouse in warehouseStore.allWarehouses"
+         :key="warehouse.id"
          class="wms-input"
-         @click="handlerClickStorage(item.id)"
+         @click="handlerClickWarehouse(warehouse.id)"
     >
-      <span>{{ item.name }}</span>
+      <span>{{ warehouse.name }}</span>
     </div>
   </div>
 </template>
 <script setup>
-import {onMounted} from "vue";
+import {onMounted, onUnmounted} from "vue";
 import {useRouter} from "vue-router";
-import {useStorageStore} from "@/stores/HTTP/WMS/StorageStore.js";
+import {useWarehouseStore} from "@/stores/HTTP/WarehouseStore.js";
+import {useWebSocketStore} from "@/stores/WebSockets/WebSocketStore.js";
 
-const storageStore = useStorageStore()
+const webSocketStore = useWebSocketStore()
+const warehouseStore = useWarehouseStore()
 const router = useRouter()
 onMounted(() => {
-  storageStore.GET_WAREHOUSES()
+  warehouseStore.GET_WAREHOUSES()
 })
-const handlerClickStorage = async (id) => {
-  await storageStore.WAREHOUSE_ID(id)
-  await router.push({name: 'WMSStorage', params: {id: id}})
+onUnmounted(() => {
   localStorage.removeItem('warehouses')
+})
+const handlerClickWarehouse = async (id) => {
+  await warehouseStore.WAREHOUSE_ID(id)
+  await router.push({name: 'WMSProcess', params: {id: id}})
+
 }
 </script>
 <style scoped>

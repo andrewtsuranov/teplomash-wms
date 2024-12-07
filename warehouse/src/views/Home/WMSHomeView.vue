@@ -31,7 +31,7 @@
 </template>
 <script setup>
 import {useRouter} from "vue-router";
-import {useUserStore} from "@/stores/HTTP/Auth/UserStore.js";
+import {useUserStore} from "@/stores/HTTP/UserStore.js";
 
 const userStore = useUserStore()
 const router = useRouter()
@@ -98,23 +98,6 @@ ul li {
   color: blanchedalmond;
 }
 
-.glow-on-hover:before {
-  content: '';
-  background: linear-gradient(45deg, #ff0000, #ff7300, #fffb00, #48ff00, #00ffd5, #002bff, #7a00ff, #ff00c8, #ff0000);
-  position: absolute;
-  top: -.5px;
-  left: -.5px;
-  background-size: 400%;
-  z-index: -1;
-  filter: blur(3px);
-  width: calc(100% + 1px);
-  height: calc(100% + 1px);
-  animation: glowing 20s linear infinite;
-  opacity: 0;
-  transition: opacity .3s ease-in-out;
-  border-radius: 10px;
-}
-
 .welcome-image:before {
   content: '';
   background: linear-gradient(-45deg, #e71313, #e73c7e, #23a6d5, #0f32e2);
@@ -133,30 +116,6 @@ ul li {
   opacity: 0;
   transition: opacity .3s ease-in-out;
   border-radius: 30px;
-}
-
-.glow-on-hover:active {
-  color: #000
-}
-
-.glow-on-hover:active:after {
-  background: transparent;
-}
-
-.glow-on-hover:before {
-  opacity: 1;
-}
-
-.glow-on-hover:after {
-  z-index: -1;
-  content: '';
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  background: #111;
-  left: 0;
-  top: 0;
-  border-radius: 10px;
 }
 
 .welcome-image:hover {
@@ -197,11 +156,6 @@ ul li {
 }
 
 @media (max-width: 1024px) {
-  .home-view-container {
-    display: grid;
-    margin: 1.5rem;
-  }
-
   .home-view {
     display: grid;
     grid-template-columns: 1fr;

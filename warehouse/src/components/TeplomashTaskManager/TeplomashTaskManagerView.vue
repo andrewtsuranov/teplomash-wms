@@ -86,7 +86,7 @@
 <script setup>
 import {useWebSocketStore} from '@/stores/WebSockets/WebSocketStore.js'
 import MyButton from "@/components/UI/MyButton.vue"
-import {usePackingStore} from "@/stores/HTTP/WMS/PackingStore.js";
+import {usePackingStore} from "@/stores/HTTP/PackingStore.js";
 import {useRouter, useRoute} from "vue-router";
 
 const router = useRouter()

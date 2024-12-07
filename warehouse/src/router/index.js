@@ -1,6 +1,6 @@
 import {createRouter, createWebHistory} from 'vue-router'
-import {useUserStore} from "@/stores/HTTP/Auth/UserStore.js";
-import {usePackingStore} from "@/stores/HTTP/WMS/PackingStore.js";
+import {useUserStore} from "@/stores/HTTP/UserStore.js";
+import {usePackingStore} from "@/stores/HTTP/PackingStore.js";
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -49,14 +49,20 @@ const router = createRouter({
                     component: () => import('@/views/Home/WMS/WarehousesView.vue'),
                 },
                 {
-                    path: '/warehouse-:id',
-                    name: 'WMSStorage',
-                    component: () => import('@/views/Home/WMS/Process/StorageID.vue'),
+                    path: 'warehouse/:id?',
+                    name: 'WMSProcess',
+                    component: () => import('@/views/Home/WMS/Process/WarehouseProcess.vue'),
                     children: [
                         {
                             path: 'packing',
+                            name: 'wmsPackingZone',
+                            component: () => import('@/views/Home/WMS/Process/Packing/PackingZones.vue')
+                        },
+                        {
+                            path: 'packing/:code',
                             name: 'wmsPacking',
                             component: () => import('@/views/Home/WMS/Process/Packing/StoragePackingView.vue'),
+                            props: true,
                             children: [
                                 {
                                     path: 'pac-tsd#:tsdID',

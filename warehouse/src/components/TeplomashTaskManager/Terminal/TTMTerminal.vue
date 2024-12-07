@@ -33,8 +33,8 @@
 </template>
 <script setup>
 import {useWebSocketStore} from '@/stores/WebSockets/WebSocketStore.js'
-import {usePackingStore} from "@/stores/HTTP/WMS/PackingStore.js";
-import {useUserStore} from "@/stores/HTTP/Auth/UserStore.js";
+import {usePackingStore} from "@/stores/HTTP/PackingStore.js";
+import {useUserStore} from "@/stores/HTTP/UserStore.js";
 
 const userStore = useUserStore()
 const packingStore = usePackingStore()
