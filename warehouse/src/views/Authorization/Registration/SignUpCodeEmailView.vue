@@ -24,7 +24,7 @@
 import MyInput from "@/components/UI/MyInput.vue";
 import MyButton from "@/components/UI/MyButton.vue"
 import {ref} from "vue";
-import {useUserStore} from "@/stores/HTTP/Auth/UserStore.js";
+import {useUserStore} from "@/stores/HTTP/UserStore.js";
 import router from "@/router/index.js";
 
 const userStore = useUserStore()

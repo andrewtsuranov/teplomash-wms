@@ -45,7 +45,7 @@
 import SvgEurOne100Mini841 from "@/components/UI/SVG/svgEurOne100Mini841.vue";
 import {useSplitDateByT} from "@/composables/SpliDateByT.js";
 import {useWebSocketStore} from "@/stores/WebSockets/WebSocketStore.js";
-import {usePackingStore} from "@/stores/HTTP/WMS/PackingStore.js";
+import {usePackingStore} from "@/stores/HTTP/PackingStore.js";
 import QRCode from 'qrcode'
 import {onMounted, ref} from "vue";
 

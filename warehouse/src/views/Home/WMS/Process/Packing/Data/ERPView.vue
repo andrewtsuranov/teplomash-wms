@@ -15,16 +15,22 @@
         >
           TEST (Получить транзакцию)
         </button>
+        <button class="btn btn-outline-info"
+                type="button"
+                @click="handleCheckPallet"
+        >
+          TEST (Проверить паллету)
+        </button>
       </div>
       <div class="erp-settings-filter">
         <div class="form-check">
-          <input class="form-check-input"
-                 type="radio"
-                 name="flexRadioDefault"
-                 id="flexRadioDefault1"
-                 value="КЭВ-6П1264Е"
+          <input id="flexRadioDefault1"
                  v-model="selectedOption"
                  checked
+                 class="form-check-input"
+                 name="flexRadioDefault"
+                 type="radio"
+                 value="КЭВ-6П1264Е"
           >
           <label class="form-check-label"
                  for="flexRadioDefault1"
@@ -34,12 +40,12 @@
         </div>
         <div class="form-check">
           <input
-              class="form-check-input"
-              type="radio"
-              name="flexRadioDefault"
-              value="all"
-              v-model="selectedOption"
               id="flexRadioDefault2"
+              v-model="selectedOption"
+              class="form-check-input"
+              name="flexRadioDefault"
+              type="radio"
+              value="all"
           >
           <label
               class="form-check-label"
@@ -57,15 +63,19 @@
       </div>
     </div>
     <svg-logo-erp class="erp-logo"/>
-    <table-group-unregistered-products :filter = "displayedProducts"/>
+    <table-group-unregistered-products :filter="displayedProducts"/>
   </div>
 </template>
 <script setup>
 import TableGroupUnregisteredProducts from "@/components/Tables/ERP/TableGroupUnregisteredProducts.vue";
 import SvgLogoErp from "@/components/UI/SVG/svgLogoErp.vue";
 import {useWebSocketStore} from "@/stores/WebSockets/WebSocketStore.js";
+import {useUserStore} from "@/stores/HTTP/UserStore.js";
+import {usePackingStore} from "@/stores/HTTP/PackingStore.js";
 import {ref, computed} from "vue";
 
+const packingStore = usePackingStore()
+const userStore = useUserStore()
 const webSocketStore = useWebSocketStore()
 const selectedOption = ref('КЭВ-6П1264Е')
 const displayedProducts = computed(() => {
@@ -76,7 +86,21 @@ const displayedProducts = computed(() => {
         product.product_type.name === selectedOption.value)
   }
 })
-
+const handleCheckPallet = async () => {
+  const data = {
+    "action": "check_pallet",
+    "from_user": userStore.getUserId,
+    "description": '1. Сканируйте зону нахождения паллеты; 2. Сканируйте QR-код паллеты; 3. Сканируйте любое изделие из паллеты;',
+    "loader_id": packingStore.selectedTSD,
+    "warehouse_id": 1,
+    "data": {
+      "to": [],
+      "from": [],
+      "barcodes": []
+    }
+  }
+  await webSocketStore.checkPalletTask(data)
+}
 </script>
 <style scoped>
 .wms-packing-erp-data {
@@ -117,7 +141,7 @@ const displayedProducts = computed(() => {
 
 .erp-settings-group-btn {
   display: grid;
-  grid-template-columns: repeat(2, minmax(auto, max-content));
+  grid-template-columns: repeat(3, minmax(auto, max-content));
   grid-template-rows: minmax(auto, 50px);
   column-gap: 2rem;
 }

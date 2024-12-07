@@ -3,7 +3,7 @@ import {ref} from "vue"
 import ky from "ky";
 import {requestUrls} from "@/stores/request-urls.js";
 import {useErrorStore} from "@/stores/Error/ErrorStore.js";
-import {useUserStore} from '@/stores/HTTP/Auth/UserStore.js'
+import {useUserStore} from '@/stores/HTTP/UserStore.js'
 
 const userStore = useUserStore()
 const kyStd = ky.create({
@@ -45,6 +45,8 @@ export const usePrintingStore = defineStore('printingStore',
         const printStatus = ref(null)
         const selectedPrinter = ref('')
         const selectedQuantity = ref(1)
+        const labelTemplatesList = ref(null)
+        const selectedLabelTemplate = ref('')
         const qrCodeZPL = (body, qty) => {
             return `^XA^FO20,30^BQN,2,7,H,7,Q,S,7^FDQM,${body}^FS^PQ${qty}^XZ`
         }
@@ -64,19 +66,45 @@ export const usePrintingStore = defineStore('printingStore',
                 printersList.value = response
                 return true
             } catch (err) {
-                console.log(err)
-                throw err
+                errorStore.Error = err.message
+                throw err;
             } finally {
                 loading.value = false
             }
         }
-        const printQRCode = async (data, count) => {
+        const getLabelTemplate = async () => {
             loading.value = true;
             errorStore.clearError();
-            const zplData = {
-                "printer": selectedPrinter.value.name,
-                "text": qrCodeZPL(data, count)
+            try {
+                labelTemplatesList.value = await kyPrint('printers/label-templates/').json()
+                return true
+            } catch (err) {
+                errorStore.Error = err.message
+                throw err;
+            } finally {
+                loading.value = false
             }
+        }
+        const printQRCode = async (body) => {
+            loading.value = true;
+            errorStore.clearError();
+           const zplData = {
+               "template_code": selectedLabelTemplate.value,
+               "printer_id": selectedPrinter.value.id,
+               "data": {
+                   "product_name": "Test Product",
+                   "body": body,
+                   "qty": selectedQuantity.value,
+               },
+               "copies": selectedQuantity.value,
+               "priority": 0
+           }
+
+
+            // const zplData = {
+            //     "printer": selectedPrinter.value.name,
+            //     "text": qrCodeZPL(data, count)
+            // }
             try {
                 const response = await kyPrint
                     .post('printers/print_label/',{json:zplData})
@@ -97,9 +125,14 @@ export const usePrintingStore = defineStore('printingStore',
             selectedPrinter,
             selectedQuantity,
             printStatus,
+            errorStore,
+            loading,
+            labelTemplatesList,
+            selectedLabelTemplate,
 //getters
 //actions
             getZPLPrinters,
+            getLabelTemplate,
             printQRCode,
             qrCodeZPL,
             code128ZPL,

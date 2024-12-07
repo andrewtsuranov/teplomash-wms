@@ -1,37 +1,23 @@
 <template>
   <div class="storage-id-container">
     <div class="storage-id-title">
-      <div>Склад {{ storageStore.warehouseData.number }}: {{ storageStore.warehouseData.name }},
-        {{ storageStore.warehouseData.address }} [ Ёмкость: {{ storageStore.warehouseData.max_capacity }} ячеек ]
+      <div>Склад {{ warehouseStore.warehouseData.number }}: {{ warehouseStore.warehouseData.name }},
+           {{ warehouseStore.warehouseData.address }} [ Ёмкость: {{ warehouseStore.warehouseData.max_capacity }} ячеек ]
       </div>
     </div>
-    <div class="storage-id-actions">
-      <router-link class="storage-id-actions-items"
-                   :to="{name: 'wmsPacking'}"
-      >Упаковка
+    <div  class="storage-id-actions">
+
+      <router-link v-for="(process, index) in warehouseStore.customSortByZone"
+                   :to="{name: 'wmsPackingZone'}"
+                   class="storage-id-actions-items"
+      > {{index}}
       </router-link>
-      <router-link class="storage-id-actions-items"
-                   :to="{name: 'wmsReceiving'}"
-      >Приёмка
-      </router-link>
-      <router-link class="storage-id-actions-items"
-                   :to="{name: 'wmsShipping'}"
-      >Отгрузка
-      </router-link>
-      <router-link class="storage-id-actions-items"
-                   :to="{name: 'wmsPicking'}"
-      >Сборка
-      </router-link>
-      <router-link class="storage-id-actions-items"
-                   :to="{name: 'wmsReturns'}"
-      >Возврат
-      </router-link>
-      <router-link class="storage-id-actions-items"
-                   :to="{name: 'wmsInventory'}"
+      <router-link :to="{name: 'wmsInventory'}"
+                   class="storage-id-actions-items"
       >Инвентаризация
       </router-link>
-      <router-link class="storage-id-actions-items"
-                   :to="{name: 'wmsReporting'}"
+      <router-link :to="{name: 'wmsReporting'}"
+                   class="storage-id-actions-items"
       >Аналитика
       </router-link>
     </div>
@@ -41,18 +27,19 @@
   </div>
 </template>
 <script setup>
-import {useStorageStore} from "@/stores/HTTP/WMS/StorageStore.js";
-import {useWebSocketStore} from "@/stores/WebSockets/WebSocketStore.js";
+import {useWarehouseStore} from "@/stores/HTTP/WarehouseStore.js";
 import {onMounted, onUnmounted} from "vue";
+defineProps({
+  id: Number
+})
+const warehouseStore = useWarehouseStore()
+onMounted( async () => {
+  await warehouseStore.GET_ALl_ZONE_TYPES()
+  await warehouseStore.GET_WAREHOUSES_ZONE_BY_ID({
+    warehouse_id: warehouseStore.getWarehouseId
+  })
+})
 
-const webSocketStore = useWebSocketStore()
-const storageStore = useStorageStore()
-onMounted(async () => {
-  await webSocketStore.initWebSocket()
-})
-onUnmounted(async () => {
-  await webSocketStore.disconnect()
-})
 </script>
 <style scoped>
 .storage-id-container {
