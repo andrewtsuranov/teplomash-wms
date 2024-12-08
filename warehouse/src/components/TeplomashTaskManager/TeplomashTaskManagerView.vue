@@ -1,40 +1,46 @@
 <template>
   <div class="teplomash-task-manager-container">
-    <label class="ttm-title">Тепломаш&reg; Task Manager : </label>
-    <div class="ttm-settings">
-      <div class="ttm-setting-panel-isConnected">
-        <span>Статус соединения:</span>
-        <span
-            :class="['status', { 'connected': webSocketStore.isConnected, 'disconnected': !webSocketStore.isConnected }]"
-        >{{ webSocketStore.connectionStatus }}
+    <label class="ttm-title gold-black-block">Тепломаш&reg; Task Manager : </label>
+    <div class="ttm-settings gold-black-block">
+      <div class="ttm-setting-panel">
+        <div class="ttm-setting-panel-items">
+          <span>Статус соединения:</span>
+          <span
+              :class="['status', { 'connected': webSocketStore.isConnected, 'disconnected': !webSocketStore.isConnected }]"
+          >{{ webSocketStore.connectionStatus }}
         </span>
-        <span v-if="webSocketStore.reconnectError"
-              class="error"
-        >Ошибка соединения:
+        </div>
+        <div class="ttm-setting-panel-items">
+          <span v-if="webSocketStore.isConnected"
+          >ТСД в сети:
         </span>
-        <span v-if="webSocketStore.error"
-              class="error"
-        >{{ webSocketStore.error }}
+          <span v-if="webSocketStore.isConnected && webSocketStore.onlineDevices.length"
+                class="online-users-count"
+          >{{ webSocketStore.onlineDevices.length }}
         </span>
-        <span v-if="webSocketStore.reconnectAttempts > 0"
-              class="wsSetting-panel-reconnected"
-        >Попыток соединения:
+          <span v-else-if="webSocketStore.isConnected && !webSocketStore.onlineDevices.length"
+                class="none-users-count non-active-color"
+          >Нет активных ТСД
         </span>
-        <span v-if="webSocketStore.reconnectAttempts > 0"
-              class="reconnected-count"
-        >{{ webSocketStore.reconnectAttempts }} из 5
+        </div>
+        <div class="ttm-setting-panel-items"
+             v-if="webSocketStore.reconnectAttempts > 0"
+        >
+          <span class="wsSetting-panel-reconnected">Попыток соединения:</span>
+          <span class="reconnected-count"
+          >
+            {{ webSocketStore.reconnectAttempts }} из 5
+          </span>
+        </div>
+        <div class="ttm-setting-panel-items"
+             v-if="webSocketStore.reconnectError || webSocketStore.error"
+        >
+          <span class="error">Ошибка соединения:</span>
+          <span class="error"
+          >
+            {{ webSocketStore.error || 'Ошибка' }}
         </span>
-        <span v-if="webSocketStore.isConnected"
-        >ТСД в сети:
-        </span>
-        <span v-if="webSocketStore.isConnected && webSocketStore.onlineDevices.length"
-              class="online-users-count"
-        >{{ webSocketStore.onlineDevices.length }}
-        </span>
-        <span v-else-if="webSocketStore.isConnected && !webSocketStore.onlineDevices.length"
-              class="none-users-count"
-        >Нет активных ТСД
-        </span>
+        </div>
       </div>
       <div class="ttm-settings-button-group">
         <my-button :disabled="webSocketStore.isConnected"
@@ -49,7 +55,7 @@
         </my-button>
       </div>
     </div>
-    <div class="ttm-tsd">
+    <div class="ttm-tsd gold-gray-block">
       <label v-if="!webSocketStore.isConnected" class="ttm-tsd-name-offline">Нет соединения с ТСД</label>
       <div v-else class="ttm-tsd-online">
         <label class="ttm-tsd-header-online">Активные ТСД:</label>
@@ -58,25 +64,38 @@
         >
           <div v-for="device in webSocketStore.onlineDevices"
                :key="device.id"
-               class="ttm-tsd-item-online"
+               class="ttm-tsd-item-online gold-black-block"
           >
-            <router-link :to="{name: 'TTM-packing', params: {tsdID: device.id }}"
+            <router-link :to="{name: 'TTM-packing', query: {id: device.id }}"
                          class="ttm-tsd-item-name-online"
                          @click="packingStore.setSelectedTSD(device.id)"
-            >{{ device.username}} {{ device.current_task }}
+            >
+              <span class="item-title">{{ device.username }}</span>
+              <span :class="{
+                'no-task': device.current_task === null,
+                'has-task': device.current_task !== null
+              }"
+                    class="item-title"
+              >
+                <span v-if="device.current_task === null"
+                      class="circle green"
+                ></span>
+                <span v-else class="circle red"></span>
+                {{ device.current_task ?? 'Задач нет' }}
+              </span>
             </router-link>
           </div>
         </div>
         <div v-if="webSocketStore.isConnected && !webSocketStore.onlineDevices.length"
              class="ttm-tsd-none-online">
-          <label class="ttm-tsd-none-item-online">Список пуст</label>
+          <label class="ttm-tsd-none-item-online non-active-color">Список пуст</label>
         </div>
       </div>
     </div>
-    <div class="ttm-terminal">
+    <div class="ttm-terminal gold-gray-block">
       <div v-if="!webSocketStore.isConnected" class="ttm-terminal-name-offline">Терминал</div>
-      <router-view v-if="webSocketStore.isConnected && route.params.tsdID"></router-view>
-      <div v-if="webSocketStore.isConnected && !route.params.tsdID"
+      <RouterView v-if="webSocketStore.isConnected && route.query.id"/>
+      <div v-if="webSocketStore.isConnected && !route.query.id"
            class="ttm-terminal-name-offline"
       >Выберите активный ТСД
       </div>
@@ -88,6 +107,7 @@ import {useWebSocketStore} from '@/stores/WebSockets/WebSocketStore.js'
 import MyButton from "@/components/UI/MyButton.vue"
 import {usePackingStore} from "@/stores/HTTP/PackingStore.js";
 import {useRouter, useRoute} from "vue-router";
+import {onMounted} from "vue";
 
 const router = useRouter()
 const route = useRoute()
@@ -96,8 +116,16 @@ const packingStore = usePackingStore()
 const handlerDisconnect = () => {
   webSocketStore.disconnect()
 }
-
-
+onMounted(async () => {
+  try {
+    if (!webSocketStore.isConnected) {
+      await webSocketStore.initWebSocket()
+    }
+  } catch (e) {
+    console.log(e)
+    throw e
+  }
+})
 </script>
 <style scoped>
 .teplomash-task-manager-container {
@@ -107,15 +135,23 @@ const handlerDisconnect = () => {
       "settings task"
       "tsd task";
   grid-template-columns: minmax(auto, 1fr) minmax(auto, 1fr);
-  /*grid-template-rows: min-content min-content min-content;*/
+  grid-auto-rows: min-content auto 1fr;
   gap: 1rem;
+}
+
+.gold-black-block {
+  background-color: #0000004a;
+  border: 1px solid #605039e0;
+}
+
+.gold-gray-block {
+  border: 1px solid #605039e0;
+  background-color: #2623238f;
 }
 
 .ttm-title {
   grid-area: title;
-  border: 1px solid #605039e0;
   border-radius: 10px;
-  background-color: #0000004a;
   padding: 0.5rem 2rem;
   font-size: 1.7rem;
 }
@@ -123,17 +159,20 @@ const handlerDisconnect = () => {
 .ttm-settings {
   grid-area: settings;
   display: grid;
-  grid-template-columns: minmax(300px, 1fr);
-  grid-template-rows: minmax(auto, 1fr);
-  align-items: start;
+  grid-template-columns: minmax(auto, 1fr);
+  grid-template-rows: minmax(200px, 1fr) min-content;
   row-gap: 1rem;
-  background-color: #0000004a;
-  border: 1px solid #605039e0;
   border-radius: 10px;
   padding: 1rem;
 }
 
-.ttm-setting-panel-isConnected {
+.ttm-setting-panel {
+  display: grid;
+  grid-template-columns: minmax(auto, 1fr);
+  grid-template-rows: repeat(3, 3rem) auto;
+}
+
+.ttm-setting-panel-items {
   display: grid;
   grid-template-columns: minmax(auto, 1fr) 1fr;
   gap: 1rem;
@@ -141,8 +180,7 @@ const handlerDisconnect = () => {
   font-size: 1.2rem;
 }
 
-.ttm-setting-panel-isConnected span {
-  /*font-weight: bold;*/
+.ttm-setting-panel-items span {
   font-size: 1.2rem;
 }
 
@@ -153,27 +191,8 @@ const handlerDisconnect = () => {
   /*grid-template-columns: 190px 1fr;*/
 }
 
-.online-users-count {
-  font-size: 1.1rem;
-  font-weight: bold;
-  color: #4CAF50;
-}
-
-.none-users-count {
-  font-size: 1.1rem;
-  font-weight: bold;
+.non-active-color {
   color: #514D4C;
-}
-
-.none-active-tsd {
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: #514D4C;
-}
-
-.reconnected-count {
-  font-size: 1.1rem;
-  font-weight: bold;
 }
 
 .ttm-settings-button-group {
@@ -182,53 +201,50 @@ const handlerDisconnect = () => {
   column-gap: 2rem;
 }
 
-.status {
-  font-weight: bold;
-  font-size: 1.1rem;
-}
-
-.status.connected {
+.green,
+.status.connected,
+.no-task,
+.my-btn-connect,
+.my-btn-connect:hover,
+.ttm-tsd-header-online,
+.online-users-count {
   color: #4CAF50;
 }
 
-.my-btn-connect {
-  color: #4CAF50;
-  border: 1px solid #605039e0;
-  border-radius: 20px;
-}
-
-.my-btn-connect:hover {
-  background-color: rgba(50, 50, 50, 0.6);
-  color: #4CAF50;
-}
-
-.status.disconnected {
-  color: red;
-}
-
-.my-btn-disconnect {
-  color: red;
-  border: 1px solid #605039e0;
-  border-radius: 20px;
-}
-
-.my-btn-disconnect:hover {
-  background-color: rgba(50, 50, 50, 0.6);
-  color: red;
-}
-
+.red,
+.status.disconnected,
+.my-btn-disconnect,
+.my-btn-disconnect:hover,
 .error {
+  color: red;
+}
+
+.status,
+.error,
+.ttm-tsd-item-name-online .item-title,
+.reconnected-count,
+.online-users-count,
+.none-users-count {
   font-weight: bold;
   font-size: 1.1rem;
-  color: red;
+}
+
+.my-btn-connect,
+.my-btn-disconnect {
+  border: 1px solid #605039e0;
+  border-radius: 20px;
+}
+
+.my-btn-connect:hover,
+.my-btn-disconnect:hover,
+.ttm-tsd-item-name-online:hover {
+  background-color: rgba(50, 50, 50, 0.6);
 }
 
 .ttm-tsd {
   grid-area: tsd;
   display: grid;
   grid-template-rows: minmax(3rem, 1fr);
-  border: 1px solid #605039e0;
-  background-color: #2623238f;
   border-radius: 10px;
   font-size: 1.2rem;
 }
@@ -248,13 +264,7 @@ const handlerDisconnect = () => {
   color: #514D4C;
 }
 
-.ttm-tsd-online {
-}
-
 .ttm-tsd-header-online {
-  /*display: grid;*/
-  /*align-items: center;*/
-  color: #4CAF50;
   font-weight: bold;
   padding: .5rem 1rem;
   border-bottom: 1px solid #605039e0;
@@ -267,8 +277,6 @@ const handlerDisconnect = () => {
 
 .ttm-tsd-item-online {
   display: grid;
-  border-bottom: 1px solid #605039e0;
-  background-color: #0000004a;
   align-items: stretch;
 }
 
@@ -278,15 +286,10 @@ const handlerDisconnect = () => {
 
 .ttm-tsd-item-name-online {
   display: grid;
+  grid-template-columns: 1fr 1fr;
   align-items: center;
-  padding: 0 0.7rem;
-  font-size: 1rem;
-  font-weight: bold;
+  padding: 0 1rem;
   color: #ffffffbf;
-}
-
-.ttm-tsd-item-name-online:hover {
-  background-color: rgba(50, 50, 50, 0.6);
 }
 
 .ttm-tsd-none-online {
@@ -297,7 +300,6 @@ const handlerDisconnect = () => {
 .ttm-tsd-none-item-online {
   font-size: 1.5rem;
   font-weight: bold;
-  color: #514D4C;
 }
 
 .ttm-terminal {
@@ -305,8 +307,6 @@ const handlerDisconnect = () => {
   display: grid;
   grid-template-columns: minmax(auto, 1fr);
   grid-template-rows: minmax(33.1rem, 1fr);
-  border: 1px solid #605039e0;
-  background-color: #2623238f;
   border-radius: 10px;
   overflow-y: auto;
 }
@@ -342,7 +342,7 @@ a:active {
     font-size: 1.5rem;
   }
 
-  .ttm-setting-panel-isConnected {
+  .ttm-setting-panel-items {
     font-size: 1rem;
   }
 

@@ -2,10 +2,12 @@ import {defineStore} from 'pinia'
 import {useUserStore} from '@/stores/HTTP/UserStore.js'
 import {computed, ref} from "vue";
 import {useTransactionStore} from "@/stores/WebSockets/transactionStore.js";
+import {usePackingStore} from "@/stores/HTTP/PackingStore.js";
 
 export const useWebSocketStore = defineStore('websocket', () => {
 //Подключаем UserStore
     const userStore = useUserStore()
+    const packingStore = usePackingStore()
     const transactionStore = useTransactionStore()
 //State
     const socket = ref(null)

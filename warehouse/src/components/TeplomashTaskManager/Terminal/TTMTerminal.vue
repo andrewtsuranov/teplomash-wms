@@ -1,18 +1,34 @@
 <template>
   <div class="ttm-terminal-container">
-    <div class="ttm-terminal-active-tsd">Выбран: ТСД № {{ tsdID }}</div>
+    <div class="ttm-terminal-active-tsd"> {{ getDeviceById?.username }}</div>
     <div class="ttm-terminal-view">
-        <div class="ttm-terminal-view-status">
-        <span>Текущая задача:</span>
-        <div v-if="webSocketStore.transactionStatus?.assigned_to === Number(tsdID)"
-        >{{ webSocketStore.transactionStatus?.transaction_type }}
+      <div v-if="transactionStore.currentTransactions.length > 0"
+           class="ttm-terminal-view-status">
+        <span>Задача:</span>
+        <div>
+          {{ lastTransactionTaskTranslated.toUpperCase() }}
         </div>
-          <span>Текущая задача:</span>
-          <div v-if="webSocketStore.transactionStatus?.assigned_to === Number(tsdID)"
-          >{{ webSocketStore.transactionStatus?.status }}
-          </div>
+        <span>Инициатор:</span>
+        <div>
+          {{ foundUserById?.lastName }} {{ foundUserById?.initialsDot }}
         </div>
-
+        <span>Место сборки:</span>
+        <div>
+          {{ transactionStore.lastTransaction?.warehouse_id }}
+        </div>
+        <span>Статус выполнение:</span>
+        <div :style="{ color: lastTransactionStatusColor }">
+          {{ lastTransactionStatusTranslated }}
+        </div>
+        <span>Создано:</span>
+        <div>
+          {{ formatTimestamp(transactionStore.lastTransaction?.timestamp).date }}
+          {{ formatTimestamp(transactionStore.lastTransaction?.timestamp).time }}
+        </div>
+      </div>
+      <div v-else>
+        Нет транзакций
+      </div>
     </div>
     <!--    <div class="ttm-terminal-confirmed input-group input-group">-->
     <!--      <input v-model="message"-->
@@ -33,14 +49,54 @@
 </template>
 <script setup>
 import {useWebSocketStore} from '@/stores/WebSockets/WebSocketStore.js'
+import {useTransactionStore} from "@/stores/WebSockets/transactionStore.js";
 import {usePackingStore} from "@/stores/HTTP/PackingStore.js";
 import {useUserStore} from "@/stores/HTTP/UserStore.js";
+import {useRoute} from "vue-router";
+import {computed} from "vue";
+import {useFormatDate} from "@/composables/Date/useFormatDate.js";
 
+const {formattedDateTime, formatTimestamp} = useFormatDate();
+const transactionStore = useTransactionStore()
+const route = useRoute()
 const userStore = useUserStore()
 const packingStore = usePackingStore()
 const webSocketStore = useWebSocketStore()
-defineProps({
-  tsdID: String
+const tsdID = route.query.id;
+const statusColors = {
+  PENDING: '#536AF9',
+  IN_PROGRESS: '#ecaf0e',
+  CANCELLED: '#e80f0f',
+  COMPLETED: '#4CAF50',
+}
+const statusTranslations = {
+  PENDING: 'Ожидает подтверждение',
+  IN_PROGRESS: 'В процессе сборки',
+  CANCELLED: 'Отменено',
+  COMPLETED: 'Завершено',
+}
+const taskTranslations = {
+  ADD_PALLET: 'Собрать паллету',
+}
+const getDeviceById = computed(() => {
+  if (packingStore.selectedTSD !== null) {
+    return webSocketStore.onlineDevices.find(device => device.id === packingStore.selectedTSD);
+  } else {
+    return null;
+  }
+})
+const foundUserById = computed(() => userStore.getUserById(transactionStore.lastTransaction.created_by_id));
+const lastTransactionStatusColor = computed(() => {
+  const lastTransaction = transactionStore.lastTransaction;
+  return lastTransaction ? statusColors[lastTransaction.status] || 'gray' : 'gray';
+})
+const lastTransactionStatusTranslated = computed(() => {
+  const lastTransaction = transactionStore.lastTransaction;
+  return lastTransaction ? statusTranslations[lastTransaction.status] || lastTransaction.status : '';
+})
+const lastTransactionTaskTranslated = computed(() => {
+  const lastTransaction = transactionStore.lastTransaction;
+  return lastTransaction ? taskTranslations[lastTransaction.transaction_type] || lastTransaction.transaction_type : '';
 })
 </script>
 <style scoped>
@@ -71,9 +127,8 @@ defineProps({
 .ttm-terminal-view-status {
   display: grid;
   grid-template-columns: auto 1fr;
-  grid-auto-rows: 1fr;
+  grid-auto-rows: min-content;
   column-gap: 1rem;
-
 }
 
 @media (max-width: 800px) {

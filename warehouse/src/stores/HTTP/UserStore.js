@@ -71,6 +71,13 @@ export const useUserStore = defineStore('userStore', () => {
     const getTokenAccess = computed(() => user.value?.access);
     const getUserId = computed(() => user.value?.user?.id);
     const getUserEmail = computed(() => user.value?.user?.email);
+    const getUserById = computed(() => (id) => {
+        if (user.value.user && user.value.user.id === id) {
+            return getFullNameUser.value;
+        } else {
+            return null; // Или undefined, в зависимости от ваших предпочтений
+        }
+    });
 //actions
     const LOGIN = async (credentials) => {
         loading.value = true;
@@ -189,6 +196,7 @@ export const useUserStore = defineStore('userStore', () => {
         loading,
         tempPassword,
         isAuthenticated,
+        getUserById,
         LOGIN,
         SIGNUP,
         VERIFY,

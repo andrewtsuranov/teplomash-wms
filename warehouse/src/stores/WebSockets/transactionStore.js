@@ -4,8 +4,16 @@ import {useWebSocketStore} from "@/stores/WebSockets/WebSocketStore.js";
 
 export const useTransactionStore = defineStore('transaction', () => {
     const webSocketStore = useWebSocketStore()
-    // In-memory reactive state
+    // State
     const currentTransactions = ref([])
+    //Getters
+    const lastTransaction = computed(() => {
+        if (currentTransactions.value.length > 0) {
+            return currentTransactions.value[0];
+        } else {
+            return null;
+        }
+    });
     // Persistent storage using localStorage
     const loadPersistedTransactions = () => {
         const saved = localStorage.getItem('transactions')
@@ -53,6 +61,7 @@ export const useTransactionStore = defineStore('transaction', () => {
     return {
         currentTransactions,
         recentTransactions,
+        lastTransaction,
         addTransaction,
         updateTransactionStatus,
         clearOldTransactions

@@ -1,8 +1,8 @@
 <template>
   <div class="process-zone-container">
     <div v-for="item in zones" :key="item.code" class="process-zone">
-      <router-link :to="{ name: processRouteName, params: { code: item.code } }">
-        {{ item.name.replace(/_/g, ' ') }}
+      <router-link :to="{ name: processRouteName, params: { code: item.code.toLowerCase() } }">
+        {{ item.name.replace(/_/g, ' ') }} ({{ item.code }})
       </router-link>
     </div>
     <RouterView/>

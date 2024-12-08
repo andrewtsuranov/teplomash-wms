@@ -1,11 +1,12 @@
 import {useErrorStore} from "@/stores/Error/ErrorStore.js"
 import {defineStore} from 'pinia'
-import {ref} from "vue"
+import {computed, ref} from "vue"
 
 export const usePackingStore = defineStore('packingStore', () => {
     const loading = ref(false)
     const errorStore = useErrorStore()
     const selectedTSD = ref(JSON.parse(localStorage.getItem('selectedTsd')) || null)
+    const packingId = ref(JSON.parse(localStorage.getItem('packingId')) || null)
     const dataYYYYMMDD = ref(new Date().toISOString().slice(0, 10));
 //state
     const palletData = {
@@ -34,8 +35,6 @@ export const usePackingStore = defineStore('packingStore', () => {
         selectedTSD.value = tsdId
         localStorage.setItem('selectedTsd', JSON.stringify(tsdId))
     }
-
-
     return {
 //state
         errorStore,
@@ -44,6 +43,7 @@ export const usePackingStore = defineStore('packingStore', () => {
         palletData,
         palletStatus,
         selectedTSD,
+        packingId,
 //getters
 //actions
         setSelectedTSD,

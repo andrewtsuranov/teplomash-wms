@@ -6,6 +6,7 @@
     <div v-if="userStore.loading">Loading...</div>
     <div v-else></div>
     <main class="home-layout-main">
+      <Breadcrumbs/>
       <router-view></router-view>
     </main>
   </div>
@@ -13,6 +14,7 @@
 <script setup>
 import HeaderView from "@/views/Header/NavbarView.vue";
 import {useUserStore} from "@/stores/HTTP/UserStore.js";
+import Breadcrumbs from "@/components/Breadcrumbs/Breadcrumbs.vue";
 
 const userStore = useUserStore()
 </script>
@@ -39,7 +41,7 @@ const userStore = useUserStore()
 .home-layout-main {
   display: grid;
   grid-template-columns: 1fr;
-  grid-template-rows: 1fr;
+  grid-template-rows: min-content 1fr;
   padding: 2rem 0;
   background-color: #514D4C5E;
 }

@@ -23,7 +23,7 @@
         <td>
           <button class="btn btn-outline-success"
                   @click="handleCreatePallet(item.items, item.product_type.pallet_types, item.product_type)"
-          >Создать паллету
+          >Собрать паллету
           </button>
         </td>
         <td>

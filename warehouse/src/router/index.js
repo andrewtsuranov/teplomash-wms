@@ -30,12 +30,18 @@ const router = createRouter({
             path: '/admin',
             name: 'Admin',
             component: () => import('@/layouts/AdminLayout.vue'),
-            meta: {adminOnly: true},
+            meta: {
+                adminOnly: true,
+                breadcrumb: 'Профиль пользователя'
+            },
         },
         {
             path: '/',
             component: () => import('@/layouts/HomeLayout.vue'),
-            meta: {requiresAuth: true},
+            meta: {
+                requiresAuth: true,
+                breadcrumb: 'Главная'
+            },
             children: [
                 {
                     path: '',
@@ -46,24 +52,28 @@ const router = createRouter({
                     path: 'warehouses',
                     name: 'WMS',
                     component: () => import('@/views/Home/WMS/WarehousesView.vue'),
+                    meta: {breadcrumb: 'Склады'},
                 },
                 {
                     path: 'warehouse/:alias',
                     name: 'WMSProcess',
                     component: () => import('@/views/Home/WMS/Process/WarehouseProcess.vue'),
                     props: true,
+                    meta: {breadcrumb: 'Процессы'},
                     children: [
                         {
                             path: 'packing',
                             name: 'wmsPackingZone',
                             component: () => import('@/views/Home/WMS/Process/ProcessZones.vue'),
-                            props: {process: 'Упаковка', processRouteName: 'wmsPacking'}
+                            props: {process: 'Упаковка', processRouteName: 'wmsPacking'},
+                            meta: {breadcrumb: 'Сборка'},
                         },
                         {
                             path: 'receiving',
                             name: 'wmsReceivingZone',
                             component: () => import('@/views/Home/WMS/Process/ProcessZones.vue'),
-                            props: {process: 'Приёмка', processRouteName: 'wmsReceiving'}
+                            props: {process: 'Приёмка', processRouteName: 'wmsReceiving'},
+                            meta: {breadcrumb: 'Приёмка'}
                         },
                         {
                             path: 'storage',
@@ -96,12 +106,11 @@ const router = createRouter({
                             props: true,
                             children: [
                                 {
-                                    path: 'pac-tsd#:tsdID',
+                                    path: 'tsd',
                                     name: 'TTM-packing',
                                     components: {
                                         default: () => import('@/components/TeplomashTaskManager/Terminal/TTMTerminal.vue'),
                                     },
-                                    props: {default: true}
                                 },
                             ]
                         },
@@ -162,12 +171,14 @@ const router = createRouter({
                 {
                     path: 'info',
                     name: 'Info',
-                    component: () => import('@/views/Home/About/AboutView.vue')
+                    component: () => import('@/views/Home/About/AboutView.vue'),
+                    meta: {breadcrumb: 'О нас'},
                 },
                 {
                     path: 'support',
                     name: 'Support',
-                    component: () => import('@/views/Home/Support/SupportView.vue')
+                    component: () => import('@/views/Home/Support/SupportView.vue'),
+                    meta: {breadcrumb: 'Поддержка'},
                 },
             ],
         },

@@ -1,6 +1,6 @@
 <template>
   <div class="wms-packing-container">
-    <h1>Упаковка: {{ code }}</h1>
+    <h1>Упаковка: {{ code.toUpperCase() }}</h1>
     <e-r-p-view/>
     <TeplomashTaskManagerView/>
     <pallet-data/>
@@ -10,9 +10,14 @@
 import TeplomashTaskManagerView from "@/components/TeplomashTaskManager/TeplomashTaskManagerView.vue";
 import PalletData from "@/components/PalletData/PalletData.vue";
 import ERPView from "@/views/Home/WMS/Process/Packing/Data/ERPView.vue";
+import {useRoute, useRouter} from 'vue-router';
+import {usePackingStore} from "@/stores/HTTP/PackingStore.js";
 
+const route = useRoute();
+const router = useRouter();
+const packingStore = usePackingStore();
 defineProps({
-  code: String
+  code: String,
 })
 </script>
 <style scoped>
