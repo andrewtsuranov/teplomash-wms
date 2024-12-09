@@ -142,7 +142,8 @@ const handleCreatePallet = async (products, palletType, productName) => {
     "loader_id": packingStore.selectedTSD,
     "warehouse_id": 1,
     "data": {
-      "zone": "PAC-01",
+      "to_zone": "PAC-01",
+      "from_zone": "PAC-01",
       "count": 2,
       "to": [],
       "from": [],

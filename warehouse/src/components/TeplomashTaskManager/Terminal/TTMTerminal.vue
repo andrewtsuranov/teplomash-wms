@@ -2,11 +2,11 @@
   <div class="ttm-terminal-container">
     <div class="ttm-terminal-active-tsd"> {{ getDeviceById?.username }}</div>
     <div class="ttm-terminal-view">
-      <div v-if="transactionStore.currentTransactions.length > 0"
+      <div v-if="transactionStore.currentTransactions.length > 0 && transactionStore.lastTransaction?.assigned_to_id === getDeviceById?.id"
            class="ttm-terminal-view-status">
         <span>Задача:</span>
         <div>
-          {{ lastTransactionTaskTranslated.toUpperCase() }}
+          {{ transactionTaskTranslated.toUpperCase() }}
         </div>
         <span>Инициатор:</span>
         <div>
@@ -17,8 +17,8 @@
           {{ transactionStore.lastTransaction?.warehouse_id }}
         </div>
         <span>Статус выполнение:</span>
-        <div :style="{ color: lastTransactionStatusColor }">
-          {{ lastTransactionStatusTranslated }}
+        <div :style="{ color: transactionColor}" style="font-weight: bold">
+          {{ transactionStatusTranslated }}
         </div>
         <span>Создано:</span>
         <div>
@@ -55,7 +55,11 @@ import {useUserStore} from "@/stores/HTTP/UserStore.js";
 import {useRoute} from "vue-router";
 import {computed} from "vue";
 import {useFormatDate} from "@/composables/Date/useFormatDate.js";
+import {useTranslationsDictionary} from "@/composables/Dictionary/useTransactionsDictionary.js";
+import {useTransactionsColorDictionary} from "@/composables/Dictionary/useTransactionsColorDictionary.js";
 
+const transactionsColorDictionary = useTransactionsColorDictionary
+const translationsDictionary = useTranslationsDictionary
 const {formattedDateTime, formatTimestamp} = useFormatDate();
 const transactionStore = useTransactionStore()
 const route = useRoute()
@@ -63,21 +67,8 @@ const userStore = useUserStore()
 const packingStore = usePackingStore()
 const webSocketStore = useWebSocketStore()
 const tsdID = route.query.id;
-const statusColors = {
-  PENDING: '#536AF9',
-  IN_PROGRESS: '#ecaf0e',
-  CANCELLED: '#e80f0f',
-  COMPLETED: '#4CAF50',
-}
-const statusTranslations = {
-  PENDING: 'Ожидает подтверждение',
-  IN_PROGRESS: 'В процессе сборки',
-  CANCELLED: 'Отменено',
-  COMPLETED: 'Завершено',
-}
-const taskTranslations = {
-  ADD_PALLET: 'Собрать паллету',
-}
+
+
 const getDeviceById = computed(() => {
   if (packingStore.selectedTSD !== null) {
     return webSocketStore.onlineDevices.find(device => device.id === packingStore.selectedTSD);
@@ -86,17 +77,18 @@ const getDeviceById = computed(() => {
   }
 })
 const foundUserById = computed(() => userStore.getUserById(transactionStore.lastTransaction.created_by_id));
-const lastTransactionStatusColor = computed(() => {
+
+const transactionColor = computed(() => {
   const lastTransaction = transactionStore.lastTransaction;
-  return lastTransaction ? statusColors[lastTransaction.status] || 'gray' : 'gray';
+  return lastTransaction ? transactionsColorDictionary[lastTransaction.status] || 'gray' : 'gray';
 })
-const lastTransactionStatusTranslated = computed(() => {
+const transactionStatusTranslated = computed(() => {
   const lastTransaction = transactionStore.lastTransaction;
-  return lastTransaction ? statusTranslations[lastTransaction.status] || lastTransaction.status : '';
+  return lastTransaction ? translationsDictionary[lastTransaction.status] || lastTransaction.status : '';
 })
-const lastTransactionTaskTranslated = computed(() => {
+const transactionTaskTranslated = computed(() => {
   const lastTransaction = transactionStore.lastTransaction;
-  return lastTransaction ? taskTranslations[lastTransaction.transaction_type] || lastTransaction.transaction_type : '';
+  return lastTransaction ? translationsDictionary[lastTransaction.transaction_type] || lastTransaction.transaction_type : '';
 })
 </script>
 <style scoped>

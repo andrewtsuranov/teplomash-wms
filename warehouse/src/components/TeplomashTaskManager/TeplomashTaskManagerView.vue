@@ -10,10 +10,10 @@
           >{{ webSocketStore.connectionStatus }}
         </span>
         </div>
-        <div class="ttm-setting-panel-items">
-          <span v-if="webSocketStore.isConnected"
-          >ТСД в сети:
-        </span>
+        <div class="ttm-setting-panel-items"
+             v-if="webSocketStore.isConnected"
+        >
+          <span>ТСД в сети:</span>
           <span v-if="webSocketStore.isConnected && webSocketStore.onlineDevices.length"
                 class="online-users-count"
           >{{ webSocketStore.onlineDevices.length }}
@@ -23,8 +23,8 @@
           >Нет активных ТСД
         </span>
         </div>
-        <div class="ttm-setting-panel-items"
-             v-if="webSocketStore.reconnectAttempts > 0"
+        <div v-if="webSocketStore.reconnectAttempts > 0"
+             class="ttm-setting-panel-items"
         >
           <span class="wsSetting-panel-reconnected">Попыток соединения:</span>
           <span class="reconnected-count"
@@ -32,8 +32,8 @@
             {{ webSocketStore.reconnectAttempts }} из 5
           </span>
         </div>
-        <div class="ttm-setting-panel-items"
-             v-if="webSocketStore.reconnectError || webSocketStore.error"
+        <div v-if="webSocketStore.reconnectError || webSocketStore.error"
+             class="ttm-setting-panel-items"
         >
           <span class="error">Ошибка соединения:</span>
           <span class="error"
@@ -77,11 +77,11 @@
               }"
                     class="item-title"
               >
-                <span v-if="device.current_task === null"
-                      class="circle green"
-                ></span>
-                <span v-else class="circle red"></span>
-                {{ device.current_task ?? 'Задач нет' }}
+                <i v-if="device.current_task === null"
+                   class="bi bi-circle-fill"
+                ></i>
+                <i v-else class="bi bi-circle-fill"></i>
+                {{ device.current_task?.type ?? 'Доступен' }}
               </span>
             </router-link>
           </div>
@@ -215,6 +215,7 @@ onMounted(async () => {
 .status.disconnected,
 .my-btn-disconnect,
 .my-btn-disconnect:hover,
+.has-task,
 .error {
   color: red;
 }

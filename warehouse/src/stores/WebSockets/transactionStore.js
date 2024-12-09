@@ -6,6 +6,7 @@ export const useTransactionStore = defineStore('transaction', () => {
     const webSocketStore = useWebSocketStore()
     // State
     const currentTransactions = ref([])
+
     //Getters
     const lastTransaction = computed(() => {
         if (currentTransactions.value.length > 0) {
