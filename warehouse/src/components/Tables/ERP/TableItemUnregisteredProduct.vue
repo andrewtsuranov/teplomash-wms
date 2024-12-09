@@ -1,93 +1,43 @@
 <template>
-  <div v-if="processedData.length > 0">
-    <table>
-      <thead>
-      <tr>
-        <th>Код</th>
-        <th>Название</th>
-        <th>Количество элементов</th>
-        <th>Дата</th>
-        <th>Действия</th>
-      </tr>
-      </thead>
-      <tbody>
-      <template
-          v-for="group in processedData"
-          :key="group.product_type.code"
-      >
-        <!-- Основная строка -->
-        <tr>
-          <td>{{ group.product_type.code }}</td>
-          <td>{{ group.product_type.name }}</td>
-          <td>{{ group.items_count }}</td>
-          <td>{{ group.earliest_date }}</td>
-          <td>
-            <button
-                @click="group.expanded.value = !group.expanded.value"
-            >
-              {{ group.expanded.value ? 'Скрыть' : 'Показать' }} детали
-            </button>
-          </td>
-        </tr>
-        <!-- Подтаблица -->
-        <tr v-if="group.expanded.value">
-          <td colspan="5">
-            <table>
-              <thead>
-              <tr>
-                <th>№</th>
-                <th>Название</th>
-                <th>Штрихкод</th>
-                <th>Дата</th>
-              </tr>
-              </thead>
-              <tbody>
-              <tr
-                  v-for="(item, index) in group.items"
-                  :key="item.id || index"
-              >
-                <td>{{ index + 1 }}</td>
-                <td>{{ group.product_type.name }}</td>
-                <td>{{ item.barcode }}</td>
-                <td>{{ item.created_at }}</td>
-              </tr>
-              </tbody>
-            </table>
-          </td>
-        </tr>
-      </template>
-      </tbody>
-    </table>
-  </div>
+  <table v-if="ERPStore.unregProductByID"
+         class="table-content table table-dark table-hover"
+  >
+    <thead class="table-info">
+    <tr>
+      <th>№</th>
+      <th>Название</th>
+      <th>Штрихкод</th>
+      <th>Тип паллеты</th>
+      <th>Дата</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr v-for="(item, index) in ERPStore.unregProductByID?.items" :key="index">
+      <td>{{ index + 1 }}</td>
+      <td>{{ ERPStore.unregProductByID?.product_type?.name }}</td>
+      <td>
+        <template v-if="ERPStore.getItemBarcode && ERPStore.getItemBarcode[index]">
+          {{ ERPStore.getItemBarcode[index]?.barcode }}
+        </template>
+      </td>
+      <td>
+        <template v-if="ERPStore.getItemPalletType && ERPStore.getItemPalletType[0]">
+          {{ ERPStore.getItemPalletType[0].name }}
+        </template>
+      </td>
+      <td>{{ useSplitDateByT(item.created_at).date }} {{ useSplitDateByT(item.created_at).time }}</td>
+    </tr>
+    </tbody>
+  </table>
   <div v-else>
     Нет данных для отображения
   </div>
 </template>
 <script setup>
-import {useWebSocketStore} from "@/stores/WebSockets/WebSocketStore.js";
 import {useERPStore} from "@/stores/HTTP/ERPStore.js";
-import {computed, ref} from "vue";
+import {useSplitDateByT} from "@/composables/SpliDateByT.js";
 
-const webSocketStore = useWebSocketStore()
 const ERPStore = useERPStore()
-const searchQuery = ref('')
-// Безопасная обработка данных
-const processedData = computed(() => {
-  const selectedItem = ERPStore.selectedItemUnregisteredProduct
-  // Проверяем существование и тип данных
-  const data = webSocketStore.wsGroupUnregProduct[selectedItem]
-
-  // Если data не массив, преобразуем в массив или возвращаем пустой массив
-  const dataArray = Array.isArray(data) ? data : data ? [data] : []
-  const filteredData = dataArray.filter(group =>
-      group.product_type.name.toLowerCase().includes(searchQuery.value.toLowerCase())
-  )
-  return filteredData.map(group => ({
-    ...group,
-    expanded: ref(false),
-    itemsCount: group.items?.length || 0
-  }))
-})
 </script>
 <style scoped>
 table {
@@ -95,8 +45,13 @@ table {
   border-collapse: collapse;
 }
 
+table thead {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
 th, td {
-  border: 1px solid #ddd;
   padding: 8px;
   text-align: left;
 }

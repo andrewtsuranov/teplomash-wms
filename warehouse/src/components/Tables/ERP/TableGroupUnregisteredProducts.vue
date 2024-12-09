@@ -12,103 +12,111 @@
       </tr>
       </thead>
       <tbody>
-      <tr v-for="(item, index) in filter" :key="index">
-        <modal-detail-unregisterd-product/>
-        <th scope="row">{{ index + 1 }}</th>
-        <td data-bs-target="#modalDetailUnregisteredProduct" data-bs-toggle="modal"
-            @click="ERPStore.getIDUnregProduct(index)">
-          {{ item.product_type.name }}
-        </td>
-        <td>{{ item.items_count }}</td>
-        <td>
-          <button class="btn btn-outline-success"
-                  @click="handleCreatePallet(item.items, item.product_type.pallet_types, item.product_type)"
-          >Собрать паллету
-          </button>
-        </td>
-        <td>
-          <button class="btn btn-outline-primary" data-bs-target="#settingsPrintModal" data-bs-toggle="modal"
-                  @click="handlerPrint"
-          >Печать Barcode
-          </button>
-          <!-- Modal -->
-          <div id="settingsPrintModal" aria-hidden="true" aria-labelledby="settingsPrintModal" class="modal fade"
-               data-bs-theme="dark" tabindex="-1">
-            <div class="modal-dialog  modal-dialog-centered">
-              <div class="modal-content">
-                <div class="modal-header">
-                  <h1 id="settingsPrintLabel" class="modal-title fs-5">Параметры печати</h1>
-                  <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"></button>
-                </div>
-                <div class="modal-body">
-                  <div class="printer-settings-container">
-                    <label>Сетевой принтер:</label>
-                    <div>
-                      <select
-                          v-model="printingStore.selectedPrinter"
-                          aria-label="Выберите принтер"
-                          class="form-select"
-                      >
-                        <option disabled value="">Выберите принтер...</option>
-                        <option
-                            v-for="(print, ip) in printingStore.printersList?.printers"
-                            :key="ip"
-                            :value="print"
+      <template v-for="(item, index) in filter" :key="index">
+        <tr>
+          <th scope="row">{{ index + 1 }}</th>
+          <td data-bs-target="#modalDetailUnregisteredProduct" data-bs-toggle="modal"
+              @click="ERPStore.getIDUnregProduct(index)">
+            {{ item.product_type.name }}
+          </td>
+          <td>{{ item.items_count }}</td>
+          <td>
+            <button class="btn btn-outline-success"
+                    @click="handleCreatePallet(item.items, item.product_type.pallet_types, item.product_type)"
+            >Собрать паллету
+            </button>
+          </td>
+          <td>
+            <button class="btn btn-outline-primary" data-bs-target="#settingsPrintModal" data-bs-toggle="modal"
+                    @click="handlerPrint(item.product_type.code)"
+            >Печать Barcode
+            </button>
+            <!-- Modal Print Settings -->
+            <div id="settingsPrintModal" aria-hidden="true" aria-labelledby="settingsPrintModal" class="modal fade"
+                 data-bs-theme="dark" tabindex="-1">
+              <div class="modal-dialog  modal-dialog-centered">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h1 id="settingsPrintLabel" class="modal-title fs-5">Параметры печати</h1>
+                    <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+                  </div>
+                  <div class="modal-body">
+                    <div class="printer-settings-container">
+                      <label>Сетевой принтер:</label>
+                      <div>
+                        <select
+                            v-model="printingStore.selectedPrinter"
+                            aria-label="Выберите принтер"
+                            class="form-select"
                         >
-                          {{ print.model }} ({{ print.name }})
+                          <option disabled value="">Выберите принтер...</option>
+                          <option
+                              v-for="(print, ip) in printingStore.printersList?.printers"
+                              :key="ip"
+                              :value="print"
+                          >
+                            {{ print.model }} ({{ print.name }})
+                          </option>
+                        </select>
+                      </div>
+                      <label>Тип печати:</label>
+                      <select class="form-select"
+                              v-model="printingStore.selectedLabelTemplate"
+                      >
+                        <option disabled value="">Выберите шаблон этикетки...</option>
+                        <option
+                            v-for="(label, id) in printingStore.labelTemplatesList"
+                            :key="id"
+                            :value="label.code"
+                        >
+                          {{ label.name }}
                         </option>
                       </select>
+                      <label>Кол-во этикеток:</label>
+                      <div class="counter">
+                        <button @click="decrement">&ndash;</button>
+                        <input v-model.number.trim="count" min="1" v-on:keypress="useNumbersOnlyWithoutDot"/>
+                        <button @click="increment">+</button>
+                      </div>
+                      <label>Статус: печати:</label>
+                      <div v-if="printingStore.printStatus?.status" :style="'color: green;' ">Отправлено на печать
+                      </div>
+                      <div v-else>Готов к печати</div>
                     </div>
-                    <label>Тип печати:</label>
-                    <select class="form-select"
-                            v-model="printingStore.selectedLabelTemplate"
-                    >
-                      <option disabled value="">Выберите шаблон этикетки...</option>
-                      <option
-                          v-for="(label, id) in printingStore.labelTemplatesList"
-                          :key="id"
-                          :value="label.code"
-                      >
-                        {{ label.name }}
-                      </option>
-                    </select>
-                    <label>Кол-во этикеток:</label>
-                    <div class="counter">
-                      <button @click="decrement">&ndash;</button>
-                      <input v-model.number.trim="count" min="1" v-on:keypress="useNumbersOnlyWithoutDot"/>
-                      <button @click="increment">+</button>
-                    </div>
-                    <label>Статус: печати:</label>
-                    <div v-if="printingStore.printStatus?.status" :style="'color: green;' ">Отправлено на печать
-                    </div>
-                    <div v-else>Готов к печати</div>
                   </div>
-                </div>
-                <div class="modal-footer">
-                  <button class="btn btn-outline-secondary"
-                          data-bs-dismiss="modal"
-                          type="button"
-                  >
-                    Отменить
-                  </button>
-                  <button class="btn btn-outline-info"
-                          type="button"
-                          @click="handPrintingLabel()"
-                  >
-                    Печать
-                  </button>
+                  <div class="modal-footer">
+                    <button class="btn btn-outline-secondary"
+                            data-bs-dismiss="modal"
+                            type="button"
+                    >
+                      Отменить
+                    </button>
+                    <button class="btn btn-outline-info"
+                            type="button"
+                            @click="handPrintingLabel()"
+                    >
+                      Печать
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        </td>
-        <td>
-          <button class="btn btn-outline-primary"
-                  @click="ERPStore.getItemUnregProductByID(index)"
-          >Раскрыть список {{ ERPStore.getListItemBarcode }}
-          </button>
-        </td>
-      </tr>
+          </td>
+          <td>
+            <button class="btn btn-outline-primary"
+                    @click="toggleTable(item.product_type.code);"
+            >
+              {{ openedItemCode === item.product_type.code ? 'Скрыть список' : 'Раскрыть список' }}
+            </button>
+          </td>
+        </tr>
+        <!-- Подтаблица, отображаемая при раскрытии списка -->
+        <tr v-if="openedItemCode === item.product_type.code" :key="'subtable-' + item.product_type.code">
+          <td colspan="6">
+            <table-item-unregistered-product/>
+          </td>
+        </tr>
+      </template>
       </tbody>
     </table>
   </div>
@@ -120,8 +128,8 @@ import {usePrintingStore} from "@/stores/HTTP/PrintingStore.js";
 import {useNumbersOnlyWithoutDot} from "@/composables/NumbersOnlyWithoutDot.js";
 import {usePackingStore} from "@/stores/HTTP/PackingStore.js";
 import {useERPStore} from "@/stores/HTTP/ERPStore.js";
-import {computed, onMounted, ref} from "vue";
-import ModalDetailUnregisterdProduct from "@/components/Tables/ERP/ModalDetailUnregisterdProduct.vue";
+import {ref} from "vue";
+import TableItemUnregisteredProduct from "@/components/Tables/ERP/TableItemUnregisteredProduct.vue";
 
 defineProps({
   filter: Object
@@ -133,6 +141,7 @@ const packingStore = usePackingStore()
 const printingStore = usePrintingStore()
 // const loading = computed(() => webSocketStore.loading)
 const count = ref(1)
+const openedItemCode = ref(null);
 const handleCreatePallet = async (products, palletType, productName) => {
   const barcodes = products.map(obj => obj.barcode)
   const data = {
@@ -161,7 +170,8 @@ const handleCreatePallet = async (products, palletType, productName) => {
     console.log(e)
   }
 }
-const handlerPrint = () => {
+const handlerPrint = (itemCode) => {
+  ERPStore.getItemUnregProductByCode(itemCode)
   printingStore.getZPLPrinters()
   printingStore.getLabelTemplate()
 }
@@ -175,11 +185,19 @@ const decrement = () => {
 }
 const handPrintingLabel = async () => {
   try {
-    await printingStore.printQRCode('[A]-[202412500]-[П]-[1667]-[КЭВ-6П1264Е]-[2]')
+    await printingStore.printQRCode(ERPStore.getItemBarcode.barcode)
   } catch (error) {
     console.error('Ошибка при печати:', error);
   }
 }
+const toggleTable = (itemCode) => {
+  if (openedItemCode.value === itemCode) {
+    openedItemCode.value = null;
+  } else {
+    openedItemCode.value = itemCode;
+    ERPStore.getItemUnregProductByCode(itemCode);
+  }
+};
 </script>
 <style scoped>
 .wms-packing-erp-data {
@@ -199,6 +217,12 @@ const handPrintingLabel = async () => {
   overflow: auto;
   border-top: 1px solid red;
   max-height: 370px;
+}
+
+table thead {
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
 
 .erp-logo {
