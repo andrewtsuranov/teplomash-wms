@@ -64,7 +64,7 @@
     </div>
     <svg-logo-erp class="erp-logo"/>
     {{}}
-<!--    <table-group-unregistered-products :filter="displayedProducts"/>-->
+    <!--    <table-group-unregistered-products :filter="displayedProducts"/>-->
     <table-group-unregistered-products/>
   </div>
 </template>
@@ -80,9 +80,6 @@ const packingStore = usePackingStore()
 const userStore = useUserStore()
 const webSocketStore = useWebSocketStore()
 const selectedOption = ref('КЭВ-6П1264Е')
-
-
-
 const displayedProducts = computed(() => {
   if (selectedOption.value === 'all') {
     return webSocketStore.wsUnregisteredProducts
@@ -115,7 +112,7 @@ onMounted(async () => {
       await webSocketStore.getUnregisteredItems()
     }
   } catch (e) {
-    console.log(e)
+    console.log("WEBSOCKET НЕ ПОДКЛЮЧЕН" + e)
   }
 })
 </script>

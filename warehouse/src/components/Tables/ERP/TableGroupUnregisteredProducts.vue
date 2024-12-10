@@ -12,17 +12,17 @@
       </tr>
       </thead>
       <tbody>
-      <template v-for="(item, key) in numberedProducts" :key="key">
+      <template v-for="(item, key) in unregisteredProducts" :key="key">
         <tr>
-          <th scope="row">{{key + 1}}</th>
+          <th scope="row">{{ item.number }}</th>
           <td data-bs-target="#modalDetailUnregisteredProduct" data-bs-toggle="modal"
               @click="ERPStore.getIDUnregProduct(index)">
             {{ item.key }}
           </td>
-          <td>{{ item.data.length }}</td>
+          <td>{{ item.data.length }} {{ item }}</td>
           <td>
             <button class="btn btn-outline-success"
-                    @click="handleCreatePallet(item.items, item?.product_type?.pallet_types, item.product_type)"
+                    @click="handleCreatePallet(item.data)"
             >Собрать паллету
             </button>
           </td>
@@ -130,6 +130,7 @@ import {usePackingStore} from "@/stores/HTTP/PackingStore.js";
 import {useERPStore} from "@/stores/HTTP/ERPStore.js";
 import {ref, computed} from "vue";
 import TableItemUnregisteredProduct from "@/components/Tables/ERP/TableItemUnregisteredProduct.vue";
+import ky from "ky";
 
 defineProps({
   filter: Object
@@ -142,12 +143,11 @@ const printingStore = usePrintingStore()
 // const loading = computed(() => webSocketStore.loading)
 const count = ref(1)
 const openedItemCode = ref(null);
-const handleCreatePallet = async (products, palletType, productName) => {
-  const barcodes = products.map(obj => obj.barcode)
+const handleCreatePallet = async (products) => {
   const data = {
     "action": "create_pallet",
     "from_user": userStore.getUserId,
-    "description": `Создание паллеты ${productName.name}`,
+    "description": `Создание паллеты ${products.map(product => product.name)}`,
     "loader_id": packingStore.selectedTSD,
     "warehouse_id": 1,
     "data": {
@@ -156,16 +156,17 @@ const handleCreatePallet = async (products, palletType, productName) => {
       "count": 2,
       "to": [],
       "from": [],
-      "barcodes": barcodes,
-      "palletType": palletType[0].name,
-      "productName": productName.name,
-      "length": palletType[0].length,
+      "barcodes": products.map(product => product.barcode),
+      "palletType": ERPStore?.productTypeById?.value?.map(pallet => pallet.id) || [],
+      "productName": products.map(product => product.name),
+      "length": 2,
       "abc_class": "A",
       "xyz_class": "X"
     }
   }
   try {
-    await webSocketStore.createPalletTask(data)
+    await ERPStore.GET_PRODUCT_TYPE_BY_ID(products[0].product_type)
+    // await webSocketStore.createPalletTask(data)
   } catch (e) {
     console.log(e)
   }
@@ -198,7 +199,7 @@ const toggleTable = (itemCode) => {
     ERPStore.getItemUnregProductByCode(itemCode);
   }
 };
-const numberedProducts = computed(() => {
+const unregisteredProducts = computed(() => {
   return Object.keys(webSocketStore.wsUnregisteredProducts)
       .map((key, index) => ({
         number: index + 1,
@@ -209,15 +210,12 @@ const numberedProducts = computed(() => {
         // Преобразование строки в Date (теперь можно напрямую)
         const dateA = new Date(a.data.created_at);
         const dateB = new Date(b.data.created_at);
-
         // Сортировка по возрастанию (самые старые даты вверху)
         // return dateA - dateB;
-
         // Сортировка по убыванию (самые новые даты вверху)
         return dateB - dateA;
       });
 });
-
 </script>
 <style scoped>
 .wms-packing-erp-data {
