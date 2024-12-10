@@ -63,7 +63,9 @@
       </div>
     </div>
     <svg-logo-erp class="erp-logo"/>
-    <table-group-unregistered-products :filter="displayedProducts"/>
+    {{}}
+<!--    <table-group-unregistered-products :filter="displayedProducts"/>-->
+    <table-group-unregistered-products/>
   </div>
 </template>
 <script setup>
@@ -78,12 +80,15 @@ const packingStore = usePackingStore()
 const userStore = useUserStore()
 const webSocketStore = useWebSocketStore()
 const selectedOption = ref('КЭВ-6П1264Е')
+
+
+
 const displayedProducts = computed(() => {
   if (selectedOption.value === 'all') {
-    return webSocketStore.wsGroupUnregProduct
+    return webSocketStore.wsUnregisteredProducts
   } else {
-    return webSocketStore.wsGroupUnregProduct?.filter(product =>
-        product.product_type.name === selectedOption.value)
+    return webSocketStore.wsUnregisteredProducts?.filter(product =>
+        product?.product_type?.name === selectedOption.value)
   }
 })
 const handleCheckPallet = async () => {

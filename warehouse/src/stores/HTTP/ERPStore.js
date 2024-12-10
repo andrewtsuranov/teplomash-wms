@@ -2,6 +2,7 @@ import {defineStore} from 'pinia'
 import {computed, ref} from "vue"
 import {useWebSocketStore} from "@/stores/WebSockets/WebSocketStore.js";
 import {useErrorStore} from "@/stores/Error/ErrorStore.js"
+import {useGroupByKey} from "@/composables/useGroupByKey.js";
 
 export const useERPStore = defineStore('ERPStore', () => {
 //State
@@ -16,12 +17,13 @@ export const useERPStore = defineStore('ERPStore', () => {
     const getItemPalletType = computed(() => {
         return unregProductByID.value?.product_type.pallet_types.map(palletType => palletType)
     })
+
 //Actions
 
 
     const getItemUnregProductByCode = (code) => {
-        // Находим элемент в массиве wsGroupUnregProduct, у которого product_type.code совпадает с переданным code
-        const foundItem = webSocketStore.wsGroupUnregProduct.find(
+        // Находим элемент в массиве wsUnregisteredProducts, у которого product_type.code совпадает с переданным code
+        const foundItem = webSocketStore.wsUnregisteredProducts?.find(
             (item) => item.product_type.code === code
         );
 
@@ -31,7 +33,7 @@ export const useERPStore = defineStore('ERPStore', () => {
         } else {
             // Опционально: обрабатываем случай, когда элемент не найден
             unregProductByID.value = null;
-            console.warn(`Item with code ${code} not found in wsGroupUnregProduct`);
+            console.warn(`Item with code ${code} not found in wsUnregisteredProducts`);
         }
     };
     return {

@@ -12,23 +12,23 @@
       </tr>
       </thead>
       <tbody>
-      <template v-for="(item, index) in filter" :key="index">
+      <template v-for="(item, key) in numberedProducts" :key="key">
         <tr>
-          <th scope="row">{{ index + 1 }}</th>
+          <th scope="row">{{key + 1}}</th>
           <td data-bs-target="#modalDetailUnregisteredProduct" data-bs-toggle="modal"
               @click="ERPStore.getIDUnregProduct(index)">
-            {{ item.product_type.name }}
+            {{ item.key }}
           </td>
-          <td>{{ item.items_count }}</td>
+          <td>{{ item.data.length }}</td>
           <td>
             <button class="btn btn-outline-success"
-                    @click="handleCreatePallet(item.items, item.product_type.pallet_types, item.product_type)"
+                    @click="handleCreatePallet(item.items, item?.product_type?.pallet_types, item.product_type)"
             >Собрать паллету
             </button>
           </td>
           <td>
             <button class="btn btn-outline-primary" data-bs-target="#settingsPrintModal" data-bs-toggle="modal"
-                    @click="handlerPrint(item.product_type.code)"
+                    @click="handlerPrint(item?.product_type?.code)"
             >Печать Barcode
             </button>
             <!-- Modal Print Settings -->
@@ -104,14 +104,14 @@
           </td>
           <td>
             <button class="btn btn-outline-primary"
-                    @click="toggleTable(item.product_type.code);"
+                    @click="toggleTable(item?.product_type?.code);"
             >
-              {{ openedItemCode === item.product_type.code ? 'Скрыть список' : 'Раскрыть список' }}
+              {{ openedItemCode === item?.product_type?.code ? 'Скрыть список' : 'Раскрыть список' }}
             </button>
           </td>
         </tr>
         <!-- Подтаблица, отображаемая при раскрытии списка -->
-        <tr v-if="openedItemCode === item.product_type.code" :key="'subtable-' + item.product_type.code">
+        <tr v-if="openedItemCode === item?.product_type?.code" :key="'subtable-' + item?.product_type?.code">
           <td colspan="6">
             <table-item-unregistered-product/>
           </td>
@@ -128,7 +128,7 @@ import {usePrintingStore} from "@/stores/HTTP/PrintingStore.js";
 import {useNumbersOnlyWithoutDot} from "@/composables/NumbersOnlyWithoutDot.js";
 import {usePackingStore} from "@/stores/HTTP/PackingStore.js";
 import {useERPStore} from "@/stores/HTTP/ERPStore.js";
-import {ref} from "vue";
+import {ref, computed} from "vue";
 import TableItemUnregisteredProduct from "@/components/Tables/ERP/TableItemUnregisteredProduct.vue";
 
 defineProps({
@@ -151,8 +151,8 @@ const handleCreatePallet = async (products, palletType, productName) => {
     "loader_id": packingStore.selectedTSD,
     "warehouse_id": 1,
     "data": {
-      "to_zone": "PAC-01",
-      "from_zone": "PAC-01",
+      "to_zone_id": "PAC-01",
+      "from_zone_id": "PAC-01",
       "count": 2,
       "to": [],
       "from": [],
@@ -198,6 +198,26 @@ const toggleTable = (itemCode) => {
     ERPStore.getItemUnregProductByCode(itemCode);
   }
 };
+const numberedProducts = computed(() => {
+  return Object.keys(webSocketStore.wsUnregisteredProducts)
+      .map((key, index) => ({
+        number: index + 1,
+        key: key,
+        data: webSocketStore.wsUnregisteredProducts[key],
+      }))
+      .sort((a, b) => {
+        // Преобразование строки в Date (теперь можно напрямую)
+        const dateA = new Date(a.data.created_at);
+        const dateB = new Date(b.data.created_at);
+
+        // Сортировка по возрастанию (самые старые даты вверху)
+        // return dateA - dateB;
+
+        // Сортировка по убыванию (самые новые даты вверху)
+        return dateB - dateA;
+      });
+});
+
 </script>
 <style scoped>
 .wms-packing-erp-data {

@@ -3,6 +3,7 @@ import {useUserStore} from '@/stores/HTTP/UserStore.js'
 import {computed, ref} from "vue";
 import {useTransactionStore} from "@/stores/WebSockets/transactionStore.js";
 import {usePackingStore} from "@/stores/HTTP/PackingStore.js";
+import {useGroupByKey} from "@/composables/useGroupByKey.js";
 
 export const useWebSocketStore = defineStore('websocket', () => {
 //Подключаем UserStore
@@ -23,7 +24,7 @@ export const useWebSocketStore = defineStore('websocket', () => {
     const privateMessage = ref(null)
     const privateMessageID = ref(null)
     const receivedMessage = ref(null)
-    const wsGroupUnregProduct = ref(JSON.parse(localStorage.getItem('wsGroupUnregProduct')) || null)
+    const wsUnregisteredProducts = ref(JSON.parse(localStorage.getItem('wsUnregisteredProducts')) || null)
     // const productTypes = ref(JSON.parse(localStorage.getItem('productTypes')) || null)
     const transactionStatus = ref(JSON.parse(localStorage.getItem('transactionStatus')) || null)
 //Getters
@@ -37,9 +38,9 @@ export const useWebSocketStore = defineStore('websocket', () => {
 
 //Actions
     function initWebSocket() {
-        // const wsUrl = `ws://lab:8081/ws/inventory/?token=${userStore.getTokenAccess}`
+        const wsUrl = `ws://lab:8081/ws/inventory/?token=${userStore.getTokenAccess}`
         // const wsUrl = `ws://192.168.1.144/ws/inventory/?token=${userStore.getTokenAccess}`
-        const wsUrl = `ws://38.180.192.229/ws/inventory/?token=${userStore.getTokenAccess}`
+        // const wsUrl = `ws://38.180.192.229/ws/inventory/?token=${userStore.getTokenAccess}`
         socket.value = new WebSocket(wsUrl)
         socket.value.onopen = onOpen.bind(this)
         socket.value.onclose = onClose.bind(this)
@@ -133,12 +134,10 @@ export const useWebSocketStore = defineStore('websocket', () => {
             //Обработка сообщения: перенос продукции из ERP в БД
             if (data.type === 'items_created' && data.status === 'success') {
                 getUnregisteredItems()
-                // productByDayGroup.value = data.items
-                // localStorage.setItem('productByDayGroup', JSON.stringify(data.items))
             }
             if (data.type === 'unregistered_items' && data.status === 'success') {
-                wsGroupUnregProduct.value = data.groups
-                localStorage.setItem('wsGroupUnregProduct', JSON.stringify(data.groups))
+                wsUnregisteredProducts.value = useGroupByKey(data.items, 'name')
+                localStorage.setItem('wsUnregisteredProducts', JSON.stringify(useGroupByKey(data.items, 'name')))
             }
             if (data.type === 'product_types_list' && data.status === 'success') {
                 productTypes.value = data.products
@@ -299,7 +298,7 @@ export const useWebSocketStore = defineStore('websocket', () => {
         privateMessage,
         privateMessageID,
         receivedMessage,
-        wsGroupUnregProduct,
+        wsUnregisteredProducts,
         // productTypes,
         transactionStatus,
 //getters
