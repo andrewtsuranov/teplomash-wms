@@ -20,37 +20,31 @@ export const useERPStore = defineStore('ERPStore', () => {
     const errorStore = useErrorStore()
     const webSocketStore = useWebSocketStore()
     const loading = ref(false)
-    const unregProductByID = ref(null)
-    const productTypeById = ref(null)
+    const palletTypeByProductId = ref(null)
 //Getters
-    const getItemBarcode = computed(() => {
-        return unregProductByID.value?.items.map(item => item)
-    })
-    const getItemPalletType = computed(() => {
-        return unregProductByID.value?.product_type.pallet_types.map(palletType => palletType)
-    })
+    const unregisteredProducts = computed(() => {
+        return Object.keys(webSocketStore.wsUnregisteredProducts)
+            .map((key, index) => ({
+                number: index + 1,
+                key: key,
+                data: webSocketStore.wsUnregisteredProducts[key],
+            }))
+        // .sort((a, b) => {
+        //     // Преобразование строки в Date (теперь можно напрямую)
+        //     const dateA = new Date(a.data.created_at);
+        //     const dateB = new Date(b.data.created_at);
+        //     // Сортировка по возрастанию (самые старые даты вверху)
+        //     // return dateA - dateB;
+        //     // Сортировка по убыванию (самые новые даты вверху)
+        //     return dateB - dateA;
+        //     });
+    });
 //Actions
-    const getItemUnregProductByCode = (code) => {
-        // Находим элемент в массиве wsUnregisteredProducts, у которого product_type.code совпадает с переданным code
-        const foundItem = webSocketStore.wsUnregisteredProducts?.find(
-            (item) => item.product_type.code === code
-        );
-        // Если элемент найден, присваиваем его unregProductByID.value
-        if (foundItem) {
-            unregProductByID.value = foundItem;
-        } else {
-            // Опционально: обрабатываем случай, когда элемент не найден
-            unregProductByID.value = null;
-            console.warn(`Item with code ${code} not found in wsUnregisteredProducts`);
-        }
-    };
-    const GET_PRODUCT_TYPE_BY_ID = async (id) => {
-        console.log(id)
+    const GET_PALLET_TYPE_BY_PRODUCT_ID = async (id) => {
         loading.value = true;
         errorStore.clearError();
         try {
-            const response = await kyStd(`pallet-types/by-product/${id}/`).json()
-            productTypeById.value = response
+            palletTypeByProductId.value = await kyStd(`pallet-types/by-product/${id}/`).json()
             return true
         } catch (e) {
             errorStore.setError(e)
@@ -63,11 +57,8 @@ export const useERPStore = defineStore('ERPStore', () => {
     return {
         errorStore,
         loading,
-        unregProductByID,
-        getItemBarcode,
-        getItemPalletType,
-        productTypeById,
-        getItemUnregProductByCode,
-        GET_PRODUCT_TYPE_BY_ID,
+        unregisteredProducts,
+        palletTypeByProductId,
+        GET_PALLET_TYPE_BY_PRODUCT_ID,
     }
 })

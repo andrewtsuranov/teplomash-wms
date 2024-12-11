@@ -31,8 +31,8 @@
               <th scope="row">{{ index + 1 }}</th>
               <td>КЭВ-2П1123Е</td>
               <td>1</td>
-<!--              <td>{{ item?.items[0]?.barcode }}</td>-->
-<!--              <td>{{ useSplitDateByT(item?.items[0].created_at).date }}</td>-->
+              <!--              <td>{{ item?.items[0]?.barcode }}</td>-->
+              <!--              <td>{{ useSplitDateByT(item?.items[0].created_at).date }}</td>-->
             </tr>
             </tbody>
           </table>

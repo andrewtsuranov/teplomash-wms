@@ -6,20 +6,28 @@
         <th scope="col">№</th>
         <th scope="col">Изделие</th>
         <th scope="col">Кол-во, шт</th>
-        <th scope="col">Действие</th>
+        <th scope="col">Пунк назначения</th>
+        <th scope="col">Задача</th>
         <th scope="col">Печать штрихкода</th>
         <th scope="col">Дополнительно</th>
       </tr>
       </thead>
       <tbody>
-      <template v-for="(item, key) in unregisteredProducts" :key="key">
+      <template v-for="(item, key) in ERPStore.unregisteredProducts" :key="key">
         <tr>
           <th scope="row">{{ item.number }}</th>
-          <td data-bs-target="#modalDetailUnregisteredProduct" data-bs-toggle="modal"
-              @click="ERPStore.getIDUnregProduct(index)">
+          <td data-bs-target="#modalDetailUnregisteredProduct" data-bs-toggle="modal">
             {{ item.key }}
           </td>
           <td>{{ item.data.length }}</td>
+          <td>
+            <select class="form-select" aria-label="Default select example">
+              <option selected>Open this select menu</option>
+              <option value="1">One</option>
+              <option value="2">Two</option>
+              <option value="3">Three</option>
+            </select>
+          </td>
           <td>
             <button class="btn btn-outline-success"
                     @click="handleCreatePallet(item)"
@@ -128,12 +136,14 @@ import {usePrintingStore} from "@/stores/HTTP/PrintingStore.js";
 import {useNumbersOnlyWithoutDot} from "@/composables/NumbersOnlyWithoutDot.js";
 import {usePackingStore} from "@/stores/HTTP/PackingStore.js";
 import {useERPStore} from "@/stores/HTTP/ERPStore.js";
+import {useWarehouseStore} from "@/stores/HTTP/WarehouseStore.js";
 import {ref, computed} from "vue";
 import TableItemUnregisteredProduct from "@/components/Tables/ERP/TableItemUnregisteredProduct.vue";
 
 defineProps({
   filter: Object
 })
+const warehouseStore = useWarehouseStore()
 const userStore = useUserStore()
 const ERPStore = useERPStore()
 const webSocketStore = useWebSocketStore()
@@ -144,25 +154,25 @@ const count = ref(1)
 const openedItemCode = ref(null);
 const handleCreatePallet = async (products) => {
   try {
-    await ERPStore.GET_PRODUCT_TYPE_BY_ID(products.data[0].product_type)
-  const data = {
-    "action": "create_pallet",
-    "from_user": userStore.getUserId,
-    "description": `Создание паллеты ${products.key}`,
-    "loader_id": packingStore.selectedTSD,
-    "warehouse_id": 1,
-    "data": {
-      "to_zone_id": "REC-01",
-      "from_zone_id": "PAC-01",
-      "count": products.data.length,
-      "to": [],
-      "from": [],
-      "barcodes": products.data.map(data => data.barcode),
-      "palletType": ERPStore.productTypeById?.value?.map(pallet => pallet.id) || [],
-      "abc_class": "A",
-      "xyz_class": "X"
+    await ERPStore.GET_PALLET_TYPE_BY_PRODUCT_ID(products.data[0].product_type)
+    const data = {
+      "action": "create_pallet",
+      "from_user": userStore.getUserId,
+      "description": `Создание паллеты ${products.key}`,
+      "loader_id": packingStore.selectedTSD,
+      "warehouse_id": warehouseStore.getWarehouseId,
+      "data": {
+        "to_zone_id": "REC-01",
+        "from_zone_id": 'warehouseStore.',
+        "count": products.data.length,
+        "to": [],
+        "from": [],
+        "barcodes": products.data.map(data => data.barcode),
+        "palletType": ERPStore.palletTypeByProductId[0]?.id || [],
+        "abc_class": "A",
+        "xyz_class": "X"
+      }
     }
-  }
     await webSocketStore.createPalletTask(data)
   } catch (e) {
     console.log(e)
@@ -196,23 +206,6 @@ const toggleTable = (itemCode) => {
     ERPStore.getItemUnregProductByCode(itemCode);
   }
 };
-const unregisteredProducts = computed(() => {
-  return Object.keys(webSocketStore.wsUnregisteredProducts)
-      .map((key, index) => ({
-        number: index + 1,
-        key: key,
-        data: webSocketStore.wsUnregisteredProducts[key],
-      }))
-      .sort((a, b) => {
-        // Преобразование строки в Date (теперь можно напрямую)
-        const dateA = new Date(a.data.created_at);
-        const dateB = new Date(b.data.created_at);
-        // Сортировка по возрастанию (самые старые даты вверху)
-        // return dateA - dateB;
-        // Сортировка по убыванию (самые новые даты вверху)
-        return dateB - dateA;
-      });
-});
 </script>
 <style scoped>
 .wms-packing-erp-data {
