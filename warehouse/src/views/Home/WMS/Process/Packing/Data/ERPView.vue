@@ -64,7 +64,7 @@
     </div>
     <svg-logo-erp class="erp-logo"/>
     {{}}
-    <!--    <table-group-unregistered-products :filter="displayedProducts"/>-->
+<!--        <table-group-unregistered-products :filter="displayedProducts"/>-->
     <table-group-unregistered-products/>
   </div>
 </template>
@@ -81,13 +81,20 @@ const userStore = useUserStore()
 const webSocketStore = useWebSocketStore()
 const selectedOption = ref('КЭВ-6П1264Е')
 const displayedProducts = computed(() => {
-  if (selectedOption.value === 'all') {
-    return webSocketStore.wsUnregisteredProducts
-  } else {
-    return webSocketStore.wsUnregisteredProducts?.filter(product =>
-        product?.product_type?.name === selectedOption.value)
+  // Проверяем, существует ли webSocketStore.wsUnregisteredProducts
+  if (!webSocketStore.wsUnregisteredProducts) {
+    return []; // Возвращаем пустой массив, если данных нет
   }
-})
+
+  if (selectedOption.value === 'all') {
+    return webSocketStore.wsUnregisteredProducts; // Отображаем все продукты
+  } else {
+    return webSocketStore.wsUnregisteredProducts.filter(product => {
+      // Добавляем проверку на существование product и product.product_type
+      return product && product.product_type && product.product_type.name === selectedOption.value;
+    });
+  }
+});
 const handleCheckPallet = async () => {
   const data = {
     "action": "check_pallet",

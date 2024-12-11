@@ -19,10 +19,10 @@
               @click="ERPStore.getIDUnregProduct(index)">
             {{ item.key }}
           </td>
-          <td>{{ item.data.length }} {{ item }}</td>
+          <td>{{ item.data.length }}</td>
           <td>
             <button class="btn btn-outline-success"
-                    @click="handleCreatePallet(item.data)"
+                    @click="handleCreatePallet(item)"
             >Собрать паллету
             </button>
           </td>
@@ -130,7 +130,6 @@ import {usePackingStore} from "@/stores/HTTP/PackingStore.js";
 import {useERPStore} from "@/stores/HTTP/ERPStore.js";
 import {ref, computed} from "vue";
 import TableItemUnregisteredProduct from "@/components/Tables/ERP/TableItemUnregisteredProduct.vue";
-import ky from "ky";
 
 defineProps({
   filter: Object
@@ -144,29 +143,27 @@ const printingStore = usePrintingStore()
 const count = ref(1)
 const openedItemCode = ref(null);
 const handleCreatePallet = async (products) => {
+  try {
+    await ERPStore.GET_PRODUCT_TYPE_BY_ID(products.data[0].product_type)
   const data = {
     "action": "create_pallet",
     "from_user": userStore.getUserId,
-    "description": `Создание паллеты ${products.map(product => product.name)}`,
+    "description": `Создание паллеты ${products.key}`,
     "loader_id": packingStore.selectedTSD,
     "warehouse_id": 1,
     "data": {
-      "to_zone_id": "PAC-01",
+      "to_zone_id": "REC-01",
       "from_zone_id": "PAC-01",
-      "count": 2,
+      "count": products.data.length,
       "to": [],
       "from": [],
-      "barcodes": products.map(product => product.barcode),
-      "palletType": ERPStore?.productTypeById?.value?.map(pallet => pallet.id) || [],
-      "productName": products.map(product => product.name),
-      "length": 2,
+      "barcodes": products.data.map(data => data.barcode),
+      "palletType": ERPStore.productTypeById?.value?.map(pallet => pallet.id) || [],
       "abc_class": "A",
       "xyz_class": "X"
     }
   }
-  try {
-    await ERPStore.GET_PRODUCT_TYPE_BY_ID(products[0].product_type)
-    // await webSocketStore.createPalletTask(data)
+    await webSocketStore.createPalletTask(data)
   } catch (e) {
     console.log(e)
   }
