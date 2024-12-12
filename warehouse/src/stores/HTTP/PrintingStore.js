@@ -85,14 +85,15 @@ export const usePrintingStore = defineStore('printingStore',
                 loading.value = false
             }
         }
-        const printQRCode = async (body) => {
+        const PRINT_LABEL = async (productData) => {
+            const body = productData.map(item => item.barcode)
             loading.value = true;
             errorStore.clearError();
             const zplData = {
                 "template_code": selectedLabelTemplate.value,
                 "printer_id": selectedPrinter.value.id,
                 "data": {
-                    "product_name": "Test Product",
+                    "product_name": productData.map(item => item.name),
                     "body": body,
                     "qty": selectedQuantity.value,
                 },
@@ -104,10 +105,9 @@ export const usePrintingStore = defineStore('printingStore',
             //     "text": qrCodeZPL(data, count)
             // }
             try {
-                const response = await kyPrint
+                printStatus.value = await kyPrint
                     .post('printers/print_label/', {json: zplData})
                     .json()
-                printStatus.value = response
                 return true
             } catch (err) {
                 console.log(err)
@@ -131,7 +131,7 @@ export const usePrintingStore = defineStore('printingStore',
 //actions
             getZPLPrinters,
             getLabelTemplate,
-            printQRCode,
+            PRINT_LABEL,
             qrCodeZPL,
             code128ZPL,
             test,

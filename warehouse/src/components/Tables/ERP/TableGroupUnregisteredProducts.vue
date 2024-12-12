@@ -30,16 +30,10 @@
           </td>
           <td>
             <button class="btn btn-outline-primary"
-                    @click="toggleTable(item?.key )"
+                    @click="showPackingProductData(item)"
             >
               {{ openedItemCode === item?.key ? 'Скрыть список' : 'Раскрыть список' }}
             </button>
-          </td>
-        </tr>
-        <!-- Подтаблица, отображаемая при раскрытии списка -->
-        <tr v-if="openedItemCode === item?.key" :key="'subTable-' + item?.key">
-          <td colspan="6">
-            <table-item-unregistered-product :subTableDataProduct="item?.data"/>
           </td>
         </tr>
       </template>
@@ -66,9 +60,7 @@ const userStore = useUserStore()
 const ERPStore = useERPStore()
 const webSocketStore = useWebSocketStore()
 const packingStore = usePackingStore()
-
 // const loading = computed(() => webSocketStore.loading)
-
 const openedItemCode = ref(null);
 const handleCreatePallet = async (products) => {
   try {
@@ -96,14 +88,19 @@ const handleCreatePallet = async (products) => {
     console.log(e)
   }
 }
-
-const toggleTable = (itemCode) => {
-  if (openedItemCode.value === itemCode) {
-    openedItemCode.value = null;
-  } else {
-    openedItemCode.value = itemCode;
-  }
-};
+const showPackingProductData = async (productData) => {
+      try {
+        await packingStore.setSelectedGroupUnregProduct(productData)
+        if (openedItemCode.value === productData.key) {
+          openedItemCode.value = null;
+        } else {
+          openedItemCode.value = productData.key;
+        }
+      } catch (e) {
+        console.log(e)
+      }
+    }
+;
 </script>
 <style scoped>
 .wms-packing-erp-data {

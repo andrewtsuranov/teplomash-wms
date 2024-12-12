@@ -83,7 +83,7 @@ onMounted(async () => {
       ". storageTitle"
       "storageActions storageTerminal";
   grid-template-columns: minmax(auto, max-content) 1fr;
-  grid-template-rows:min-content 1fr;
+  grid-template-rows: auto 1fr;
   gap: 1.5rem;
   padding: 0 1rem;
 }
@@ -105,7 +105,6 @@ onMounted(async () => {
   grid-auto-rows: min-content;
   font-size: 1.5rem;
   row-gap: 2rem;
-  cursor: pointer;
 }
 
 .storage-id-actions-items {

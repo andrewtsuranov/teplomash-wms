@@ -2,6 +2,7 @@
   <div class="wms-packing-container">
     <h1>Упаковка: {{ code.toUpperCase() }}</h1>
     <e-r-p-view/>
+    <packing-product-data/>
     <TeplomashTaskManagerView/>
     <pallet-data/>
   </div>
@@ -12,6 +13,7 @@ import PalletData from "@/components/PalletData/PalletData.vue";
 import ERPView from "@/views/Home/WMS/Process/Packing/Data/ERPView.vue";
 import {useRoute, useRouter} from 'vue-router';
 import {usePackingStore} from "@/stores/HTTP/PackingStore.js";
+import PackingProductData from "@/components/WMS/Process/PAC/PackingProductData.vue";
 
 const route = useRoute();
 const router = useRouter();

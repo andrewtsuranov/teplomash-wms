@@ -6,6 +6,7 @@ export const usePackingStore = defineStore('packingStore', () => {
     const loading = ref(false)
     const errorStore = useErrorStore()
     const selectedTSD = ref(JSON.parse(localStorage.getItem('selectedTsd')) || null)
+    const selectedGroupUnregProduct = ref(null)
     const packingId = ref(JSON.parse(localStorage.getItem('packingId')) || null)
     const dataYYYYMMDD = ref(new Date().toISOString().slice(0, 10));
 //state
@@ -35,10 +36,15 @@ export const usePackingStore = defineStore('packingStore', () => {
         selectedTSD.value = tsdId
         localStorage.setItem('selectedTsd', JSON.stringify(tsdId))
     }
+    const setSelectedGroupUnregProduct = (product) => {
+        selectedGroupUnregProduct.value = product
+        // localStorage.setItem('selectedTsd', JSON.stringify(product))
+    }
     return {
 //state
         errorStore,
         loading,
+        selectedGroupUnregProduct,
         // packingData,
         palletData,
         palletStatus,
@@ -47,5 +53,6 @@ export const usePackingStore = defineStore('packingStore', () => {
 //getters
 //actions
         setSelectedTSD,
+        setSelectedGroupUnregProduct,
     }
 })
