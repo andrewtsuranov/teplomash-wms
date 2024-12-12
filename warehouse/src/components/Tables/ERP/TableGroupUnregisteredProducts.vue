@@ -5,6 +5,7 @@
       <tr>
         <th scope="col">№</th>
         <th scope="col">Изделие</th>
+        <th scope="col">Ошибка</th>
         <th scope="col">Кол-во, шт</th>
         <th scope="col">Задача</th>
         <th scope="col">Дополнительно</th>
@@ -16,6 +17,9 @@
           <th scope="row">{{ item.number }}</th>
           <td>
             {{ item?.key }}
+          </td>
+          <td>
+            {{ item.data[0].error }}
           </td>
           <td>{{ item.data.length }}</td>
           <td>
