@@ -25,23 +25,23 @@
       <div class="erp-settings-filter">
         <div class="form-check">
           <input id="flexRadioDefault1"
-                 v-model="selectedOption"
+                 v-model="selectedFilter"
                  checked
                  class="form-check-input"
                  name="flexRadioDefault"
                  type="radio"
-                 value="КЭВ-6П1264Е"
+                 value="КЭВ-18П4021Е"
           >
           <label class="form-check-label"
                  for="flexRadioDefault1"
           >
-            КЭВ-6П1264Е (TEST Default)
+            КЭВ-18П4021Е (TEST Default)
           </label>
         </div>
         <div class="form-check">
           <input
               id="flexRadioDefault2"
-              v-model="selectedOption"
+              v-model="selectedFilter"
               class="form-check-input"
               name="flexRadioDefault"
               type="radio"
@@ -63,38 +63,35 @@
       </div>
     </div>
     <svg-logo-erp class="erp-logo"/>
-    {{}}
-<!--        <table-group-unregistered-products :filter="displayedProducts"/>-->
-    <table-group-unregistered-products/>
+    <table-group-unregistered-products :filterUnregProductByUser="filterUnregProductByUser"/>
   </div>
 </template>
 <script setup>
 import TableGroupUnregisteredProducts from "@/components/Tables/ERP/TableGroupUnregisteredProducts.vue";
 import SvgLogoErp from "@/components/UI/SVG/svgLogoErp.vue";
 import {useWebSocketStore} from "@/stores/WebSockets/WebSocketStore.js";
+import {useERPStore} from "@/stores/HTTP/ERPStore.js";
 import {useUserStore} from "@/stores/HTTP/UserStore.js";
 import {usePackingStore} from "@/stores/HTTP/PackingStore.js";
 import {ref, computed, onMounted} from "vue";
 
+const ERPStore = useERPStore()
 const packingStore = usePackingStore()
 const userStore = useUserStore()
 const webSocketStore = useWebSocketStore()
-const selectedOption = ref('КЭВ-6П1264Е')
-const displayedProducts = computed(() => {
-  // Проверяем, существует ли webSocketStore.wsUnregisteredProducts
+const selectedFilter = ref('КЭВ-18П4021Е')
+const filterUnregProductByUser = computed(() => {
   if (!webSocketStore.wsUnregisteredProducts) {
-    return []; // Возвращаем пустой массив, если данных нет
+    return []
   }
-
-  if (selectedOption.value === 'all') {
-    return webSocketStore.wsUnregisteredProducts; // Отображаем все продукты
+  if (selectedFilter.value === 'КЭВ-18П4021Е') {
+   return webSocketStore.unregisteredProducts.filter(item => {
+      return item.key === selectedFilter.value
+    })
   } else {
-    return webSocketStore.wsUnregisteredProducts.filter(product => {
-      // Добавляем проверку на существование product и product.product_type
-      return product && product.product_type && product.product_type.name === selectedOption.value;
-    });
+    return webSocketStore.unregisteredProducts
   }
-});
+})
 const handleCheckPallet = async () => {
   const data = {
     "action": "check_pallet",
