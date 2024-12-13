@@ -36,11 +36,10 @@
               <option disabled value="">Выберите принтер...</option>
               <option
                   v-for="(print, ip) in printingStore.printersList?.printers || []"
-                  :key="ip"
+                  :key="print.id"
                   :value="print"
-                  :selected="print.zone.includes(warehouseStore.selectedZone?.id)"
               >
-                {{ print.model }} ({{ print.name }}) {{ print.zone }}
+                {{ print.model }} ({{ print.name }}) {{ print.id }}
               </option>
             </select>
           </div>
@@ -97,7 +96,7 @@ import {usePrintingStore} from "@/stores/HTTP/PrintingStore.js";
 import {usePackingStore} from "@/stores/HTTP/PackingStore.js";
 import {useWarehouseStore} from "@/stores/HTTP/WarehouseStore.js";
 import {useNumbersOnlyWithoutDot} from "@/composables/NumbersOnlyWithoutDot.js";
-import {ref, computed} from "vue";
+import {ref, computed, onMounted} from "vue";
 
 const warehouseStore = useWarehouseStore()
 const packingStore = usePackingStore()
@@ -118,25 +117,10 @@ const decrement = () => {
     count.value--;
   }
 }
-const filteredPrintersList = computed(() => {
-  const selectedZone = warehouseStore.selectedZone
-  if (!selectedZone || !printingStore.printersList?.printers) {
-    return []
-  }
-
-  return printingStore.printersList.printers.filter(printer => {
-    return printer.zone === selectedZone.id
-  })
-})
-const filteredLabelTemplates = computed(() => {
-  // if (props.isBarcode) {
-  //   return printingStore.labelTemplatesList.filter(
-  //       label => label.name === 'Barcode'
-  //   );
-  // }
-  return printingStore.labelTemplatesList;
+onMounted(() => {
+  // Находим принтер с id === 1 и устанавливаем его как выбранный
+  printingStore.selectedPrinter.value = printingStore.printersList?.printers.find(p => p.id === 1) || null;
 });
-
 </script>
 <style scoped>
 .printer-settings-container {
