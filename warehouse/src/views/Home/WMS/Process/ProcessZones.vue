@@ -1,11 +1,11 @@
 <template>
   <div class="process-zone-container">
-    <div v-for="item in zones" :key="item.code" class="process-zone">
-      <div
-          @click.prevent="handleZoneClick(item)"
-      >
-        {{ item.name.replace(/_/g, ' ') }}
-      </div>
+    <div v-for="item in zones"
+         :key="item.code"
+         class="process-zone"
+         @click="handleZoneClick(item)"
+    >
+      <span v-if="item">{{ item.name.replace(/_/g, ' ') }}</span>
     </div>
     <RouterView/>
   </div>
@@ -30,7 +30,7 @@ const props = defineProps({
 const zones = computed(() => warehouseStore.customSortByZone[props.process] || []);
 const handleZoneClick = (zone) => {
   warehouseStore.setSelectedZone(zone)
-  router.push({ name: props.processRouteName, params: { code: zone.code.toLowerCase() } })
+  router.push({name: props.processRouteName, params: {code: zone.code.toLowerCase()}})
 }
 </script>
 <style scoped>
@@ -53,12 +53,24 @@ const handleZoneClick = (zone) => {
 }
 
 .process-zone span {
-  display: grid;
-  justify-items: center;
+  display: block;
   text-align: center;
 }
 
 .process-zone:hover {
   background-color: #2F2D2B;
+}
+
+@media (max-width: 800px) {
+  .process-zone-container {
+    display: grid;
+    row-gap: 2rem;
+    padding: 1rem;
+  }
+
+  .process-zone {
+    font-size: 2rem;
+    padding: 10px 50px;
+  }
 }
 </style>

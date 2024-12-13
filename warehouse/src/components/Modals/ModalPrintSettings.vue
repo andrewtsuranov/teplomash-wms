@@ -15,7 +15,7 @@
           <h1 id="settingsPrintLabel"
               class="modal-title fs-5"
           >
-            Параметры печати
+            Параметры печати {{packingStore.selectedGroupUnregProduct?.key}}
           </h1>
           <button aria-label="Close"
                   class="btn-close"
@@ -27,31 +27,38 @@
         <div class="modal-body printer-settings-container"
         >
           <label>Сетевой принтер:</label>
-          <div>
             <select
                 v-model="printingStore.selectedPrinter"
                 aria-label="Выберите принтер"
                 class="form-select"
             >
-              <option disabled value="">Выберите принтер...</option>
+              <option disabled
+                      :value=null
+              >
+                Выберите принтер...
+              </option>
               <option
-                  v-for="(print, ip) in printingStore.printersList?.printers || []"
-                  :key="print.id"
+                  v-for="(print, index) in printingStore.printersList?.printers"
+                  :key="index"
                   :value="print"
               >
-                {{ print.model }} ({{ print.name }}) {{ print.id }}
+                {{ print.model }} ({{ print.name }})
               </option>
             </select>
-          </div>
           <label>Тип печати:</label>
           <select v-model="printingStore.selectedLabelTemplate"
+                  aria-label="Выберите шаблон этикетки"
                   class="form-select"
           >
-            <option disabled value="">Выберите шаблон этикетки...</option>
+            <option disabled
+                    :value="null"
+            >
+              Выберите шаблон этикетки...
+            </option>
             <option
-                v-for="(label, id) in filteredLabelTemplates"
-                :key="id"
-                :value="label.code"
+                v-for="(label, index) in printingStore.labelTemplatesList"
+                :key="index"
+                :value="label"
             >
               {{ label.name }}
             </option>
@@ -59,19 +66,19 @@
           <label>Кол-во этикеток:</label>
           <div class="counter">
             <button @click="decrement">&ndash;</button>
-            <input v-model.number.trim="count"
+            <input v-model.number.trim="printingStore.selectedQuantityLabel"
                    min="1"
                    v-on:keypress="useNumbersOnlyWithoutDot"
             />
             <button @click="increment">+</button>
           </div>
-          <label>Статус: печати:</label>
-          <div v-if="printingStore.printStatus?.status"
-               :style="'color: green;'"
-          >
-            Печатает...
-          </div>
-          <div v-else>Ожидает задание на печать</div>
+<!--          <label>Статус: печати:</label>-->
+<!--          <div v-if="printingStore.printStatus?.status"-->
+<!--               :style="'color: green;'"-->
+<!--          >-->
+<!--            Печатает...-->
+<!--          </div>-->
+<!--          <div v-else>Ожидает задание на печать</div>-->
         </div>
         <div class="modal-footer">
           <button class="btn btn-outline-secondary"
@@ -96,11 +103,10 @@ import {usePrintingStore} from "@/stores/HTTP/PrintingStore.js";
 import {usePackingStore} from "@/stores/HTTP/PackingStore.js";
 import {useWarehouseStore} from "@/stores/HTTP/WarehouseStore.js";
 import {useNumbersOnlyWithoutDot} from "@/composables/NumbersOnlyWithoutDot.js";
-import {ref, computed, onMounted} from "vue";
 
 const warehouseStore = useWarehouseStore()
 const packingStore = usePackingStore()
-const count = ref(1)
+
 const printingStore = usePrintingStore()
 const handlePrint = async (productData) => {
   try {
@@ -117,10 +123,6 @@ const decrement = () => {
     count.value--;
   }
 }
-onMounted(() => {
-  // Находим принтер с id === 1 и устанавливаем его как выбранный
-  printingStore.selectedPrinter.value = printingStore.printersList?.printers.find(p => p.id === 1) || null;
-});
 </script>
 <style scoped>
 .printer-settings-container {

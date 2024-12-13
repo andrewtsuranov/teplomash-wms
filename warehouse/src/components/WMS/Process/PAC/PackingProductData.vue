@@ -19,22 +19,34 @@
       </div>
     </div>
   </div>
-        <ModalPrintSettings/>
+  <ModalPrintSettings/>
 </template>
 <script setup>
 import {usePackingStore} from "@/stores/HTTP/PackingStore.js";
 import {usePrintingStore} from "@/stores/HTTP/PrintingStore.js";
+import {useWarehouseStore} from "@/stores/HTTP/WarehouseStore.js";
 import TableItemUnregisteredProduct from "@/components/Tables/ERP/TableItemUnregisteredProduct.vue";
 import ModalPrintSettings from "@/components/Modals/ModalPrintSettings.vue";
-import {ref} from "vue";
 
 const packingStore = usePackingStore()
 const printingStore = usePrintingStore()
-const isBarcode = ref(2)
+const warehouseStore = useWarehouseStore()
 const handlerPrint = async () => {
   try {
     await printingStore.getZPLPrinters()
     await printingStore.getLabelTemplate()
+    if (warehouseStore.selectedZone.id) {
+      const printerInZone = printingStore.printersList.printers
+          .find(printer => printer.zone === warehouseStore.selectedZone.id);
+      if (printerInZone) {
+        await printingStore.setSelectedPrinter(printerInZone)
+      }
+    }
+    await printingStore.setSelectedLabelTemplate(
+        printingStore.labelTemplatesList
+            .find(label => label.name.toLowerCase() === 'barcode'
+            ))
+    await printingStore.setSelectedQuantityLabel(packingStore.selectedGroupUnregProduct.data.length)
   } catch (e) {
     console.log(e)
     throw e

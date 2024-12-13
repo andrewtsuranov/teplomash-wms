@@ -74,8 +74,8 @@ onUnmounted(() => {
 }
 
 .wms-input span {
-  display: grid;
-  justify-items: center;
+  display: block;
+  text-align: center;
 }
 
 .wms-input:hover {

@@ -1,10 +1,12 @@
 import {defineStore} from 'pinia'
-import {ref} from "vue"
+import {computed, ref} from "vue"
 import ky from "ky";
 import {requestUrls} from "@/stores/request-urls.js";
 import {useErrorStore} from "@/stores/Error/ErrorStore.js";
 import {useUserStore} from '@/stores/HTTP/UserStore.js'
+import {useWarehouseStore} from "@/stores/HTTP/WarehouseStore.js";
 
+const warehouseStore = useWarehouseStore()
 const userStore = useUserStore()
 const kyStd = ky.create({
     prefixUrl: requestUrls.storage,
@@ -43,18 +45,15 @@ export const usePrintingStore = defineStore('printingStore',
         const loading = ref(false)
         const printersList = ref(null)
         const printStatus = ref(null)
-        const selectedPrinter = ref('')
-        const selectedQuantity = ref(1)
+        const selectedPrinter = ref(null)
+        const selectedQuantityLabel = ref(1)
+        const selectedLabelTemplate = ref(null)
         const labelTemplatesList = ref(null)
-        const selectedLabelTemplate = ref('')
         const qrCodeZPL = (body, qty) => {
             return `^XA^FO20,30^BQN,2,7,H,7,Q,S,7^FDQM,${body}^FS^PQ${qty}^XZ`
         }
         const code128ZPL = (body, qty) => {
             return `^XA^FO20,100^BY4^BCN,200,Y,N,N^FD${body}^FS^PQ${qty}^XZ`
-        }
-        const test = () => {
-            return '~WC'
         }
 //getters
 //actions
@@ -62,9 +61,8 @@ export const usePrintingStore = defineStore('printingStore',
             loading.value = true;
             errorStore.clearError();
             try {
-                const response = await kyPrint('printers/list_printers/').json()
-                printersList.value = response
-                return true
+                printersList.value = await kyPrint('printers/list_printers/').json()
+                 return true
             } catch (err) {
                 errorStore.Error = err.message
                 throw err;
@@ -95,9 +93,9 @@ export const usePrintingStore = defineStore('printingStore',
                 "data": {
                     "product_name": productData.map(item => item.name),
                     "body": body,
-                    "qty": selectedQuantity.value,
+                    "qty": selectedQuantityLabel.value,
                 },
-                "copies": selectedQuantity.value,
+                "copies": selectedQuantityLabel.value,
                 "priority": 0
             }
             // const zplData = {
@@ -116,12 +114,20 @@ export const usePrintingStore = defineStore('printingStore',
                 loading.value = false
             }
         }
-//
+       const setSelectedPrinter = (printer) => {
+           selectedPrinter.value = printer;
+        }
+        const setSelectedQuantityLabel = (qty) => {
+            selectedQuantityLabel.value = qty;
+        }
+        const setSelectedLabelTemplate = (type) => {
+            selectedLabelTemplate.value = type;
+        }
         return {
 //state
             printersList,
             selectedPrinter,
-            selectedQuantity,
+            selectedQuantityLabel,
             printStatus,
             errorStore,
             loading,
@@ -134,6 +140,8 @@ export const usePrintingStore = defineStore('printingStore',
             PRINT_LABEL,
             qrCodeZPL,
             code128ZPL,
-            test,
+            setSelectedPrinter,
+            setSelectedQuantityLabel,
+            setSelectedLabelTemplate,
         }
     })

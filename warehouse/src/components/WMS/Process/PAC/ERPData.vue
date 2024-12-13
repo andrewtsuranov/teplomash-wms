@@ -21,12 +21,6 @@
         >
           TEST (Проверить паллету)
         </button>
-        <button class="btn btn-outline-info"
-                type="button"
-                @click="webSocketStore.updateProductCodes(false)"
-        >
-          TEST (Обновить коды)
-        </button>
       </div>
       <div class="erp-settings-filter">
         <div class="form-check">
@@ -153,8 +147,8 @@ onMounted(async () => {
 
 .erp-settings-group-btn {
   display: grid;
-  grid-template-columns: repeat(4, minmax(auto, max-content));
-  grid-template-rows: minmax(auto, 1fr);
+  grid-template-columns: repeat(3, minmax(auto, max-content));
+  grid-template-rows: minmax(auto, 3rem);
   column-gap: 2rem;
 }
 

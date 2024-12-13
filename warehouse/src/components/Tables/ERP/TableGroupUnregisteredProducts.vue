@@ -57,6 +57,9 @@ const webSocketStore = useWebSocketStore()
 const packingStore = usePackingStore()
 const openedItemCode = ref(null);
 const handleCreatePallet = async (products) => {
+  if (!packingStore.selectedTSD) {
+    alert('Выберите активный ТСД')
+  }
   try {
     await ERPStore.GET_PALLET_TYPE_BY_PRODUCT_ID(products.data[0].product_type)
     const data = {

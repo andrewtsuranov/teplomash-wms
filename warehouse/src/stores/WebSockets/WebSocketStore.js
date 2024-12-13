@@ -253,18 +253,6 @@ export const useWebSocketStore = defineStore('websocket', () => {
             error.value = 'Cannot send message: WebSocket is not connected'
         }
     }
-    const updateProductCodes = (dry_run = true) => {
-        const data = {
-            action: 'update_product_codes',
-            dry_run: dry_run
-        }
-        if (isConnected.value && socket.value && socket.value.readyState === WebSocket.OPEN) {
-            socket.value.send(JSON.stringify(data))
-        } else {
-            console.error('Cannot send message: WebSocket is not connected')
-            error.value = 'Cannot send message: WebSocket is not connected'
-        }
-    }
     const createPalletTask = (payload) => {
         if (isConnected.value && socket.value && socket.value.readyState === WebSocket.OPEN) {
             socket.value.send(JSON.stringify(payload))
@@ -357,6 +345,5 @@ export const useWebSocketStore = defineStore('websocket', () => {
         createPalletTask,
         getTransactionData,
         checkPalletTask,
-        updateProductCodes,
     }
 })
