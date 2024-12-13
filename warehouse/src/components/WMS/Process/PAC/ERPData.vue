@@ -21,6 +21,12 @@
         >
           TEST (Проверить паллету)
         </button>
+        <button class="btn btn-outline-info"
+                type="button"
+                @click="webSocketStore.updateProductCodes(false)"
+        >
+          TEST (Обновить коды)
+        </button>
       </div>
       <div class="erp-settings-filter">
         <div class="form-check">
@@ -108,6 +114,7 @@ const handleCheckPallet = async () => {
   try {
     await webSocketStore.checkPalletTask(data)
   } catch (e) {
+    console.log(e)
   }
 }
 onMounted(async () => {
@@ -137,19 +144,6 @@ onMounted(async () => {
   justify-items: center;
 }
 
-.counter button {
-  height: 100%;
-  border: 1px solid #514D4C;
-}
-
-.counter input {
-  display: grid;
-  text-align: center;
-  border: 1px solid #514D4C;
-  outline: none;
-  background: none;
-}
-
 .erp-settings-container {
   display: grid;
   grid-template-columns: 1fr;
@@ -159,8 +153,8 @@ onMounted(async () => {
 
 .erp-settings-group-btn {
   display: grid;
-  grid-template-columns: repeat(3, minmax(auto, max-content));
-  grid-template-rows: minmax(auto, 50px);
+  grid-template-columns: repeat(4, minmax(auto, max-content));
+  grid-template-rows: minmax(auto, 1fr);
   column-gap: 2rem;
 }
 

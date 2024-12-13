@@ -9,23 +9,28 @@
         <table-item-unregistered-product/>
       </div>
       <div>
-        <button class="btn btn-outline-primary" data-bs-target="#modalPrintSettings" data-bs-toggle="modal"
-                @click="handlerPrint">
+        <button class="btn btn-outline-primary"
+                data-bs-target="#modalPrintSettings"
+                data-bs-toggle="modal"
+                @click="handlerPrint"
+        >
           Печать Barcode
         </button>
-        <ModalPrintSettings/>
       </div>
     </div>
   </div>
+        <ModalPrintSettings/>
 </template>
 <script setup>
 import {usePackingStore} from "@/stores/HTTP/PackingStore.js";
 import {usePrintingStore} from "@/stores/HTTP/PrintingStore.js";
 import TableItemUnregisteredProduct from "@/components/Tables/ERP/TableItemUnregisteredProduct.vue";
 import ModalPrintSettings from "@/components/Modals/ModalPrintSettings.vue";
+import {ref} from "vue";
 
 const packingStore = usePackingStore()
 const printingStore = usePrintingStore()
+const isBarcode = ref(2)
 const handlerPrint = async () => {
   try {
     await printingStore.getZPLPrinters()

@@ -103,7 +103,6 @@ const router = createRouter({
                             path: 'packing/:code',
                             name: 'wmsPacking',
                             component: () => import('@/views/Home/WMS/Process/Packing/StoragePackingView.vue'),
-                            props: true,
                             children: [
                                 {
                                     path: 'tsd',

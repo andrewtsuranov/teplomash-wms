@@ -49,7 +49,7 @@
 import {ref, computed} from 'vue';
 import {useUserStore} from "@/stores/HTTP/UserStore.js";
 import {useErrorStore} from "@/stores/Error/ErrorStore.js";
-import MyButton from "@/components/UI/MyButton.vue";
+import MyButton from "@/components/UI/Buttons/MyButton.vue";
 import {useRouter} from 'vue-router';
 import {usePasswordToggle} from "@/composables/Validations/usePasswordToggle.js";
 

@@ -1,26 +1,25 @@
 <template>
   <div class="wms-packing-container">
-    <h1>Упаковка: {{ code.toUpperCase() }}</h1>
-    <e-r-p-view/>
-    <packing-product-data/>
-    <TeplomashTaskManagerView/>
-    <pallet-data/>
+    <h2>{{warehouseStore.selectedZone.name.replace(/_/g, ' ').toUpperCase()}} </h2>
+    <ERPData/>
+    <PackingProductData/>
+    <TeplomashTaskManager/>
+    <PalletData/>
   </div>
 </template>
 <script setup>
-import TeplomashTaskManagerView from "@/components/TeplomashTaskManager/TeplomashTaskManagerView.vue";
-import PalletData from "@/components/PalletData/PalletData.vue";
-import ERPView from "@/views/Home/WMS/Process/Packing/Data/ERPView.vue";
-import {useRoute, useRouter} from 'vue-router';
-import {usePackingStore} from "@/stores/HTTP/PackingStore.js";
+import ERPData from "@/components/WMS/Process/PAC/ERPData.vue";
 import PackingProductData from "@/components/WMS/Process/PAC/PackingProductData.vue";
+import TeplomashTaskManager from "@/components/TeplomashTaskManager/TeplomashTaskManager.vue";
+import PalletData from "@/components/WMS/Process/PAC/PalletData.vue";
+import {useRouter} from 'vue-router';
+import {usePackingStore} from "@/stores/HTTP/PackingStore.js";
+import {useWarehouseStore} from "@/stores/HTTP/WarehouseStore.js";
 
-const route = useRoute();
+const warehouseStore = useWarehouseStore()
 const router = useRouter();
 const packingStore = usePackingStore();
-defineProps({
-  code: String,
-})
+
 </script>
 <style scoped>
 .wms-packing-container {

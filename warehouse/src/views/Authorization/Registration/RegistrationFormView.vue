@@ -120,10 +120,10 @@
 </template>
 <script setup>
 import {useUserStore} from "@/stores/HTTP/UserStore.js";
-import MyInput from "@/components/UI/MyInput.vue";
-import MyButton from "@/components/UI/MyButton.vue"
+import MyInput from "@/components/UI/Inputs/MyInput.vue";
+import MyButton from "@/components/UI/Buttons/MyButton.vue"
 import {computed, ref} from "vue";
-import MySelect from "@/components/UI/MySelect.vue"
+import MySelect from "@/components/UI/Select/MySelect.vue"
 import {usePasswordToggle} from "@/composables/Validations/usePasswordToggle.js";
 import {useEmailValidation} from "@/composables/Validations/useEmailValidation.js";
 import {usePasswordValidation} from "@/composables/Validations/usePasswordValidation.js";

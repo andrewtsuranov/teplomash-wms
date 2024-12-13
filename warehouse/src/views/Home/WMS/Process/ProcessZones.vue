@@ -1,9 +1,11 @@
 <template>
   <div class="process-zone-container">
     <div v-for="item in zones" :key="item.code" class="process-zone">
-      <router-link :to="{ name: processRouteName, params: { code: item.code.toLowerCase() } }">
-        {{ item.name.replace(/_/g, ' ') }} ({{ item.code }})
-      </router-link>
+      <div
+          @click.prevent="handleZoneClick(item)"
+      >
+        {{ item.name.replace(/_/g, ' ') }}
+      </div>
     </div>
     <RouterView/>
   </div>
@@ -11,7 +13,9 @@
 <script setup>
 import {useWarehouseStore} from "@/stores/HTTP/WarehouseStore.js";
 import {computed} from "vue";
+import {useRouter} from "vue-router";
 
+const router = useRouter()
 const warehouseStore = useWarehouseStore()
 const props = defineProps({
   process: {
@@ -24,6 +28,10 @@ const props = defineProps({
   }
 });
 const zones = computed(() => warehouseStore.customSortByZone[props.process] || []);
+const handleZoneClick = (zone) => {
+  warehouseStore.setSelectedZone(zone)
+  router.push({ name: props.processRouteName, params: { code: zone.code.toLowerCase() } })
+}
 </script>
 <style scoped>
 .process-zone-container {

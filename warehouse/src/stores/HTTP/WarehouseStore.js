@@ -22,6 +22,7 @@ export const useWarehouseStore = defineStore('warehouseStore', () => {
     const loading = ref(false)
     const allWarehouses = ref(JSON.parse(localStorage.getItem('warehouses')) || null)
     const warehouseData = ref(JSON.parse(localStorage.getItem('warehouseData')) || null)
+    const selectedZone = ref(JSON.parse(localStorage.getItem('selectedZone')) || null)
     const allZoneTypes = ref(null)
     const warehouseZoneTypeById = ref(JSON.parse(localStorage.getItem('warehouseZoneTypeById')) || null)
     const warehouseAliasMap = ref({})
@@ -112,6 +113,10 @@ export const useWarehouseStore = defineStore('warehouseStore', () => {
             loading.value = false
         }
     }
+    const setSelectedZone = (zone) => {
+        selectedZone.value = zone
+       localStorage.setItem('selectedZone', JSON.stringify(zone))
+    }
     return {
 //state
         errorStore,
@@ -121,6 +126,7 @@ export const useWarehouseStore = defineStore('warehouseStore', () => {
         allZoneTypes,
         warehouseZoneTypeById,
         warehouseAliasMap,
+        selectedZone,
 //getters
         groupByZone,
         customSortByZone,
@@ -130,5 +136,6 @@ export const useWarehouseStore = defineStore('warehouseStore', () => {
         WAREHOUSE_ID,
         GET_ALl_ZONE_TYPES,
         GET_WAREHOUSES_ZONE_BY_ID,
+        setSelectedZone,
     }
 })

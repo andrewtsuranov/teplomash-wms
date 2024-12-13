@@ -55,8 +55,8 @@ export const useWebSocketStore = defineStore('websocket', () => {
 
 //Actions
     function initWebSocket() {
-        // const wsUrl = `ws://lab:8081/ws/inventory/?token=${userStore.getTokenAccess}`
-        const wsUrl = `ws://38.180.192.229/ws/inventory/?token=${userStore.getTokenAccess}`
+        const wsUrl = `ws://lab:8081/ws/inventory/?token=${userStore.getTokenAccess}`
+        // const wsUrl = `ws://38.180.192.229/ws/inventory/?token=${userStore.getTokenAccess}`
         // const wsUrl = `ws://192.168.1.144/ws/inventory/?token=${userStore.getTokenAccess}`
         socket.value = new WebSocket(wsUrl)
         socket.value.onopen = onOpen.bind(this)
@@ -253,6 +253,18 @@ export const useWebSocketStore = defineStore('websocket', () => {
             error.value = 'Cannot send message: WebSocket is not connected'
         }
     }
+    const updateProductCodes = (dry_run = true) => {
+        const data = {
+            action: 'update_product_codes',
+            dry_run: dry_run
+        }
+        if (isConnected.value && socket.value && socket.value.readyState === WebSocket.OPEN) {
+            socket.value.send(JSON.stringify(data))
+        } else {
+            console.error('Cannot send message: WebSocket is not connected')
+            error.value = 'Cannot send message: WebSocket is not connected'
+        }
+    }
     const createPalletTask = (payload) => {
         if (isConnected.value && socket.value && socket.value.readyState === WebSocket.OPEN) {
             socket.value.send(JSON.stringify(payload))
@@ -345,5 +357,6 @@ export const useWebSocketStore = defineStore('websocket', () => {
         createPalletTask,
         getTransactionData,
         checkPalletTask,
+        updateProductCodes,
     }
 })

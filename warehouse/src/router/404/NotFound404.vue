@@ -11,7 +11,7 @@
   </div>
 </template>
 <script setup>
-import MyButton from '@/components/UI/MyButton.vue'
+import MyButton from '@/components/UI/Buttons/MyButton.vue'
 import {useRouter} from "vue-router";
 
 const router = useRouter()

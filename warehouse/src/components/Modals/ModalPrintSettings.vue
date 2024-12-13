@@ -24,51 +24,55 @@
           >
           </button>
         </div>
-        <div class="modal-body"
+        <div class="modal-body printer-settings-container"
         >
-          <div class="printer-settings-container"
-          >
-            <label>Сетевой принтер:</label>
-            <div>
-              <select
-                  v-model="printingStore.selectedPrinter"
-                  aria-label="Выберите принтер"
-                  class="form-select"
-              >
-                <option disabled value="">Выберите принтер...</option>
-                <option
-                    v-for="(print, ip) in printingStore.printersList?.printers"
-                    :key="ip"
-                    :value="print"
-                >
-                  {{ print.model }} ({{ print.name }})
-                </option>
-              </select>
-            </div>
-            <label>Тип печати:</label>
-            <select v-model="printingStore.selectedLabelTemplate"
-                    class="form-select"
+          <label>Сетевой принтер:</label>
+          <div>
+            <select
+                v-model="printingStore.selectedPrinter"
+                aria-label="Выберите принтер"
+                class="form-select"
             >
-              <option disabled value="">Выберите шаблон этикетки...</option>
+              <option disabled value="">Выберите принтер...</option>
               <option
-                  v-for="(label, id) in printingStore.labelTemplatesList"
-                  :key="id"
-                  :value="label.code"
+                  v-for="(print, ip) in printingStore.printersList?.printers || []"
+                  :key="ip"
+                  :value="print"
+                  :selected="print.zone.includes(warehouseStore.selectedZone?.id)"
               >
-                {{ label.name }}
+                {{ print.model }} ({{ print.name }}) {{ print.zone }}
               </option>
             </select>
-            <label>Кол-во этикеток:</label>
-            <div class="counter">
-              <button @click="decrement">&ndash;</button>
-              <input v-model.number.trim="count" min="1" v-on:keypress="useNumbersOnlyWithoutDot"/>
-              <button @click="increment">+</button>
-            </div>
-            <label>Статус: печати:</label>
-            <div v-if="printingStore.printStatus?.status" :style="'color: green;' ">Отправлено на печать
-            </div>
-            <div v-else>Готов к печати</div>
           </div>
+          <label>Тип печати:</label>
+          <select v-model="printingStore.selectedLabelTemplate"
+                  class="form-select"
+          >
+            <option disabled value="">Выберите шаблон этикетки...</option>
+            <option
+                v-for="(label, id) in filteredLabelTemplates"
+                :key="id"
+                :value="label.code"
+            >
+              {{ label.name }}
+            </option>
+          </select>
+          <label>Кол-во этикеток:</label>
+          <div class="counter">
+            <button @click="decrement">&ndash;</button>
+            <input v-model.number.trim="count"
+                   min="1"
+                   v-on:keypress="useNumbersOnlyWithoutDot"
+            />
+            <button @click="increment">+</button>
+          </div>
+          <label>Статус: печати:</label>
+          <div v-if="printingStore.printStatus?.status"
+               :style="'color: green;'"
+          >
+            Печатает...
+          </div>
+          <div v-else>Ожидает задание на печать</div>
         </div>
         <div class="modal-footer">
           <button class="btn btn-outline-secondary"
@@ -91,8 +95,11 @@
 <script setup>
 import {usePrintingStore} from "@/stores/HTTP/PrintingStore.js";
 import {usePackingStore} from "@/stores/HTTP/PackingStore.js";
-import {ref} from "vue";
+import {useWarehouseStore} from "@/stores/HTTP/WarehouseStore.js";
+import {useNumbersOnlyWithoutDot} from "@/composables/NumbersOnlyWithoutDot.js";
+import {ref, computed} from "vue";
 
+const warehouseStore = useWarehouseStore()
 const packingStore = usePackingStore()
 const count = ref(1)
 const printingStore = usePrintingStore()
@@ -111,6 +118,51 @@ const decrement = () => {
     count.value--;
   }
 }
+const filteredPrintersList = computed(() => {
+  const selectedZone = warehouseStore.selectedZone
+  if (!selectedZone || !printingStore.printersList?.printers) {
+    return []
+  }
+
+  return printingStore.printersList.printers.filter(printer => {
+    return printer.zone === selectedZone.id
+  })
+})
+const filteredLabelTemplates = computed(() => {
+  // if (props.isBarcode) {
+  //   return printingStore.labelTemplatesList.filter(
+  //       label => label.name === 'Barcode'
+  //   );
+  // }
+  return printingStore.labelTemplatesList;
+});
+
 </script>
 <style scoped>
+.printer-settings-container {
+  display: grid;
+  grid-template-columns: minmax(auto, 1fr) 1fr;
+  grid-auto-rows: min-content;
+  align-items: center;
+  row-gap: 1rem;
+}
+
+.counter {
+  display: grid;
+  grid-template-columns: minmax(3rem, auto) 1fr minmax(3rem, auto);
+  font-size: 1.2rem;
+}
+
+.counter button {
+  height: 100%;
+  border: 1px solid #514D4C;
+}
+
+.counter input {
+  display: grid;
+  text-align: center;
+  border: 1px solid #514D4C;
+  outline: none;
+  background: none;
+}
 </style>

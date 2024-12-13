@@ -21,8 +21,8 @@
   </div>
 </template>
 <script setup>
-import MyInput from "@/components/UI/MyInput.vue";
-import MyButton from "@/components/UI/MyButton.vue"
+import MyInput from "@/components/UI/Inputs/MyInput.vue";
+import MyButton from "@/components/UI/Buttons/MyButton.vue"
 import {ref} from "vue";
 import {useUserStore} from "@/stores/HTTP/UserStore.js";
 import router from "@/router/index.js";

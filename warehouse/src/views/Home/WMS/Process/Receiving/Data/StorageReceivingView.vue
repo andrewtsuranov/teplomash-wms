@@ -42,7 +42,7 @@
 <teplomash-task-manager-view/>
 </template>
 <script setup>
-import TeplomashTaskManagerView from "@/components/TeplomashTaskManager/TeplomashTaskManagerView.vue";
+import TeplomashTaskManagerView from "@/components/TeplomashTaskManager/TeplomashTaskManager.vue";
 </script>
 <style scoped>
 .in-table-container {
