@@ -1,6 +1,6 @@
 <template>
   <div class="wms-packing-container">
-    <h2>{{warehouseStore.selectedZone.name.replace(/_/g, ' ').toUpperCase()}} </h2>
+    <h2>{{ warehouseStore.selectedZone.name.replace(/_/g, ' ').toUpperCase() }} </h2>
     <ERPData/>
     <PackingProductData/>
     <TeplomashTaskManager/>
@@ -19,7 +19,6 @@ import {useWarehouseStore} from "@/stores/HTTP/WarehouseStore.js";
 const warehouseStore = useWarehouseStore()
 const router = useRouter();
 const packingStore = usePackingStore();
-
 </script>
 <style scoped>
 .wms-packing-container {

@@ -12,7 +12,7 @@
           <h1 id="modalPrintSettingsLabel"
               class="modal-title fs-5"
           >
-            Параметры печати этикеток {{ packingStore.selectedGroupUnregProduct?.key }}
+            Параметры печати этикетки {{ packingStore.selectedGroupUnregProduct?.key }}
           </h1>
           <button aria-label="Close"
                   class="btn-close"
@@ -82,6 +82,7 @@
                       data-bs-target="#modalPreviewPrintingBody"
                       data-bs-toggle="modal"
                       type="button"
+                      @click="handlePreviewPrint()"
               >
                 Просмотр
               </button>
@@ -124,11 +125,13 @@ const handlePrint = async (productData) => {
     console.error('Ошибка при печати:', error);
   }
 }
+const handlePreviewPrint = () => {
+}
 </script>
 <style scoped>
 .printer-settings-container {
   display: grid;
-  grid-template-columns: minmax(auto, 1fr) 1fr;
+  grid-template-columns: 1fr 1fr;
   grid-auto-rows: min-content;
   align-items: center;
   row-gap: 1rem;

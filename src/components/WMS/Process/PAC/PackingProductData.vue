@@ -8,7 +8,7 @@
       <div class="packing-product-data-table">
         <table-item-unregistered-product/>
       </div>
-      <div>
+      <div class="packing-product-data-printing">
         <button class="btn btn-outline-primary"
                 data-bs-target="#modalPrintSettings"
                 data-bs-toggle="modal"
@@ -16,10 +16,17 @@
         >
           Печать Barcode
         </button>
+        <button class="btn btn-outline-primary"
+                data-bs-target="#modalPrintSettings"
+                data-bs-toggle="modal"
+                @click="handlerPrint"
+        >
+          Печать Nameplate
+        </button>
       </div>
     </div>
+    <ModalPrintSettings/>
   </div>
-  <ModalPrintSettings/>
 </template>
 <script setup>
 import {usePackingStore} from "@/stores/HTTP/PackingStore.js";
@@ -44,7 +51,7 @@ const handlerPrint = async () => {
     }
     await printingStore.setSelectedLabelTemplate(
         printingStore.labelTemplatesList
-            .find(label => label.name.toLowerCase() === 'barcode'
+            .find(label => label.code.toLowerCase() === 'code-128'
             ))
     await printingStore.setSelectedQuantityLabel(packingStore.selectedGroupUnregProduct.data.length)
   } catch (e) {
@@ -77,5 +84,12 @@ const handlerPrint = async () => {
 }
 
 .packing-product-data-table {
+}
+
+.packing-product-data-printing {
+  display: grid;
+  grid-template-columns: minmax(auto, max-content);
+  grid-template-rows: min-content min-content;
+  row-gap: 1rem;
 }
 </style>

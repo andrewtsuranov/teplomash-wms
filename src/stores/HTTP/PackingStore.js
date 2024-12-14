@@ -33,6 +33,9 @@ export const usePackingStore = defineStore('packingStore', () => {
     }
     // const packingData = ref(JSON.parse(localStorage.getItem('packingData')) || null)
 //getters
+    const getBarcodesFromSelectedGroupUnregProduct = computed(() =>
+        selectedGroupUnregProduct.value?.data.map(product => product.barcode
+        ))
 //actions
     const setSelectedTSD = (tsdId) => {
         selectedTSD.value = tsdId
@@ -62,6 +65,7 @@ export const usePackingStore = defineStore('packingStore', () => {
         selectedTSD,
         packingId,
 //getters
+        getBarcodesFromSelectedGroupUnregProduct,
 //actions
         setSelectedTSD,
         setSelectedGroupUnregProduct,
