@@ -12,29 +12,29 @@
       </tr>
       </thead>
       <tbody>
-        <tr v-for="(item, key) in filterUnregProductByUser" :key="key">
-          <th scope="row">{{ item.number }}</th>
-          <td>
-            {{ item?.key }}
-          </td>
-          <td>
-            {{ item.data[0].error }}
-          </td>
-          <td>{{ item.data.length }}</td>
-          <td>
-            <button class="btn btn-outline-success"
-                    @click="handleCreatePallet(item)"
-            >Собрать паллету
-            </button>
-          </td>
-          <td>
-            <button class="btn btn-outline-primary"
-                    @click="showPackingProductData(item)"
-            >
-              {{ openedItemCode === item?.key ? 'Скрыть список' : 'Раскрыть список' }}
-            </button>
-          </td>
-        </tr>
+      <tr v-for="(item, key) in filterUnregProductByUser" :key="key">
+        <th scope="row">{{ item.number }}</th>
+        <td>
+          {{ item?.key }}
+        </td>
+        <td>
+          {{ item.data[0].error }}
+        </td>
+        <td>{{ item.data.length }}</td>
+        <td>
+          <button class="btn btn-outline-success"
+                  @click="handleCreatePallet(item)"
+          >Собрать паллету
+          </button>
+        </td>
+        <td>
+          <button class="btn btn-outline-primary"
+                  @click="toggleDetailUnregProduct(item)"
+          >
+            {{ packingStore.openedItemProductKey === item?.key ? 'Скрыть список' : 'Раскрыть список' }}
+          </button>
+        </td>
+      </tr>
       </tbody>
     </table>
   </div>
@@ -55,7 +55,6 @@ const userStore = useUserStore()
 const ERPStore = useERPStore()
 const webSocketStore = useWebSocketStore()
 const packingStore = usePackingStore()
-const openedItemCode = ref(null);
 const handleCreatePallet = async (products) => {
   if (!packingStore.selectedTSD) {
     alert('Выберите активный ТСД')
@@ -84,18 +83,18 @@ const handleCreatePallet = async (products) => {
     console.log(e)
   }
 }
-const showPackingProductData = async (productData) => {
-      try {
-        await packingStore.setSelectedGroupUnregProduct(productData)
-        if (openedItemCode.value === productData.key) {
-          openedItemCode.value = null;
-        } else {
-          openedItemCode.value = productData.key;
-        }
-      } catch (e) {
-        console.log(e)
-      }
+const toggleDetailUnregProduct = async (productData) => {
+  try {
+    if (packingStore.openedItemProductKey === productData.key) {
+      packingStore.closeTableItemUnregProduct()
+    } else {
+      await packingStore.setSelectedGroupUnregProduct(productData)
+      packingStore.openTableItemUnregProduct(productData.key)
     }
+  } catch (e) {
+    console.log(e)
+  }
+}
 </script>
 <style scoped>
 .in-table-container {

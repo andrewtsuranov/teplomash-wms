@@ -1,5 +1,5 @@
 <template>
-  <div v-if="packingStore.selectedGroupUnregProduct"
+  <div v-if="packingStore.isShownTableItemUnregProduct && packingStore.selectedGroupUnregProduct"
        class="packing-product-data-container">
     <div class="packing-product-data">
       <div class="packing-product-data-title">

@@ -7,6 +7,8 @@ export const usePackingStore = defineStore('packingStore', () => {
     const errorStore = useErrorStore()
     const selectedTSD = ref(JSON.parse(localStorage.getItem('selectedTsd')) || null)
     const selectedGroupUnregProduct = ref(null)
+    const openedItemProductKey = ref(null);
+    const isShownTableItemUnregProduct = ref(false)
     const packingId = ref(JSON.parse(localStorage.getItem('packingId')) || null)
     const dataYYYYMMDD = ref(new Date().toISOString().slice(0, 10));
 //state
@@ -38,14 +40,23 @@ export const usePackingStore = defineStore('packingStore', () => {
     }
     const setSelectedGroupUnregProduct = (product) => {
         selectedGroupUnregProduct.value = product
-        // localStorage.setItem('selectedTsd', JSON.stringify(product))
+    }
+    const openTableItemUnregProduct = (itemKey) => {
+        openedItemProductKey.value = itemKey;
+        isShownTableItemUnregProduct.value = true;
+    }
+    const closeTableItemUnregProduct = () => {
+        openedItemProductKey.value = null;
+        isShownTableItemUnregProduct.value = false;
+        selectedGroupUnregProduct.value = null;
     }
     return {
 //state
         errorStore,
         loading,
         selectedGroupUnregProduct,
-        // packingData,
+        openedItemProductKey,
+        isShownTableItemUnregProduct,
         palletData,
         palletStatus,
         selectedTSD,
@@ -54,5 +65,7 @@ export const usePackingStore = defineStore('packingStore', () => {
 //actions
         setSelectedTSD,
         setSelectedGroupUnregProduct,
+        openTableItemUnregProduct,
+        closeTableItemUnregProduct,
     }
 })

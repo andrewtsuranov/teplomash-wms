@@ -56,13 +56,14 @@ export const usePrintingStore = defineStore('printingStore',
             return `^XA^FO20,100^BY4^BCN,200,Y,N,N^FD${body}^FS^PQ${qty}^XZ`
         }
 //getters
+        const quantityLabel = computed(() => selectedQuantityLabel.value);
 //actions
         const getZPLPrinters = async () => {
             loading.value = true;
             errorStore.clearError();
             try {
                 printersList.value = await kyPrint('printers/list_printers/').json()
-                 return true
+                return true
             } catch (err) {
                 errorStore.Error = err.message
                 throw err;
@@ -114,14 +115,22 @@ export const usePrintingStore = defineStore('printingStore',
                 loading.value = false
             }
         }
-       const setSelectedPrinter = (printer) => {
-           selectedPrinter.value = printer;
+        const setSelectedPrinter = (printer) => {
+            selectedPrinter.value = printer;
         }
         const setSelectedQuantityLabel = (qty) => {
             selectedQuantityLabel.value = qty;
         }
         const setSelectedLabelTemplate = (type) => {
             selectedLabelTemplate.value = type;
+        }
+        const increment = () => {
+            selectedQuantityLabel.value++;
+        }
+        const decrement = () => {
+            if (selectedQuantityLabel.value > 1) {
+                selectedQuantityLabel.value--;
+            }
         }
         return {
 //state
@@ -134,6 +143,7 @@ export const usePrintingStore = defineStore('printingStore',
             labelTemplatesList,
             selectedLabelTemplate,
 //getters
+            quantityLabel,
 //actions
             getZPLPrinters,
             getLabelTemplate,
@@ -143,5 +153,7 @@ export const usePrintingStore = defineStore('printingStore',
             setSelectedPrinter,
             setSelectedQuantityLabel,
             setSelectedLabelTemplate,
+            increment,
+            decrement,
         }
     })

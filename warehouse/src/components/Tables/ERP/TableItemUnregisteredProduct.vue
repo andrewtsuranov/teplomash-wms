@@ -13,13 +13,12 @@
       <td>{{ index + 1 }}</td>
       <td>{{ item.name }}</td>
       <td>{{ item.barcode }}</td>
-      <td>{{ useSplitDateByT(item.created_at).date }} {{ useSplitDateByT(item.created_at).time }}</td>
+      <td>{{ item.created_at }}</td>
     </tr>
     </tbody>
   </table>
 </template>
 <script setup>
-import {useSplitDateByT} from "@/composables/SpliDateByT.js";
 import {usePackingStore} from "@/stores/HTTP/PackingStore.js";
 
 const packingStore = usePackingStore()
