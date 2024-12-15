@@ -2,8 +2,9 @@
   <div class="ttm-terminal-container">
     <div class="ttm-terminal-active-tsd"> {{ getDeviceById?.username }}</div>
     <div class="ttm-terminal-view">
-      <div v-if="transactionStore.currentTransactions.length > 0 && transactionStore.lastTransaction?.assigned_to_id === getDeviceById?.id"
-           class="ttm-terminal-view-status">
+      <div
+          v-if="transactionStore.currentTransactions.length > 0 && transactionStore.lastTransaction?.assigned_to_id === getDeviceById?.id"
+          class="ttm-terminal-view-status">
         <span>Задача:</span>
         <div>
           {{ transactionTaskTranslated.toUpperCase() }}
@@ -53,7 +54,7 @@ import {useTransactionStore} from "@/stores/WebSockets/transactionStore.js";
 import {usePackingStore} from "@/stores/HTTP/PackingStore.js";
 import {useUserStore} from "@/stores/HTTP/UserStore.js";
 import {useRoute} from "vue-router";
-import {computed} from "vue";
+import {computed, onUnmounted} from "vue";
 import {useFormatDate} from "@/composables/Date/useFormatDate.js";
 import {useTranslationsDictionary} from "@/composables/Dictionary/useTransactionsDictionary.js";
 import {useTransactionsColorDictionary} from "@/composables/Dictionary/useTransactionsColorDictionary.js";
@@ -67,8 +68,6 @@ const userStore = useUserStore()
 const packingStore = usePackingStore()
 const webSocketStore = useWebSocketStore()
 const tsdID = route.query.id;
-
-
 const getDeviceById = computed(() => {
   if (packingStore.selectedTSD !== null) {
     return webSocketStore.onlineDevices.find(device => device.id === packingStore.selectedTSD);
@@ -77,7 +76,6 @@ const getDeviceById = computed(() => {
   }
 })
 const foundUserById = computed(() => userStore.getUserById(transactionStore.lastTransaction.created_by_id));
-
 const transactionColor = computed(() => {
   const lastTransaction = transactionStore.lastTransaction;
   return lastTransaction ? transactionsColorDictionary[lastTransaction.status] || 'gray' : 'gray';
@@ -89,6 +87,9 @@ const transactionStatusTranslated = computed(() => {
 const transactionTaskTranslated = computed(() => {
   const lastTransaction = transactionStore.lastTransaction;
   return lastTransaction ? translationsDictionary[lastTransaction.transaction_type] || lastTransaction.transaction_type : '';
+})
+onUnmounted(() => {
+  packingStore.clearSelectedTSD()
 })
 </script>
 <style scoped>

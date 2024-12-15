@@ -84,6 +84,10 @@ const handlerPrint = async () => {
 }
 
 .packing-product-data-table {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: minmax(auto, min-content);
+  overflow: auto;
 }
 
 .packing-product-data-printing {

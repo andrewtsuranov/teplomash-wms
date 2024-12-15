@@ -107,7 +107,7 @@ import {useWebSocketStore} from '@/stores/WebSockets/WebSocketStore.js'
 import MyButton from "@/components/UI/Buttons/MyButton.vue"
 import {usePackingStore} from "@/stores/HTTP/PackingStore.js";
 import {useRouter, useRoute} from "vue-router";
-import {onMounted} from "vue";
+import {onMounted, onUnmounted} from "vue";
 
 const router = useRouter()
 const route = useRoute()
@@ -121,10 +121,14 @@ onMounted(async () => {
     if (!webSocketStore.isConnected) {
       await webSocketStore.initWebSocket()
     }
+    if (localStorage.selectedTsd) {
+      await router.push({name: 'TTM-packing', query: {id: localStorage.selectedTsd}})
+    }
   } catch (e) {
     console.log(e)
     throw e
   }
+
 })
 </script>
 <style scoped>

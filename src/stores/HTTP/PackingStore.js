@@ -53,6 +53,10 @@ export const usePackingStore = defineStore('packingStore', () => {
         isShownTableItemUnregProduct.value = false;
         selectedGroupUnregProduct.value = null;
     }
+    const clearSelectedTSD = () => {
+        selectedTSD.value = null
+        localStorage.removeItem('selectedTsd')
+    }
     return {
 //state
         errorStore,
@@ -71,5 +75,6 @@ export const usePackingStore = defineStore('packingStore', () => {
         setSelectedGroupUnregProduct,
         openTableItemUnregProduct,
         closeTableItemUnregProduct,
+        clearSelectedTSD,
     }
 })
