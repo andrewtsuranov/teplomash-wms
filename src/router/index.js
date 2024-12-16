@@ -66,7 +66,7 @@ const router = createRouter({
                             name: 'wmsPackingZone',
                             component: () => import('@/views/Home/WMS/Process/ProcessZones.vue'),
                             props: {process: 'Упаковка', processRouteName: 'wmsPacking'},
-                            meta: {breadcrumb: 'Сборка'},
+                            meta: {breadcrumb: 'Упаковка'},
                         },
                         {
                             path: 'receiving',
@@ -114,7 +114,7 @@ const router = createRouter({
                             ]
                         },
                         {
-                            path: 'receiving/:code-rec',
+                            path: 'receiving/:code',
                             name: 'wmsReceiving',
                             component: () => import('@/views/Home/WMS/Process/Receiving/Data/StorageReceivingView.vue'),
                             children: [

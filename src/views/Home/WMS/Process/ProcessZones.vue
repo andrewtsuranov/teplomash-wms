@@ -5,7 +5,7 @@
          class="process-zone"
          @click="handleZoneClick(item)"
     >
-      <span v-if="item">{{ item.name.replace(/_/g, ' ') }}</span>
+      <span v-if="item">{{ item?.name.replace(/_/g, ' ') }}</span>
     </div>
     <RouterView/>
   </div>
