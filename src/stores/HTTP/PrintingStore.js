@@ -53,7 +53,7 @@ export const usePrintingStore = defineStore('printingStore',
             return `^XA^FO20,30^BQN,2,7,H,7,Q,S,7^FDQM,${body}^FS^PQ${qty}^XZ`
         }
         const code128ZPL = (body, qty) => {
-            return `^XA^FO20,100^BY4^BCN,200,Y,N,N^FD${body}^FS^PQ${qty}^XZ`
+            return `^XA^LL1181^PW689^LH0,0^FO10,50^BY4^BCN,200,Y,N,N^FD$body^FS^XZ`
         }
 //getters
         const quantityLabel = computed(() => selectedQuantityLabel.value);
@@ -85,17 +85,16 @@ export const usePrintingStore = defineStore('printingStore',
             }
         }
         const PRINT_LABEL = async (productData) => {
-            const body = productData.map(item => item.barcode)
             loading.value = true;
             errorStore.clearError();
             const zplData = {
-                "template_code": selectedLabelTemplate.value,
+                "template_code": selectedLabelTemplate.value.code,
                 "printer_id": selectedPrinter.value.id,
-                "data": {
-                    "product_name": productData.map(item => item.name),
-                    "body": body,
-                    "qty": selectedQuantityLabel.value,
-                },
+                "data": productData.map(item => ({
+                    "product_name": item.name,
+                    "body": item.barcode,
+                    // "qty": selectedQuantityLabel.value,
+                })),
                 "copies": selectedQuantityLabel.value,
                 "priority": 0
             }
@@ -157,3 +156,12 @@ export const usePrintingStore = defineStore('printingStore',
             decrement,
         }
     })
+
+    ^XA
+    ^LL495
+    ^PW690
+    ^LH0,0
+^CI28
+^FO56,40^A@N,50,25, E:^FB450,3,0,L,0^FD$product_name^FS
+^FO56,200^BY4^BCN,190,Y,N,N^FD$body^FS
+^XZ

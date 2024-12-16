@@ -105,7 +105,7 @@ const router = createRouter({
                             component: () => import('@/views/Home/WMS/Process/Packing/StoragePackingView.vue'),
                             children: [
                                 {
-                                    path: 'tsd',
+                                    path: 'tsd-pac',
                                     name: 'TTM-packing',
                                     components: {
                                         default: () => import('@/components/TeplomashTaskManager/Terminal/TTMTerminal.vue'),
@@ -114,7 +114,7 @@ const router = createRouter({
                             ]
                         },
                         {
-                            path: 'receiving/:code',
+                            path: 'receiving/:code-rec',
                             name: 'wmsReceiving',
                             component: () => import('@/views/Home/WMS/Process/Receiving/Data/StorageReceivingView.vue'),
                             children: [
