@@ -156,12 +156,3 @@ export const usePrintingStore = defineStore('printingStore',
             decrement,
         }
     })
-
-    ^XA
-    ^LL495
-    ^PW690
-    ^LH0,0
-^CI28
-^FO56,40^A@N,50,25, E:^FB450,3,0,L,0^FD$product_name^FS
-^FO56,200^BY4^BCN,190,Y,N,N^FD$body^FS
-^XZ

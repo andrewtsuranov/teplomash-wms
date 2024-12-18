@@ -62,20 +62,17 @@ const handleCreatePallet = async (products) => {
   try {
     await ERPStore.GET_PALLET_TYPE_BY_PRODUCT_ID(products.data[0].product_type)
     const data = {
-      "action": "create_pallet",
-      "description": `Создание паллеты ${products.key}`,
-      "assigned_to_id": packingStore.selectedTSD,
-      "warehouse_id": warehouseStore.getWarehouseId,
-      "to_zone_id": 1,
-      "from_zone_id": 18,
-      "count": 2,
-      "palletType": ERPStore.palletTypeByProductId[0]?.id || [],
-      "data": {
-        "abc_class": "A",
-        "xyz_class": "X",
-        "to": [],
-        "from": [],
-        "barcodes": products.data.map(data => data.barcode),
+      "action": "create_task",
+      "taskData": {
+        "task_code": "CREATE_PALLET",
+        "assigned_to_id": packingStore.selectedTSD,
+        "variables": {
+          "warehouse_id": warehouseStore.getWarehouseId,
+          "count": 2,
+          "id_PT": products.data[0].product_type,
+          "to_zone_id": 1,
+          "from_zone_id": 18,
+        },
       }
     }
     await webSocketStore.createPalletTask(data)
