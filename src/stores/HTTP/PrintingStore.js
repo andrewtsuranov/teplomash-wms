@@ -56,7 +56,8 @@ export const usePrintingStore = defineStore('printingStore',
             return `^XA^LL1181^PW689^LH0,0^FO10,50^BY4^BCN,200,Y,N,N^FD$body^FS^XZ`
         }
 //getters
-        const quantityLabel = computed(() => selectedQuantityLabel.value);
+        const quantityLabel = ref(1)
+        const totalLabelPrint = computed(() => selectedQuantityLabel.value);
 //actions
         const getZPLPrinters = async () => {
             loading.value = true;
@@ -124,11 +125,11 @@ export const usePrintingStore = defineStore('printingStore',
             selectedLabelTemplate.value = type;
         }
         const increment = () => {
-            selectedQuantityLabel.value++;
+            quantityLabel.value++;
         }
         const decrement = () => {
-            if (selectedQuantityLabel.value > 1) {
-                selectedQuantityLabel.value--;
+            if (quantityLabel.value > 1) {
+                quantityLabel.value--;
             }
         }
         return {
@@ -140,9 +141,10 @@ export const usePrintingStore = defineStore('printingStore',
             errorStore,
             loading,
             labelTemplatesList,
-            selectedLabelTemplate,
-//getters
             quantityLabel,
+//getters
+            selectedLabelTemplate,
+            totalLabelPrint,
 //actions
             getZPLPrinters,
             getLabelTemplate,

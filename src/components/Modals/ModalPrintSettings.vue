@@ -60,7 +60,7 @@
               {{ label.name }}
             </option>
           </select>
-          <label>Кол-во этикеток:</label>
+          <label>Кол-во копий:</label>
           <div class="counter">
             <button @click="printingStore.decrement">&ndash;</button>
             <input v-model.number.trim="printingStore.quantityLabel"
@@ -69,6 +69,8 @@
             />
             <button @click="printingStore.increment">+</button>
           </div>
+          <label>Всего этикеток: </label>
+          <div>{{ printingStore.totalLabelPrint }} шт.</div>
           <!--          <label>Статус: печати:</label>-->
           <!--          <div v-if="printingStore.printStatus?.status"-->
           <!--               :style="'color: green;'"-->
@@ -131,15 +133,16 @@ const handlePreviewPrint = () => {
 <style scoped>
 .printer-settings-container {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: auto 1fr;
   grid-auto-rows: min-content;
   align-items: center;
-  row-gap: 1rem;
+  gap: 1rem;
+  font-size: 1.1rem;
 }
 
 .counter {
   display: grid;
-  grid-template-columns: minmax(3rem, auto) 1fr minmax(3rem, auto);
+  grid-template-columns: 3rem 5rem 3rem;
   font-size: 1.2rem;
 }
 

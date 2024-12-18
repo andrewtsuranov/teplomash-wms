@@ -25,6 +25,7 @@
             <div v-for="(barcode, index) in packingStore.getBarcodesFromSelectedGroupUnregProduct"
                  :key="index"
                  class="barcode-item">
+              <label>{{ packingStore.selectedGroupUnregProduct?.key }}</label>
               <svg :id="'barcode-' + index"></svg>
             </div>
           </div>
@@ -57,11 +58,12 @@ const generateBarcodes = () => {
           width: 3,
           height: 100,
           displayValue: true,
-          margin: 30,
+          marginTop: 0,
           background: 'none',
           lineColor: '#000000',
           fontSize: 30,
-          font: 'monospace',
+          font: 'Arial',
+          text: `Зав.№ ${barcode}`,
           textAlign: "center",
         })
       } catch (error) {
@@ -92,7 +94,19 @@ watch(() => packingStore.getBarcodesFromSelectedGroupUnregProduct, () => {
 
 .barcode-item {
   display: grid;
+  padding: 1rem;
+  grid-template-columns: 350px;
   background: #FFFFFF;
   border-radius: 1rem;
+  justify-items: center;
+}
+
+label {
+  color: #000;
+  font-size: 1.6rem;
+  font-weight: bold;
+  padding: 0 1.5rem;
+  font-family: "Arial Narrow";
+  line-height: 1.2;
 }
 </style>

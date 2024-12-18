@@ -68,7 +68,7 @@
           >
             <router-link :to="{name: 'TTM-packing', query: {id: device.id }}"
                          class="ttm-tsd-item-name-online"
-                         :class="{'active' : packingStore.selectedTSD===device.id}"
+                         :class="{'active' : packingStore.selectedTSD===device.id || route.query.id === device.id}"
                          @click="packingStore.setSelectedTSD(device.id)"
             >
               <span class="item-title">{{ device.username }}</span>
@@ -122,8 +122,8 @@ onMounted(async () => {
     if (!webSocketStore.isConnected) {
       await webSocketStore.initWebSocket()
     }
-    if (localStorage.selectedTsd) {
-      await router.push({name: 'TTM-packing', query: {id: localStorage.selectedTsd}})
+    if (packingStore.selectedTSD) {
+      await router.push({name: 'TTM-packing', query: {id: packingStore.selectedTSD}})
     }
   } catch (e) {
     console.log(e)

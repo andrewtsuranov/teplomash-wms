@@ -54,7 +54,7 @@ import {useTransactionStore} from "@/stores/WebSockets/transactionStore.js";
 import {usePackingStore} from "@/stores/HTTP/PackingStore.js";
 import {useUserStore} from "@/stores/HTTP/UserStore.js";
 import {useRoute} from "vue-router";
-import {computed, onUnmounted} from "vue";
+import {computed, onMounted, onUnmounted} from "vue";
 import {useFormatDate} from "@/composables/Date/useFormatDate.js";
 import {useTranslationsDictionary} from "@/composables/Dictionary/useTransactionsDictionary.js";
 import {useTransactionsColorDictionary} from "@/composables/Dictionary/useTransactionsColorDictionary.js";
@@ -67,13 +67,14 @@ const route = useRoute()
 const userStore = useUserStore()
 const packingStore = usePackingStore()
 const webSocketStore = useWebSocketStore()
-const tsdID = route.query.id;
+const tsdID = route.query.id
 const getDeviceById = computed(() => {
   if (packingStore.selectedTSD !== null) {
     return webSocketStore.onlineDevices.find(device => device.id === packingStore.selectedTSD);
-  } else {
-    return null;
-  }
+  } else if (tsdID) {
+    return webSocketStore.onlineDevices.find(device => device.id === tsdID);
+  } else
+    return null
 })
 const foundUserById = computed(() => userStore.getUserById(transactionStore.lastTransaction.created_by_id));
 const transactionColor = computed(() => {

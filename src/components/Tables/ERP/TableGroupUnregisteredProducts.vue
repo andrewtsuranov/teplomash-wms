@@ -18,7 +18,9 @@
           {{ item?.key }}
         </td>
         <td>
-          {{ item.data[0].error }}
+          <i class="bi bi-exclamation-circle-fill"
+             style="color: #ffc107; font-size: 1.3rem"
+             v-if="item.data[0].error"></i>
         </td>
         <td>{{ item.data.length }}</td>
         <td>
