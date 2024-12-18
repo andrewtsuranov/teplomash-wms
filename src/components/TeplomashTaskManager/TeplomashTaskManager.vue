@@ -68,6 +68,7 @@
           >
             <router-link :to="{name: 'TTM-packing', query: {id: device.id }}"
                          class="ttm-tsd-item-name-online"
+                         :class="{'active' : packingStore.selectedTSD===device.id}"
                          @click="packingStore.setSelectedTSD(device.id)"
             >
               <span class="item-title">{{ device.username }}</span>
@@ -128,7 +129,6 @@ onMounted(async () => {
     console.log(e)
     throw e
   }
-
 })
 </script>
 <style scoped>
@@ -328,7 +328,10 @@ a:active {
   text-decoration: none;
 }
 
-.teplomash-active-exact-link {
+/*.teplomash-active-exact-link {*/
+/*  background-color: rgba(2, 73, 89, 0.6);*/
+/*}*/
+.ttm-tsd-item-name-online.active {
   background-color: rgba(2, 73, 89, 0.6);
 }
 
