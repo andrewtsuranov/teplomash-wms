@@ -68,10 +68,9 @@ const handleCreatePallet = async (products) => {
         "assigned_to_id": packingStore.selectedTSD,
         "variables": {
           "warehouse_id": warehouseStore.getWarehouseId,
-          "count": 3,
           "id_PT": products.data[0].product_type,
           "to_zone_id": 1,
-          "from_zone_id": 18,
+          "from_zone_id": 1,
         },
       }
     }
