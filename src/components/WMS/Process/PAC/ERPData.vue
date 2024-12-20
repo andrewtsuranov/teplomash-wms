@@ -21,6 +21,24 @@
         >
           TEST (Проверить паллету)
         </button>
+        <div>
+          <button
+              class="btn btn-outline-info"
+              type="button"
+              @click="webSocketStore.fillProps"
+          >
+            TEST (Заполнить свойства)
+          </button>
+        </div>
+        <div>
+          <button
+              class="btn btn-outline-info"
+              type="button"
+              @click="webSocketStore.linkPallet"
+          >
+            TEST (Связать тип паллеты)
+          </button>
+        </div>
       </div>
       <div class="erp-settings-filter">
         <div class="form-check">
@@ -54,6 +72,7 @@
             Показать все данные
           </label>
         </div>
+
       </div>
       <div class="erp-settings-info">
         <div class="alert alert-secondary m-0" data-bs-theme="dark" role="alert">
@@ -112,13 +131,13 @@ const handleCheckPallet = async () => {
   }
 }
 onMounted(async () => {
-  try {
-    if (webSocketStore.isConnected) {
-      await webSocketStore.getUnregisteredItems()
-    }
-  } catch (e) {
-    console.log("WEBSOCKET НЕ ПОДКЛЮЧЕН" + e)
-  }
+  // try {
+  //   if (webSocketStore.isConnected) {
+  //     await webSocketStore.getUnregisteredItems()
+  //   }
+  // } catch (e) {
+  //   console.log("WEBSOCKET НЕ ПОДКЛЮЧЕН" + e)
+  // }
 })
 </script>
 <style scoped>

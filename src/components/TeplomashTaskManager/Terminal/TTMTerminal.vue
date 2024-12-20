@@ -26,26 +26,15 @@
           {{ formatTimestamp(transactionStore.lastTransaction?.timestamp).date }}
           {{ formatTimestamp(transactionStore.lastTransaction?.timestamp).time }}
         </div>
+        <span v-if="transactionError">Ошибка:</span>
+        <div v-if="transactionError">
+          {{transactionError}}
+        </div>
       </div>
       <div v-else>
         Нет транзакций
       </div>
     </div>
-    <!--    <div class="ttm-terminal-confirmed input-group input-group">-->
-    <!--      <input v-model="message"-->
-    <!--             aria-describedby="button-addon2"-->
-    <!--             aria-label="Recipient's username"-->
-    <!--             class="form-control"-->
-    <!--             placeholder="Отправить сообщение..."-->
-    <!--             type="text"-->
-    <!--      >-->
-    <!--      <button id="button-addon2"-->
-    <!--              class="btn btn-success"-->
-    <!--              type="button"-->
-    <!--              @click="webSocketStore.sendMessage(message, packingStore.selectedTSD)"-->
-    <!--      >Отправить-->
-    <!--      </button>-->
-    <!--    </div>-->
   </div>
 </template>
 <script setup>
@@ -89,8 +78,8 @@ const transactionTaskTranslated = computed(() => {
   const lastTransaction = transactionStore.lastTransaction;
   return lastTransaction ? translationsDictionary[lastTransaction.transaction_type] || lastTransaction.transaction_type : '';
 })
-onUnmounted(() => {
-  packingStore.clearSelectedTSD()
+const transactionError = computed(() => {
+  return webSocketStore.unknownError ? webSocketStore.unknownError.message : null
 })
 </script>
 <style scoped>

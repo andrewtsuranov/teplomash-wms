@@ -19,6 +19,7 @@
         </td>
         <td>
           <i class="bi bi-exclamation-circle-fill"
+             v-b-tooltip.hover :title="item.data[0].error"
              style="color: #ffc107; font-size: 1.3rem"
              v-if="item.data[0].error"></i>
         </td>
@@ -47,7 +48,6 @@ import {useWebSocketStore} from "@/stores/WebSockets/WebSocketStore.js";
 import {usePackingStore} from "@/stores/HTTP/PackingStore.js";
 import {useERPStore} from "@/stores/HTTP/ERPStore.js";
 import {useWarehouseStore} from "@/stores/HTTP/WarehouseStore.js";
-import {ref} from "vue";
 
 defineProps({
   filterUnregProductByUser: Object

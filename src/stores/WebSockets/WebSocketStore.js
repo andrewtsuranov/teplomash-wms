@@ -16,6 +16,7 @@ export const useWebSocketStore = defineStore('websocket', () => {
     const message = ref(null)
     const reconnectError = ref(false)
     const error = ref()
+    const unknownError = ref()
     const reconnectAttempts = ref(0)
     const maxReconnectAttempts = ref(5)
     const reconnectDelay = ref(3000)
@@ -55,8 +56,8 @@ export const useWebSocketStore = defineStore('websocket', () => {
 
 //Actions
     function initWebSocket() {
-        // const wsUrl = `ws://lab:8081/ws/inventory/?token=${userStore.getTokenAccess}`
-        const wsUrl = `ws://38.180.192.229/ws/inventory/?token=${userStore.getTokenAccess}`
+        const wsUrl = `ws://lab:8081/ws/inventory/?token=${userStore.getTokenAccess}`
+        // const wsUrl = `ws://38.180.192.229/ws/inventory/?token=${userStore.getTokenAccess}`
         // const wsUrl = `ws://192.168.1.144/ws/inventory/?token=${userStore.getTokenAccess}`
         socket.value = new WebSocket(wsUrl)
         socket.value.onopen = onOpen.bind(this)
@@ -141,28 +142,28 @@ export const useWebSocketStore = defineStore('websocket', () => {
             if (data.type === 'loaders_list') {
                 onlineDevices.value = data.loaders
             }
-            // Обработка сообщения: получение приватного ссобщения
-            if (data.type === 'private_message') {
-                receivedMessage.value = {
-                    from_id: `(Получено сообщение от ТСД №${data.from_user}) >>`,
-                    message: data.message
-                }
-            }
             //Обработка сообщения: перенос продукции из ERP в БД
             if (data.type === 'items_created' && data.status === 'success') {
                 getUnregisteredItems()
             }
             if (data.type === 'unregistered_items' && data.status === 'success') {
+                // if (localStorage.getItem('wsUnregisteredProducts')) {
+                //
+                //     const newObj = useGroupByKey(data.items, 'name')
+                //     const wsUnregisteredProducts = {...existingObject, ...newObj}
+                //     wsUnregisteredProducts.value = wsUnregisteredProducts
+                //     localStorage.setItem('wsUnregisteredProducts', JSON.stringify(wsUnregisteredProducts))
+                // }
                 wsUnregisteredProducts.value = useGroupByKey(data.items, 'name')
-                localStorage.setItem('wsUnregisteredProducts', JSON.stringify(useGroupByKey(data.items, 'name')))
+                localStorage.setItem('wsUnregisteredProducts', JSON.stringify(wsUnregisteredProducts.value))
             }
             if (data.type === 'product_types_list' && data.status === 'success') {
                 productTypes.value = data.products
                 localStorage.setItem('productTypes', JSON.stringify(data.products))
             }
-            // if (data.type === 'product_types_updated' && data.status === 'success') {
-            //     alert(data.message)
-            // }
+            if (data.type === 'error' && data.code === 'UNKNOWN_ERROR') {
+                unknownError.value = data.message
+            }
             if (data.type === 'transaction_update') {
                 transactionStore.addTransaction(data.transaction)
             }
@@ -207,7 +208,8 @@ export const useWebSocketStore = defineStore('websocket', () => {
 
     const getUnregisteredItems = () => {
         const data = {
-            "action": "get_unregistered_items"
+            "action": "get_unregistered_items",
+            "date": "2023-12-10 10:08:46"
         }
         if (isConnected.value && socket.value && socket.value.readyState === WebSocket.OPEN) {
             socket.value.send(JSON.stringify(data))
@@ -301,6 +303,29 @@ export const useWebSocketStore = defineStore('websocket', () => {
         }));
     }
 
+    const fillProps = () => {
+        const data = {
+            "action": "fill_props"
+        }
+        if (isConnected.value && socket.value && socket.value.readyState === WebSocket.OPEN) {
+            socket.value.send(JSON.stringify(data))
+        } else {
+            console.error('Cannot send message: WebSocket is not connected')
+            error.value = 'Cannot send message: WebSocket is not connected'
+        }
+    }
+    const linkPallet = () => {
+        const data = {
+            "action": "link_pallet"
+        }
+        if (isConnected.value && socket.value && socket.value.readyState === WebSocket.OPEN) {
+            socket.value.send(JSON.stringify(data))
+        } else {
+            console.error('Cannot send message: WebSocket is not connected')
+            error.value = 'Cannot send message: WebSocket is not connected'
+        }
+    }
+
     return {
 //state
         socket,
@@ -318,6 +343,7 @@ export const useWebSocketStore = defineStore('websocket', () => {
         wsUnregisteredProducts,
         // productTypes,
         transactionStatus,
+        unknownError,
 //getters
         lastMessage,
         connectionStatus,
@@ -345,5 +371,7 @@ export const useWebSocketStore = defineStore('websocket', () => {
         createPalletTask,
         getTransactionData,
         checkPalletTask,
+        fillProps,
+        linkPallet,
     }
 })
