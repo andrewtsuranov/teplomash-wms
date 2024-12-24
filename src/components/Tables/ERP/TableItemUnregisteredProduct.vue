@@ -24,19 +24,10 @@ import {usePackingStore} from "@/stores/HTTP/PackingStore.js";
 const packingStore = usePackingStore()
 </script>
 <style scoped>
-table {
-  width: 100%;
-  border-collapse: collapse;
-}
 
 table thead {
   position: sticky;
   top: 0;
   z-index: 10;
-}
-
-th, td {
-  padding: 8px;
-  text-align: left;
 }
 </style>

@@ -105,7 +105,7 @@ label {
   color: #000;
   font-size: 1.6rem;
   font-weight: bold;
-  padding: 0 1.5rem;
+  padding: 0 1.2rem;
   font-family: "Arial Narrow";
   line-height: 1.2;
 }

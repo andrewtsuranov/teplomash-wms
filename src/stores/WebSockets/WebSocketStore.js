@@ -33,15 +33,19 @@ export const useWebSocketStore = defineStore('websocket', () => {
     const connectionStatus = computed(() => isConnected.value ? 'В сети' : 'Не в сети')
     const getPrivateMessage = computed(() => privateMessage.value)
     const getPrivateMessageID = computed(() => privateMessageID.value)
+    const groupOfUnregProducts = computed(() => {
+        if (!wsUnregisteredProducts.value) return {};
+        return useGroupByKey(wsUnregisteredProducts.value, 'name');
+    });
     const foundIdUser = computed((itemId) => {
         return onlineDevices.value.find(item => item.id === itemId)
     })
     const unregisteredProducts = computed(() => {
-        return Object.keys(wsUnregisteredProducts.value)
+        return Object.keys(groupOfUnregProducts?.value)
             .map((key, index) => ({
                 number: index + 1,
                 key: key,
-                data: wsUnregisteredProducts.value[key],
+                data: groupOfUnregProducts?.value[key],
             }))
         // .sort((a, b) => {
         //     // Преобразование строки в Date (теперь можно напрямую)
@@ -147,16 +151,33 @@ export const useWebSocketStore = defineStore('websocket', () => {
                 getUnregisteredItems()
             }
             if (data.type === 'unregistered_items' && data.status === 'success') {
-                // if (localStorage.getItem('wsUnregisteredProducts')) {
-                //
-                //     const newObj = useGroupByKey(data.items, 'name')
-                //     const wsUnregisteredProducts = {...existingObject, ...newObj}
-                //     wsUnregisteredProducts.value = wsUnregisteredProducts
-                //     localStorage.setItem('wsUnregisteredProducts', JSON.stringify(wsUnregisteredProducts))
-                // }
-                wsUnregisteredProducts.value = useGroupByKey(data.items, 'name')
-                localStorage.setItem('wsUnregisteredProducts', JSON.stringify(wsUnregisteredProducts.value))
+                console.log('Новые данные:', data.items.length, 'элементов');
+
+                if (!wsUnregisteredProducts.value) {
+                    wsUnregisteredProducts.value = data.items;
+                } else {
+                    // Фильтруем элементы с более новым временем создания
+                    const newItems = data.items.filter(newItem => {
+                        const existingItem = wsUnregisteredProducts.value.find(item => item.id === newItem.id);
+                        if (!existingItem) return true; // полностью новый элемент
+
+                        // Сравниваем даты создания
+                        return new Date(newItem.created_at) > new Date(existingItem.created_at);
+                    });
+
+                    console.log('Найдено новых или обновленных элементов:', newItems.length);
+
+                    if (newItems.length > 0) {
+                        wsUnregisteredProducts.value = [...wsUnregisteredProducts.value, ...newItems];
+                    }
+                }
+
+                localStorage.setItem('wsUnregisteredProducts', JSON.stringify(wsUnregisteredProducts.value));
             }
+
+
+
+
             if (data.type === 'product_types_list' && data.status === 'success') {
                 productTypes.value = data.products
                 localStorage.setItem('productTypes', JSON.stringify(data.products))
@@ -209,7 +230,7 @@ export const useWebSocketStore = defineStore('websocket', () => {
     const getUnregisteredItems = () => {
         const data = {
             "action": "get_unregistered_items",
-            "date": "2023-12-10 10:08:46"
+            "date": "2023-12-10 23:59:59"
         }
         if (isConnected.value && socket.value && socket.value.readyState === WebSocket.OPEN) {
             socket.value.send(JSON.stringify(data))
@@ -243,18 +264,7 @@ export const useWebSocketStore = defineStore('websocket', () => {
             error.value = 'Cannot send message: WebSocket is not connected'
         }
     }
-    const updateProductTypes = (array) => {
-        const data = {
-            "action": "update_product_types",
-            "products": array
-        }
-        if (isConnected.value && socket.value && socket.value.readyState === WebSocket.OPEN) {
-            socket.value.send(JSON.stringify(data))
-        } else {
-            console.error('Cannot send message: WebSocket is not connected')
-            error.value = 'Cannot send message: WebSocket is not connected'
-        }
-    }
+
     const createPalletTask = (payload) => {
         if (isConnected.value && socket.value && socket.value.readyState === WebSocket.OPEN) {
             socket.value.send(JSON.stringify(payload))
@@ -286,16 +296,7 @@ export const useWebSocketStore = defineStore('websocket', () => {
             error.value = 'Cannot send message: WebSocket is not connected'
         }
     }
-    // function createPallet() {
-    //     // Создание паллеты
-    //     socket.value.send(JSON.stringify({
-    //         action: 'create_pallet',
-    //         length: 120,
-    //         abc_class: 'A',
-    //         xyz_class: 'X',
-    //         barcode: '1234567890'
-    //     }));
-    // }
+
     function getWarehouse() {
         socket.value.send(JSON.stringify({
             action: 'get_warehouse',
@@ -303,17 +304,6 @@ export const useWebSocketStore = defineStore('websocket', () => {
         }));
     }
 
-    const fillProps = () => {
-        const data = {
-            "action": "fill_props"
-        }
-        if (isConnected.value && socket.value && socket.value.readyState === WebSocket.OPEN) {
-            socket.value.send(JSON.stringify(data))
-        } else {
-            console.error('Cannot send message: WebSocket is not connected')
-            error.value = 'Cannot send message: WebSocket is not connected'
-        }
-    }
     const linkPallet = () => {
         const data = {
             "action": "link_pallet"
@@ -351,6 +341,7 @@ export const useWebSocketStore = defineStore('websocket', () => {
         getPrivateMessage,
         getPrivateMessageID,
         foundIdUser,
+        groupOfUnregProducts,
         unregisteredProducts,
 //actions
         initWebSocket,
@@ -367,11 +358,9 @@ export const useWebSocketStore = defineStore('websocket', () => {
         createItemsBulk,
         reconnect,
         getProductTypes,
-        updateProductTypes,
         createPalletTask,
         getTransactionData,
         checkPalletTask,
-        fillProps,
         linkPallet,
     }
 })

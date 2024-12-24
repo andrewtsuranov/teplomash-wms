@@ -1,50 +1,15 @@
 <template>
   <div class="wms-packing-erp-data">
-    <div class="erp-settings-container">
-      <div class="erp-settings-group-btn">
-        <button
-            class="btn btn-outline-info"
-            type="button"
-            @click="webSocketStore.getUnregisteredItems()"
-        >
-          TEST (Загрузить данные)
-        </button>
-        <button class="btn btn-outline-info"
-                type="button"
-                @click="webSocketStore.getTransactionData(400, true, true)"
-        >
-          TEST (Получить транзакцию)
-        </button>
-        <button class="btn btn-outline-info"
-                type="button"
-                @click="handleCheckPallet"
-        >
-          TEST (Проверить паллету)
-        </button>
-        <div>
-          <button
-              class="btn btn-outline-info"
-              type="button"
-              @click="webSocketStore.fillProps"
-          >
-            TEST (Заполнить свойства)
-          </button>
-        </div>
-        <div>
-          <button
-              class="btn btn-outline-info"
-              type="button"
-              @click="webSocketStore.linkPallet"
-          >
-            TEST (Связать тип паллеты)
-          </button>
-        </div>
+    <div class="erp-data">
+      <div class="erp-alert alert m-0" data-bs-theme="dark" role="alert">
+        <i class="bi bi-info-circle erp-alert-logo"></i>
+        <span
+            class="erp-alert-text">Данные обновляются в автоматическом режиме с периодичностью один раз в 30 минут!</span>
       </div>
       <div class="erp-settings-filter">
         <div class="form-check">
           <input id="flexRadioDefault1"
                  v-model="selectedFilter"
-                 checked
                  class="form-check-input"
                  name="flexRadioDefault"
                  type="radio"
@@ -60,6 +25,7 @@
           <input
               id="flexRadioDefault2"
               v-model="selectedFilter"
+              checked
               class="form-check-input"
               name="flexRadioDefault"
               type="radio"
@@ -72,17 +38,40 @@
             Показать все данные
           </label>
         </div>
-
       </div>
-      <div class="erp-settings-info">
-        <div class="alert alert-secondary m-0" data-bs-theme="dark" role="alert">
-          <i class="bi bi-info-circle" style="padding-right: 1rem"></i>
-          Данные обновляются в автоматическом режиме с периодичностью один раз в 30 минут!
-        </div>
-      </div>
+      <table-group-unregistered-products :filterUnregProductByUser="filterUnregProductByUser"/>
     </div>
     <svg-logo-erp class="erp-logo"/>
-    <table-group-unregistered-products :filterUnregProductByUser="filterUnregProductByUser"/>
+    <div class="erp-settings-group-btn">
+      <button class="btn btn-outline-info"
+              type="button"
+              @click="webSocketStore.getUnregisteredItems()"
+      >
+        TEST (Обновить данные)
+      </button>
+      <div class="qrcode">
+        <label style="text-transform: uppercase">Задача: Собрать паллету</label>
+        <div v-html="qrcode"></div>
+      </div>
+      <!--      <button class="btn btn-outline-info"-->
+      <!--              type="button"-->
+      <!--              @click="webSocketStore.getTransactionData(400, true, true)"-->
+      <!--      >-->
+      <!--        TEST (Получить транзакцию)-->
+      <!--      </button>-->
+      <!--      <button class="btn btn-outline-info"-->
+      <!--              type="button"-->
+      <!--              @click="handleCheckPallet"-->
+      <!--      >-->
+      <!--        TEST (Проверить паллету)-->
+      <!--      </button>-->
+      <!--      <button class="btn btn-outline-info"-->
+      <!--              type="button"-->
+      <!--              @click="webSocketStore.linkPallet"-->
+      <!--      >-->
+      <!--        TEST (Связать тип паллеты)-->
+      <!--      </button>-->
+    </div>
   </div>
 </template>
 <script setup>
@@ -92,114 +81,160 @@ import {useWebSocketStore} from "@/stores/WebSockets/WebSocketStore.js";
 import {useERPStore} from "@/stores/HTTP/ERPStore.js";
 import {useUserStore} from "@/stores/HTTP/UserStore.js";
 import {usePackingStore} from "@/stores/HTTP/PackingStore.js";
+import {useWarehouseStore} from "@/stores/HTTP/WarehouseStore.js";
 import {ref, computed, onMounted} from "vue";
+import QRCode from 'qrcode'
 
+const warehouseStore = useWarehouseStore()
 const ERPStore = useERPStore()
 const packingStore = usePackingStore()
 const userStore = useUserStore()
 const webSocketStore = useWebSocketStore()
-const selectedFilter = ref('КЭВ-18П4021Е')
+const selectedFilter = ref('all')
+const text = ref("{\"task_code\": \"CREATE_PALLET_WITH_SCAN\", \"variables\": {\"warehouse_id\": 1}}")
+const qrcode = ref(null)
 const filterUnregProductByUser = computed(() => {
-  if (!webSocketStore.wsUnregisteredProducts) {
+  if (!webSocketStore.unregisteredProducts) {
     return []
   }
   if (selectedFilter.value === 'КЭВ-18П4021Е') {
-   return webSocketStore.unregisteredProducts.filter(item => {
+    return webSocketStore.unregisteredProducts.filter(item => {
       return item.key === selectedFilter.value
     })
   } else {
     return webSocketStore.unregisteredProducts
   }
 })
-const handleCheckPallet = async () => {
+// const handleCheckPallet = async () => {
+//   const data = {
+//     "action": "check_pallet",
+//     "from_user": userStore.getUserId,
+//     "description": '1. Сканируйте зону нахождения паллеты; 2. Сканируйте QR-код паллеты; 3. Сканируйте любое изделие из паллеты;',
+//     "loader_id": packingStore.selectedTSD,
+//     "warehouse_id": 1,
+//     "data": {
+//       "to": [],
+//       "from": [],
+//       "barcodes": []
+//     }
+//   }
+//   try {
+//     await webSocketStore.checkPalletTask(data)
+//   } catch (e) {
+//     console.log(e)
+//   }
+// }
+const generateQR = async (data) => {
+  const opts = {
+    errorCorrectionLevel: 'H',
+    quality: 0.3,
+    width: 200,
+    margin: 1,
+    color: {
+      dark: "#000",
+      light: '#EEE'
+    }
+  };
+  return new Promise((resolve, reject) => {
+    QRCode.toString(data, opts, (err, string) => {
+      if (err) reject(err);
+      resolve(string);
+    });
+  });
+};
+const taskScanData = () => {
   const data = {
-    "action": "check_pallet",
-    "from_user": userStore.getUserId,
-    "description": '1. Сканируйте зону нахождения паллеты; 2. Сканируйте QR-код паллеты; 3. Сканируйте любое изделие из паллеты;',
-    "loader_id": packingStore.selectedTSD,
-    "warehouse_id": 1,
-    "data": {
-      "to": [],
-      "from": [],
-      "barcodes": []
+    task_code: "CREATE_PALLET_WITH_SCAN",
+    variables: {
+      warehouse_id: warehouseStore.warehouseData.id
     }
   }
+  return JSON.stringify(data)
+}
+
+onMounted(async () => {
   try {
-    await webSocketStore.checkPalletTask(data)
+    qrcode.value = await generateQR(taskScanData())
+    // if (webSocketStore.isConnected) {
+    //   await webSocketStore.getUnregisteredItems()
+    // }
   } catch (e) {
     console.log(e)
   }
-}
-onMounted(async () => {
-  // try {
-  //   if (webSocketStore.isConnected) {
-  //     await webSocketStore.getUnregisteredItems()
-  //   }
-  // } catch (e) {
-  //   console.log("WEBSOCKET НЕ ПОДКЛЮЧЕН" + e)
-  // }
 })
 </script>
 <style scoped>
 .wms-packing-erp-data {
   display: grid;
+  grid: "data logo"
+        "data buttons";
   grid-template-columns: 1fr 300px;
-  grid-template-rows: 1fr;
+  grid-template-rows: min-content 1fr;
   background-color: #2e2e2e;
   border: 1px solid #605039e0;
   border-radius: 1rem;
   padding: 1rem;
+  column-gap: 1.5rem;
+}
+
+.erp-data {
+  display: grid;
+  grid-area: data;
+  grid-template-columns: minmax(auto, 1fr);
+  grid-auto-rows: min-content;
+  row-gap: 1rem;
+}
+
+.erp-alert {
+  display: grid;
+  grid-template-columns:min-content minmax(auto, 1fr);
+  column-gap: .7rem;
+  background-color: #0000004a;
+  border-color: #605039e0;
+}
+
+.erp-alert-logo,
+.erp-alert-text {
+  color: #979797;
+  font-size: 1.1rem;
 }
 
 .erp-logo {
   display: grid;
+  grid-area: logo;
   grid-template-rows: minmax(auto, 200px);
   justify-items: center;
 }
 
-.erp-settings-container {
-  display: grid;
-  grid-template-columns: 1fr;
-  grid-auto-rows: minmax(auto, 1fr);
-  padding-bottom: 1rem;
-}
 
 .erp-settings-group-btn {
   display: grid;
-  grid-template-columns: repeat(3, minmax(auto, max-content));
-  grid-template-rows: minmax(auto, 3rem);
-  column-gap: 2rem;
+  grid-area: buttons;
+  grid-template-columns: minmax(auto, .8fr);
+  grid-auto-rows: minmax(auto, 3rem);
+  row-gap: 1rem;
+  justify-content: center;
 }
 
-.erp-settings-info {
+.qrcode {
   display: grid;
-  grid-auto-columns: max-content;
-  grid-template-rows: min-content;
-  column-gap: 2rem;
-  align-content: end;
+  grid-template-columns: minmax(auto, 1fr);
+  grid-template-rows: min-content 1fr;
+  row-gap: .5rem;
+  justify-items: center;
 }
 
 @media (max-width: 800px) {
   .wms-packing-erp-data {
     display: grid;
+    grid: "logo"
+          "buttons"
+          "data";
     grid-template-columns: 1fr;
     grid-template-rows: auto 1fr;
-  }
-
-  .erp-settings-container {
     row-gap: 1rem;
   }
 
-  .erp-settings-group-btn {
-    display: grid;
-    grid-template-columns: 1fr;
-    grid-auto-rows: minmax(auto, 50px);
-    row-gap: 1.2rem;
-  }
 
-  .erp-settings-info {
-    display: grid;
-    grid-auto-columns: minmax(auto, 1fr);
-  }
 }
 </style>

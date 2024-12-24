@@ -81,6 +81,8 @@ const transactionTaskTranslated = computed(() => {
 const transactionError = computed(() => {
   return webSocketStore.unknownError ? webSocketStore.unknownError.message : null
 })
+
+
 </script>
 <style scoped>
 .ttm-terminal-container {

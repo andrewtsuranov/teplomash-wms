@@ -118,7 +118,6 @@ const handlerDisconnect = () => {
   webSocketStore.disconnect()
 }
 onMounted(async () => {
-  await console.log(route.query.id)
   try {
     if (!webSocketStore.isConnected) {
       await webSocketStore.initWebSocket()
@@ -126,9 +125,6 @@ onMounted(async () => {
     if (packingStore.selectedTSD) {
       await router.push({name: 'TTM-packing', query: {id: packingStore.selectedTSD}})
     }
-    // if (route.query.id) {
-    //   await router.push({name: 'TTM-packing', query: {id: route.query.id}})
-    // }
   } catch (e) {
     console.log(e)
     throw e

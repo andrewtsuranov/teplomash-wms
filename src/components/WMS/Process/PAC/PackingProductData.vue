@@ -3,7 +3,7 @@
        class="packing-product-data-container">
     <div class="packing-product-data">
       <div class="packing-product-data-title">
-        Информация об упаковке продукции: [ {{ packingStore.selectedGroupUnregProduct.key }} ]
+        Информация об упаковке продукции: {{ packingStore.selectedGroupUnregProduct.key }}
       </div>
       <div class="packing-product-data-table">
         <table-item-unregistered-product/>
@@ -15,13 +15,6 @@
                 @click="handlerPrint"
         >
           Печать Barcode
-        </button>
-        <button class="btn btn-outline-primary"
-                data-bs-target="#modalPrintSettings"
-                data-bs-toggle="modal"
-                @click="handlerPrint"
-        >
-          Печать Nameplate
         </button>
       </div>
     </div>
@@ -85,9 +78,9 @@ const handlerPrint = async () => {
 
 .packing-product-data-table {
   display: grid;
-  grid-template-columns: 1fr;
-  grid-template-rows: minmax(auto, min-content);
+  grid-template-columns: minmax(auto, 1fr);
   overflow: auto;
+  max-height: 370px;
 }
 
 .packing-product-data-printing {

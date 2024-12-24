@@ -1,12 +1,12 @@
 import {defineStore} from 'pinia'
 import {ref, computed} from 'vue'
 import {useWebSocketStore} from "@/stores/WebSockets/WebSocketStore.js";
+import {useDifferenceById} from "@/composables/useDifferenceById.js";
 
 export const useTransactionStore = defineStore('transaction', () => {
     const webSocketStore = useWebSocketStore()
     // State
     const currentTransactions = ref([])
-
     //Getters
     const lastTransaction = computed(() => {
         if (currentTransactions.value.length > 0) {
@@ -32,6 +32,7 @@ export const useTransactionStore = defineStore('transaction', () => {
         if (currentTransactions.value.length > 100) {
             currentTransactions.value = currentTransactions.value.slice(0, 100)
         }
+        updateUnregItemsByTransaction(transaction)
         // Persist to localStorage
         localStorage.setItem('transactions', JSON.stringify(currentTransactions.value))
     }
@@ -59,6 +60,13 @@ export const useTransactionStore = defineStore('transaction', () => {
     }
     // Initialize by loading persisted transactions
     loadPersistedTransactions()
+    const updateUnregItemsByTransaction = (transaction) => {
+        if (transaction.transaction_type === "ADD_PALLET" && transaction.status === "COMPLETED") {
+            if (transaction.pallet !== null) {
+                return webSocketStore.wsUnregisteredProducts.value = useDifferenceById(webSocketStore.wsUnregisteredProducts, transaction.pallet.items).difference
+            }
+        }
+    }
     return {
         currentTransactions,
         recentTransactions,

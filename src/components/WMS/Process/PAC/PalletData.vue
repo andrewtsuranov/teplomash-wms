@@ -1,9 +1,9 @@
 <template>
   <div class="wms-packing-pallet">
-    <div v-for="n in 7"
+    <div v-for="n in 2"
          :key="n"
          class="pallet-item-content"
-         :class="['pallet-status', { 'pending': true, 'finish': false, 'error': false }]"
+         :class="['pallet-status', { 'pending': false, 'finish': false, 'error': true }]"
     >
       <div class="pallet-item-row-one">
         <span>Зона:{{ packingStore.palletData.zoneStorage }}</span>
@@ -91,13 +91,13 @@ onMounted(async () => {
   /*row-gap: .5rem;*/
   border-radius: 1rem;
   min-height: 400px;
-  /*background-color: #ecaf0e;*/
+  background-color: #ecaf0e;
 }
 
 .pallet-item-row-one {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
-  /*color: #2e2e2e;*/
+  color: #2e2e2e;
   /*border: 2px solid #ecaf0e;*/
   font-size: 1.2rem;
   font-weight: bold;
@@ -108,7 +108,7 @@ onMounted(async () => {
   display: grid;
   grid-template-columns: 1fr;
   padding: 1rem;
-  /*background-color: #2F2D2B;*/
+  background-color: #2F2D2B;
 }
 
 .pallet-item-row-three {
