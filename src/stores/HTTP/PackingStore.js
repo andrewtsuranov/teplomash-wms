@@ -6,8 +6,7 @@ export const usePackingStore = defineStore('packingStore', () => {
     const loading = ref(false)
     const errorStore = useErrorStore()
     const selectedTSD = ref(JSON.parse(localStorage.getItem('selectedTsd')) || null)
-    const selectedGroupUnregProduct = ref(null)
-    const openedItemProductKey = ref(null);
+    const openedItemProductId = ref(null);
     const isShownTableItemUnregProduct = ref(false)
     const packingId = ref(JSON.parse(localStorage.getItem('packingId')) || null)
     const dataYYYYMMDD = ref(new Date().toISOString().slice(0, 10));
@@ -31,25 +30,19 @@ export const usePackingStore = defineStore('packingStore', () => {
         sent: 'Отправлена на склад',
         error: "Ошибка действия",
     }
-    // const packingData = ref(JSON.parse(localStorage.getItem('packingData')) || null)
 //getters
-    const getBarcodesFromSelectedGroupUnregProduct = computed(() =>
-        selectedGroupUnregProduct.value?.data.map(product => product.barcode
-        ))
+
 //actions
     const setSelectedTSD = (tsdId) => {
         selectedTSD.value = tsdId
         localStorage.setItem('selectedTsd', JSON.stringify(tsdId))
     }
-    const setSelectedGroupUnregProduct = (product) => {
-        selectedGroupUnregProduct.value = product
-    }
-    const openTableItemUnregProduct = (itemKey) => {
-        openedItemProductKey.value = itemKey;
+    const openTableItemUnregProduct = (itemId) => {
+        openedItemProductId.value = itemId;
         isShownTableItemUnregProduct.value = true;
     }
     const closeTableItemUnregProduct = () => {
-        openedItemProductKey.value = null;
+        openedItemProductId.value = null;
         isShownTableItemUnregProduct.value = false;
         selectedGroupUnregProduct.value = null;
     }
@@ -61,18 +54,16 @@ export const usePackingStore = defineStore('packingStore', () => {
 //state
         errorStore,
         loading,
-        selectedGroupUnregProduct,
-        openedItemProductKey,
+        openedItemProductId,
         isShownTableItemUnregProduct,
         palletData,
         palletStatus,
         selectedTSD,
         packingId,
 //getters
-        getBarcodesFromSelectedGroupUnregProduct,
+
 //actions
         setSelectedTSD,
-        setSelectedGroupUnregProduct,
         openTableItemUnregProduct,
         closeTableItemUnregProduct,
         clearSelectedTSD,

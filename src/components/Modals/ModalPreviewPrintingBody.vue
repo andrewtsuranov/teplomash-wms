@@ -1,31 +1,31 @@
 <template>
-  <div class="modal fade"
-       id="modalPreviewPrintingBody"
+  <div id="modalPreviewPrintingBody"
        aria-hidden="true"
        aria-labelledby="modalPreviewPrintingBodyLabel"
+       class="modal fade"
        data-bs-theme="dark"
        tabindex="-1"
   >
     <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
       <div class="modal-content">
         <div class="modal-header">
-          <h1 class="modal-title fs-5"
-              id="modalPreviewPrintingBodyLabel"
+          <h1 id="modalPreviewPrintingBodyLabel"
+              class="modal-title fs-5"
           > Предварительный просмотр
           </h1>
-          <button type="button"
+          <button aria-label="Close"
                   class="btn-close"
                   data-bs-dismiss="modal"
-                  aria-label="Close"
+                  type="button"
           >
           </button>
         </div>
         <div class="modal-body">
           <div class="barcodes-container">
-            <div v-for="(barcode, index) in packingStore.getBarcodesFromSelectedGroupUnregProduct"
+            <div v-for="(barcode, index) in ERPStore.getBarcodesFromUnregItemsById"
                  :key="index"
                  class="barcode-item">
-              <label>{{ packingStore.selectedGroupUnregProduct?.key }}</label>
+              <label>{{ ERPStore.unregItemsById.items[0]?.name }}</label>
               <svg :id="'barcode-' + index"></svg>
             </div>
           </div>
@@ -44,12 +44,14 @@
 </template>
 <script setup>
 import {usePackingStore} from "@/stores/HTTP/PackingStore.js";
+import {useERPStore} from "@/stores/HTTP/ERPStore.js";
 import {onMounted, watch, nextTick} from "vue";
 import JsBarcode from 'jsbarcode'
 
+const ERPStore = useERPStore()
 const packingStore = usePackingStore()
 const generateBarcodes = () => {
-  packingStore.getBarcodesFromSelectedGroupUnregProduct.forEach((barcode, index) => {
+  ERPStore.getBarcodesFromUnregItemsById.forEach((barcode, index) => {
     const element = document.getElementById(`barcode-${index}`)
     if (element) {
       try {
@@ -75,7 +77,7 @@ const generateBarcodes = () => {
 onMounted(() => {
   generateBarcodes()
 })
-watch(() => packingStore.getBarcodesFromSelectedGroupUnregProduct, () => {
+watch(() => ERPStore.unregItemsById.items, () => {
       nextTick(() => {
         generateBarcodes()
       })

@@ -8,19 +8,22 @@
       <th>Дата</th>
     </tr>
     </thead>
-    <tbody>
-    <tr v-for="(item, index) in packingStore.selectedGroupUnregProduct.data" :key="item.id">
+    <tbody v-if=" ERPStore.unregItemsById">
+    <tr v-for="(item, index) in ERPStore.unregItemsById.items" :key="index">
       <td>{{ index + 1 }}</td>
       <td>{{ item.name }}</td>
       <td>{{ item.barcode }}</td>
-      <td>{{ item.created_at }}</td>
+      <td>{{ useSplitDateByT(item.created_at).date}} {{useSplitDateByT(item.created_at).time}}</td>
     </tr>
     </tbody>
   </table>
 </template>
 <script setup>
 import {usePackingStore} from "@/stores/HTTP/PackingStore.js";
+import {useERPStore} from "@/stores/HTTP/ERPStore.js";
+import {useSplitDateByT} from "@/composables/SpliDateByT.js";
 
+const ERPStore = useERPStore()
 const packingStore = usePackingStore()
 </script>
 <style scoped>

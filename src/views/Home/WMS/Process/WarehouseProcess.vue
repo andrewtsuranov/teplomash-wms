@@ -32,7 +32,7 @@
       </router-link>
     </div>
     <div class="storage-id-terminal">
-      <router-view></router-view>
+      <RouterView/>
     </div>
   </div>
 </template>

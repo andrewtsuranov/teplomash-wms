@@ -1,6 +1,6 @@
 import {defineStore} from 'pinia'
 import ky from "ky"
-import {ref} from "vue"
+import {computed, ref} from "vue"
 
 import {useErrorStore} from "@/stores/Error/ErrorStore.js"
 import {useUserStore} from "@/stores/HTTP/UserStore.js";
@@ -18,11 +18,27 @@ export const useERPStore = defineStore('ERPStore', () => {
 //State
     const errorStore = useErrorStore()
     const loading = ref(false)
+    const unregItemsById = ref(null)
     const palletTypeByProductId = ref(null)
-    const unregProductByKey = ref(null)
 //Getters
-
+    const getBarcodesFromUnregItemsById = computed(() =>
+        unregItemsById.value.items.map(item => item.barcode
+        ))
 //Actions
+    const GET_UNREG_ITEMS_BY_ID = async (ItemId) => {
+        loading.value = true;
+        errorStore.clearError();
+        try {
+            unregItemsById.value = await kyStd(`items/unregistered/?product_type_id=${ItemId}`).json()
+            return true
+        } catch (e) {
+            errorStore.setError(e)
+            console.log(e)
+            throw e
+        } finally {
+            loading.value = false
+        }
+    }
     const GET_PALLET_TYPE_BY_PRODUCT_ID = async (id) => {
         loading.value = true;
         errorStore.clearError();
@@ -41,7 +57,9 @@ export const useERPStore = defineStore('ERPStore', () => {
         errorStore,
         loading,
         palletTypeByProductId,
-        unregProductByKey,
+        unregItemsById,
+        getBarcodesFromUnregItemsById,
         GET_PALLET_TYPE_BY_PRODUCT_ID,
+        GET_UNREG_ITEMS_BY_ID,
     }
 })

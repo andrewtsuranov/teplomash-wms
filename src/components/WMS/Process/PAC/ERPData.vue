@@ -91,18 +91,17 @@ const packingStore = usePackingStore()
 const userStore = useUserStore()
 const webSocketStore = useWebSocketStore()
 const selectedFilter = ref('all')
-const text = ref("{\"task_code\": \"CREATE_PALLET_WITH_SCAN\", \"variables\": {\"warehouse_id\": 1}}")
 const qrcode = ref(null)
 const filterUnregProductByUser = computed(() => {
-  if (!webSocketStore.unregisteredProducts) {
+  if (!webSocketStore.getUnregisteredProducts) {
     return []
   }
   if (selectedFilter.value === 'КЭВ-18П4021Е') {
-    return webSocketStore.unregisteredProducts.filter(item => {
-      return item.key === selectedFilter.value
+    return webSocketStore.getUnregisteredProducts.filter(item => {
+      return item.name === selectedFilter.value
     })
   } else {
-    return webSocketStore.unregisteredProducts
+    return webSocketStore.getUnregisteredProducts
   }
 })
 // const handleCheckPallet = async () => {
@@ -146,7 +145,9 @@ const taskScanData = () => {
   const data = {
     task_code: "CREATE_PALLET_WITH_SCAN",
     variables: {
-      warehouse_id: warehouseStore.warehouseData.id
+      warehouse_id: warehouseStore.warehouseData.id,
+      to_zone_id: warehouseStore.selectedZone.id,
+      from_zone_id: warehouseStore.selectedZone.id,
     }
   }
   return JSON.stringify(data)
@@ -211,7 +212,7 @@ onMounted(async () => {
   display: grid;
   grid-area: buttons;
   grid-template-columns: minmax(auto, .8fr);
-  grid-auto-rows: minmax(auto, 3rem);
+  grid-template-rows: minmax(auto, 3rem) min-content;
   row-gap: 1rem;
   justify-content: center;
 }

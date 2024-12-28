@@ -1,9 +1,9 @@
 <template>
-  <div v-if="packingStore.isShownTableItemUnregProduct && packingStore.selectedGroupUnregProduct"
+  <div v-if="packingStore.isShownTableItemUnregProduct"
        class="packing-product-data-container">
     <div class="packing-product-data">
       <div class="packing-product-data-title">
-        Информация об упаковке продукции: {{ packingStore.selectedGroupUnregProduct.key }}
+        Информация об упаковке продукции: {{ ERPStore.unregItemsById.items[0]?.name }}
       </div>
       <div class="packing-product-data-table">
         <table-item-unregistered-product/>
@@ -25,9 +25,11 @@
 import {usePackingStore} from "@/stores/HTTP/PackingStore.js";
 import {usePrintingStore} from "@/stores/HTTP/PrintingStore.js";
 import {useWarehouseStore} from "@/stores/HTTP/WarehouseStore.js";
+import {useERPStore} from "@/stores/HTTP/ERPStore.js";
 import TableItemUnregisteredProduct from "@/components/Tables/ERP/TableItemUnregisteredProduct.vue";
 import ModalPrintSettings from "@/components/Modals/ModalPrintSettings.vue";
 
+const ERPStore = useERPStore()
 const packingStore = usePackingStore()
 const printingStore = usePrintingStore()
 const warehouseStore = useWarehouseStore()
@@ -46,7 +48,7 @@ const handlerPrint = async () => {
         printingStore.labelTemplatesList
             .find(label => label.code.toLowerCase() === 'code-128'
             ))
-    await printingStore.setSelectedQuantityLabel(packingStore.selectedGroupUnregProduct.data.length)
+    // await printingStore.setSelectedQuantityLabel(ERPStore.unregItemsById.items.length)
   } catch (e) {
     console.log(e)
     throw e

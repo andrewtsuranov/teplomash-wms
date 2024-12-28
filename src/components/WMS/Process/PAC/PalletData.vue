@@ -3,7 +3,7 @@
     <div v-for="n in 2"
          :key="n"
          class="pallet-item-content"
-         :class="['pallet-status', { 'pending': false, 'finish': false, 'error': true }]"
+         :class="['pallet-status', 'pallet-background', { 'pending': true, 'finish': false, 'error': f }]"
     >
       <div class="pallet-item-row-one">
         <span>Зона:{{ packingStore.palletData.zoneStorage }}</span>
@@ -27,12 +27,12 @@
             </tr>
             </thead>
             <tbody>
-            <tr v-for="(item, index) in webSocketStore.wsUnregisteredProducts" :key="index">
-              <th scope="row">{{ index + 1 }}</th>
-              <td>КЭВ-2П1123Е</td>
+            <tr v-for="(item, index) in packingStore.selectedGroupUnregProduct?.data" :key="index">
+              <th scope="row">{{ index+1 }}</th>
+              <td>{{ packingStore.selectedGroupUnregProduct.key }}</td>
               <td>1</td>
-              <!--              <td>{{ item?.items[0]?.barcode }}</td>-->
-              <!--              <td>{{ useSplitDateByT(item?.items[0].created_at).date }}</td>-->
+                            <td>{{ item.barcode }}</td>
+                            <td>{{ item.created_at }}</td>
             </tr>
             </tbody>
           </table>
@@ -91,7 +91,7 @@ onMounted(async () => {
   /*row-gap: .5rem;*/
   border-radius: 1rem;
   min-height: 400px;
-  background-color: #ecaf0e;
+
 }
 
 .pallet-item-row-one {
@@ -124,19 +124,22 @@ onMounted(async () => {
   grid-area: qrcode;
   align-self: end;
 }
-
+.pallet-background.error,
 .pallet-status.error {
+  background-color:#e80f0f ;
   border: 2px solid #e80f0f;
   animation-name: blinking;
   animation-duration: 1s;
   animation-iteration-count: 50;
 }
-
+.pallet-background.pending,
 .pallet-status.pending {
+  background-color: #ecaf0e;
   border: 2px solid #ecaf0e;
 }
-
+.pallet-background.finish,
 .pallet-status.finish {
+  background-color: #19da21;
   border: 2px solid #19da21;
 }
 
@@ -150,6 +153,7 @@ onMounted(async () => {
 @keyframes blinking {
   50% {
     border-color: #ecaf0e;
+    background-color:#ecaf0e ;
   }
 }
 </style>

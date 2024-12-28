@@ -3,9 +3,11 @@ import {computed, ref} from "vue"
 import ky from "ky";
 import {requestUrls} from "@/stores/request-urls.js";
 import {useErrorStore} from "@/stores/Error/ErrorStore.js";
+import {useERPStore} from "@/stores/HTTP/ERPStore.js";
 import {useUserStore} from '@/stores/HTTP/UserStore.js'
 import {useWarehouseStore} from "@/stores/HTTP/WarehouseStore.js";
 
+const ERPStore = useERPStore()
 const warehouseStore = useWarehouseStore()
 const userStore = useUserStore()
 const kyStd = ky.create({
@@ -38,123 +40,105 @@ const kyPrint = kyStd.extend({
 //     ^ADN                         // Выбор шрифта
 //     ^FD http://site.com^FS       // Текст
 //     ^XZ                          // Конец этикетки
-export const usePrintingStore = defineStore('printingStore',
-    () => {
+export const usePrintingStore = defineStore('printingStore', () => {
 //state
-        const errorStore = useErrorStore()
-        const loading = ref(false)
-        const printersList = ref(null)
-        const printStatus = ref(null)
-        const selectedPrinter = ref(null)
-        const selectedQuantityLabel = ref(1)
-        const selectedLabelTemplate = ref(null)
-        const labelTemplatesList = ref(null)
-        const qrCodeZPL = (body, qty) => {
-            return `^XA^FO20,30^BQN,2,7,H,7,Q,S,7^FDQM,${body}^FS^PQ${qty}^XZ`
-        }
-        const code128ZPL = (body, qty) => {
-            return `^XA^LL1181^PW689^LH0,0^FO10,50^BY4^BCN,200,Y,N,N^FD$body^FS^XZ`
-        }
+    const errorStore = useErrorStore()
+    const loading = ref(false)
+    const printersList = ref(null)
+    const printStatus = ref(null)
+    const selectedPrinter = ref(null)
+    const selectedLabelTemplate = ref(null)
+    const labelTemplatesList = ref(null)
+    const quantityLabel = ref(1)
 //getters
-        const quantityLabel = ref(1)
-        const totalLabelPrint = computed(() => selectedQuantityLabel.value);
+//         const totalLabelPrint = computed(() => selectedQuantityLabel.value);
 //actions
-        const getZPLPrinters = async () => {
-            loading.value = true;
-            errorStore.clearError();
-            try {
-                printersList.value = await kyPrint('printers/list_printers/').json()
-                return true
-            } catch (err) {
-                errorStore.Error = err.message
-                throw err;
-            } finally {
-                loading.value = false
-            }
+    const getZPLPrinters = async () => {
+        loading.value = true;
+        errorStore.clearError();
+        try {
+            printersList.value = await kyPrint('printers/list_printers/').json()
+            return true
+        } catch (err) {
+            errorStore.Error = err.message
+            throw err;
+        } finally {
+            loading.value = false
         }
-        const getLabelTemplate = async () => {
-            loading.value = true;
-            errorStore.clearError();
-            try {
-                labelTemplatesList.value = await kyPrint('printers/label-templates/').json()
-                return true
-            } catch (err) {
-                errorStore.Error = err.message
-                throw err;
-            } finally {
-                loading.value = false
-            }
+    }
+    const getLabelTemplate = async () => {
+        loading.value = true;
+        errorStore.clearError();
+        try {
+            labelTemplatesList.value = await kyPrint('printers/label-templates/').json()
+            return true
+        } catch (err) {
+            errorStore.Error = err.message
+            throw err;
+        } finally {
+            loading.value = false
         }
-        const PRINT_LABEL = async (productData) => {
-            loading.value = true;
-            errorStore.clearError();
-            const zplData = {
-                "template_code": selectedLabelTemplate.value.code,
-                "printer_id": selectedPrinter.value.id,
-                "data": productData.map(item => ({
-                    "product_name": item.name,
-                    "body": item.barcode,
-                    // "qty": selectedQuantityLabel.value,
-                })),
-                "copies": selectedQuantityLabel.value,
-                "priority": 0
-            }
-            // const zplData = {
-            //     "printer": selectedPrinter.value.name,
-            //     "text": qrCodeZPL(data, count)
-            // }
-            try {
-                printStatus.value = await kyPrint
-                    .post('printers/print_label/', {json: zplData})
-                    .json()
-                return true
-            } catch (err) {
-                console.log(err)
-                throw err
-            } finally {
-                loading.value = false
-            }
+    }
+    const PRINT_LABEL = async (barcode) => {
+        loading.value = true;
+        errorStore.clearError();
+        const zplData = {
+            "template_code": selectedLabelTemplate.value.code,
+            "printer_id": selectedPrinter.value.id,
+            "data": barcode.map(item => ({
+                "product_name": ERPStore.unregItemsById.items[0].name,
+                "body": item,
+                // "qty": selectedQuantityLabel.value,
+            })),
+            "copies": 1,
+            "priority": 0
         }
-        const setSelectedPrinter = (printer) => {
-            selectedPrinter.value = printer;
+        try {
+            printStatus.value = await kyPrint
+                .post('printers/print_label/', {json: zplData})
+                .json()
+            return true
+        } catch (err) {
+            console.log(err)
+            throw err
+        } finally {
+            loading.value = false
         }
-        const setSelectedQuantityLabel = (qty) => {
-            selectedQuantityLabel.value = qty;
+    }
+    const setSelectedPrinter = (printer) => {
+        selectedPrinter.value = printer;
+    }
+
+    const setSelectedLabelTemplate = (type) => {
+        selectedLabelTemplate.value = type;
+    }
+    const increment = () => {
+        quantityLabel.value++;
+    }
+    const decrement = () => {
+        if (quantityLabel.value > 1) {
+            quantityLabel.value--;
         }
-        const setSelectedLabelTemplate = (type) => {
-            selectedLabelTemplate.value = type;
-        }
-        const increment = () => {
-            quantityLabel.value++;
-        }
-        const decrement = () => {
-            if (quantityLabel.value > 1) {
-                quantityLabel.value--;
-            }
-        }
-        return {
+    }
+    return {
 //state
-            printersList,
-            selectedPrinter,
-            selectedQuantityLabel,
-            printStatus,
-            errorStore,
-            loading,
-            labelTemplatesList,
-            quantityLabel,
+        printersList,
+        selectedPrinter,
+        printStatus,
+        errorStore,
+        loading,
+        labelTemplatesList,
+        quantityLabel,
 //getters
-            selectedLabelTemplate,
-            totalLabelPrint,
+        selectedLabelTemplate,
+        // totalLabelPrint,
 //actions
-            getZPLPrinters,
-            getLabelTemplate,
-            PRINT_LABEL,
-            qrCodeZPL,
-            code128ZPL,
-            setSelectedPrinter,
-            setSelectedQuantityLabel,
-            setSelectedLabelTemplate,
-            increment,
-            decrement,
-        }
-    })
+        getZPLPrinters,
+        getLabelTemplate,
+        PRINT_LABEL,
+        setSelectedPrinter,
+        setSelectedLabelTemplate,
+        increment,
+        decrement,
+    }
+})

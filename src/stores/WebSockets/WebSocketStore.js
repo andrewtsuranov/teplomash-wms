@@ -33,29 +33,12 @@ export const useWebSocketStore = defineStore('websocket', () => {
     const connectionStatus = computed(() => isConnected.value ? 'В сети' : 'Не в сети')
     const getPrivateMessage = computed(() => privateMessage.value)
     const getPrivateMessageID = computed(() => privateMessageID.value)
-    const groupOfUnregProducts = computed(() => {
-        if (!wsUnregisteredProducts.value) return {};
-        return useGroupByKey(wsUnregisteredProducts.value, 'name');
-    });
+
     const foundIdUser = computed((itemId) => {
         return onlineDevices.value.find(item => item.id === itemId)
     })
-    const unregisteredProducts = computed(() => {
-        return Object.keys(groupOfUnregProducts?.value)
-            .map((key, index) => ({
-                number: index + 1,
-                key: key,
-                data: groupOfUnregProducts?.value[key],
-            }))
-        // .sort((a, b) => {
-        //     // Преобразование строки в Date (теперь можно напрямую)
-        //     const dateA = new Date(a.data.created_at);
-        //     const dateB = new Date(b.data.created_at);
-        //     // Сортировка по возрастанию (самые старые даты вверху)
-        //     // return dateA - dateB;
-        //     // Сортировка по убыванию (самые новые даты вверху)
-        //     return dateB - dateA;
-        //     });
+    const getUnregisteredProducts = computed(() => {
+            return wsUnregisteredProducts.value
     })
 
 //Actions
@@ -150,33 +133,10 @@ export const useWebSocketStore = defineStore('websocket', () => {
             if (data.type === 'items_created' && data.status === 'success') {
                 getUnregisteredItems()
             }
-            if (data.type === 'unregistered_items' && data.status === 'success') {
-                console.log('Новые данные:', data.items.length, 'элементов');
-
-                if (!wsUnregisteredProducts.value) {
-                    wsUnregisteredProducts.value = data.items;
-                } else {
-                    // Фильтруем элементы с более новым временем создания
-                    const newItems = data.items.filter(newItem => {
-                        const existingItem = wsUnregisteredProducts.value.find(item => item.id === newItem.id);
-                        if (!existingItem) return true; // полностью новый элемент
-
-                        // Сравниваем даты создания
-                        return new Date(newItem.created_at) > new Date(existingItem.created_at);
-                    });
-
-                    console.log('Найдено новых или обновленных элементов:', newItems.length);
-
-                    if (newItems.length > 0) {
-                        wsUnregisteredProducts.value = [...wsUnregisteredProducts.value, ...newItems];
-                    }
-                }
-
-                localStorage.setItem('wsUnregisteredProducts', JSON.stringify(wsUnregisteredProducts.value));
+            if (data.type === 'items_list' && data.status === 'success') {
+                wsUnregisteredProducts.value = data.items
+                localStorage.setItem('wsUnregisteredProducts', JSON.stringify(data.items));
             }
-
-
-
 
             if (data.type === 'product_types_list' && data.status === 'success') {
                 productTypes.value = data.products
@@ -229,8 +189,11 @@ export const useWebSocketStore = defineStore('websocket', () => {
 
     const getUnregisteredItems = () => {
         const data = {
-            "action": "get_unregistered_items",
-            "date": "2023-12-10 23:59:59"
+            "action": "get_product_types",
+            "settings": {
+                "detail_level": "min",
+                "has_items": true
+            }
         }
         if (isConnected.value && socket.value && socket.value.readyState === WebSocket.OPEN) {
             socket.value.send(JSON.stringify(data))
@@ -341,8 +304,7 @@ export const useWebSocketStore = defineStore('websocket', () => {
         getPrivateMessage,
         getPrivateMessageID,
         foundIdUser,
-        groupOfUnregProducts,
-        unregisteredProducts,
+        getUnregisteredProducts,
 //actions
         initWebSocket,
         getUnregisteredItems,

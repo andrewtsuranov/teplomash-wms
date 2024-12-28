@@ -58,7 +58,7 @@ const router = createRouter({
                     path: 'warehouse/:alias',
                     name: 'WMSProcess',
                     component: () => import('@/views/Home/WMS/Process/WarehouseProcess.vue'),
-                    props: true,
+                    // props: true,
                     meta: {breadcrumb: 'Процессы'},
                     children: [
                         {
@@ -111,7 +111,7 @@ const router = createRouter({
                                     components: {
                                         default: () => import('@/components/TeplomashTaskManager/Terminal/TTMTerminal.vue'),
                                     },
-                                    meta: {breadcrumb: 'Task-Manager'},
+                                    meta: {breadcrumb: 'Задачи'},
                                 },
                             ]
                         },
@@ -130,12 +130,12 @@ const router = createRouter({
                             ]
                         },
                         {
-                            path: 'storage:/code',
+                            path: 'storage/:code',
                             name: 'wmsStorage',
                             component: () => import('@/views/Home/WMS/Process/Storage/StorageView.vue'),
                         },
                         {
-                            path: 'picking:/code',
+                            path: 'picking/:code',
                             name: 'wmsPicking',
                             component: () => import('@/views/Home/WMS/Process/Picking/StoragePickingView.vue'),
                         },

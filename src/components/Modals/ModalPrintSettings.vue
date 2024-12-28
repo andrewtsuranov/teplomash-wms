@@ -12,7 +12,7 @@
           <h1 id="modalPrintSettingsLabel"
               class="modal-title fs-5"
           >
-            Параметры печати этикетки {{ packingStore.selectedGroupUnregProduct?.key }}
+            Параметры печати этикетки {{ ERPStore.unregItemsById.items[0]?.name }}
           </h1>
           <button aria-label="Close"
                   class="btn-close"
@@ -70,7 +70,7 @@
             <button @click="printingStore.increment">+</button>
           </div>
           <label>Всего этикеток: </label>
-          <div>{{ printingStore.totalLabelPrint }} шт.</div>
+          <div> шт.</div>
           <!--          <label>Статус: печати:</label>-->
           <!--          <div v-if="printingStore.printStatus?.status"-->
           <!--               :style="'color: green;'"-->
@@ -100,7 +100,7 @@
           </button>
           <button class="btn btn-outline-success"
                   type="button"
-                  @click="handlePrint(packingStore.selectedGroupUnregProduct.data)"
+                  @click="handlePrint(ERPStore.getBarcodesFromUnregItemsById)"
           >
             Печать
           </button>
@@ -114,15 +114,17 @@
 import {usePrintingStore} from "@/stores/HTTP/PrintingStore.js";
 import {usePackingStore} from "@/stores/HTTP/PackingStore.js";
 import {useWarehouseStore} from "@/stores/HTTP/WarehouseStore.js";
+import {useERPStore} from "@/stores/HTTP/ERPStore.js";
+
 import {useNumbersOnlyWithoutDot} from "@/composables/NumbersOnlyWithoutDot.js";
 import ModalPreviewPrintingBody from "@/components/Modals/ModalPreviewPrintingBody.vue";
-
+const printingStore = usePrintingStore()
+const ERPStore = useERPStore()
 const warehouseStore = useWarehouseStore()
 const packingStore = usePackingStore()
-const printingStore = usePrintingStore()
-const handlePrint = async (productData) => {
+const handlePrint = async (barcode) => {
   try {
-    await printingStore.PRINT_LABEL(productData)
+    await printingStore.PRINT_LABEL(barcode)
   } catch (error) {
     console.error('Ошибка при печати:', error);
   }
