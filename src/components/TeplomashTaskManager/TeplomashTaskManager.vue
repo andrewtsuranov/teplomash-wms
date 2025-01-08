@@ -110,23 +110,47 @@ import {usePackingStore} from "@/stores/HTTP/PackingStore.js";
 import {useRouter, useRoute} from "vue-router";
 import {onMounted, onUnmounted} from "vue";
 
+const packingStore = usePackingStore()
 const router = useRouter()
 const route = useRoute()
 const webSocketStore = useWebSocketStore()
-const packingStore = usePackingStore()
 const handlerDisconnect = () => {
   webSocketStore.disconnect()
+}
+const clearQuery = () => {
+  router.replace({query: {}})
 }
 onMounted(async () => {
   try {
     if (!webSocketStore.isConnected) {
       await webSocketStore.initWebSocket()
     }
-    if (packingStore.selectedTSD) {
-      await router.push({name: 'TTM-packing', query: {id: packingStore.selectedTSD}})
+    let attempts = 0
+    const maxAttempts = 50
+    while (webSocketStore.onlineDevices.length === 0 && attempts < maxAttempts) {
+      await new Promise(resolve => setTimeout(resolve, 100))
+      attempts++
+    }
+    if (route.query.id && !webSocketStore.onlineDevices.some(device =>
+        Number(device.id) === Number(route.query.id)
+    )) {
+      clearQuery()
+      packingStore.clearSelectedTSD()
+      return
+    }
+    if (packingStore.selectedTSD && route.query.id) {
+      const device = webSocketStore.onlineDevices.find(device =>
+          Number(device.id) === Number(route.query.id)
+      )
+      if (device) {
+        await router.push({name: 'TTM-packing', query: {id: route.query.id}})
+      } else {
+        clearQuery()
+        packingStore.clearSelectedTSD()
+      }
     }
   } catch (e) {
-    console.log(e)
+    console.error(e)
     throw e
   }
 })

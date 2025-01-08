@@ -11,8 +11,9 @@ export const useWebSocketStore = defineStore('websocket', () => {
     const packingStore = usePackingStore()
     const transactionStore = useTransactionStore()
 //State
-    const socket = ref(null)
     const isConnected = ref(false)
+    const onlineDevices = ref([])
+    const socket = ref(null)
     const message = ref(null)
     const reconnectError = ref(false)
     const error = ref()
@@ -20,7 +21,6 @@ export const useWebSocketStore = defineStore('websocket', () => {
     const reconnectAttempts = ref(0)
     const maxReconnectAttempts = ref(5)
     const reconnectDelay = ref(3000)
-    const onlineDevices = ref([])
     const lastPongTime = ref(null)
     const privateMessage = ref(null)
     const privateMessageID = ref(null)
@@ -33,18 +33,17 @@ export const useWebSocketStore = defineStore('websocket', () => {
     const connectionStatus = computed(() => isConnected.value ? 'В сети' : 'Не в сети')
     const getPrivateMessage = computed(() => privateMessage.value)
     const getPrivateMessageID = computed(() => privateMessageID.value)
-
     const foundIdUser = computed((itemId) => {
         return onlineDevices.value.find(item => item.id === itemId)
     })
     const getUnregisteredProducts = computed(() => {
-            return wsUnregisteredProducts.value
+        return wsUnregisteredProducts.value
     })
 
 //Actions
     function initWebSocket() {
-        const wsUrl = `ws://lab:8081/ws/inventory/?token=${userStore.getTokenAccess}`
-        // const wsUrl = `ws://38.180.192.229/ws/inventory/?token=${userStore.getTokenAccess}`
+        // const wsUrl = `ws://lab:8081/ws/inventory/?token=${userStore.getTokenAccess}`
+        const wsUrl = `ws://38.180.192.229/ws/inventory/?token=${userStore.getTokenAccess}`
         // const wsUrl = `ws://192.168.1.144/ws/inventory/?token=${userStore.getTokenAccess}`
         socket.value = new WebSocket(wsUrl)
         socket.value.onopen = onOpen.bind(this)
@@ -137,7 +136,6 @@ export const useWebSocketStore = defineStore('websocket', () => {
                 wsUnregisteredProducts.value = data.items
                 localStorage.setItem('wsUnregisteredProducts', JSON.stringify(data.items));
             }
-
             if (data.type === 'product_types_list' && data.status === 'success') {
                 productTypes.value = data.products
                 localStorage.setItem('productTypes', JSON.stringify(data.products))
@@ -227,7 +225,6 @@ export const useWebSocketStore = defineStore('websocket', () => {
             error.value = 'Cannot send message: WebSocket is not connected'
         }
     }
-
     const createPalletTask = (payload) => {
         if (isConnected.value && socket.value && socket.value.readyState === WebSocket.OPEN) {
             socket.value.send(JSON.stringify(payload))
@@ -278,7 +275,6 @@ export const useWebSocketStore = defineStore('websocket', () => {
             error.value = 'Cannot send message: WebSocket is not connected'
         }
     }
-
     return {
 //state
         socket,
