@@ -33,9 +33,9 @@
       <div class="alert alert-info">
         Стеллаж #{{ storageStore.selectedRack }}
         <br>
-        Занято паллет: {{ occupiedPalletsCount }}
+        Занято паллетомест: {{ occupiedPalletsCount }}
         <br>
-        Свободно мест: {{ freePalletsCount }}
+        Свободно паллетомест: {{ freePalletsCount }}
       </div>
     </div>
     <Transition name="fade">
@@ -101,12 +101,13 @@ onMounted(async () => {
 <style scoped>
 .rack-profile {
   display: grid;
-  position: relative;
+  grid-template-columns: 1fr;
+  overflow-x: auto;
+  /*position: relative;*/
   /*max-width: 1280px;*/
-  margin-top: 20px;
+  /*margin-top: 20px;*/
   padding: 20px;
-  background-color: #1b2040;
-  border-radius: 8px;
+  /*background-color: #1b2040;*/
   transition: all 0.3s ease;
 }
 
@@ -124,8 +125,9 @@ onMounted(async () => {
 }
 
 .rack-grid {
-  display: flex;
-  flex-direction: column-reverse;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: repeat(7, 1fr);
   gap: 10px;
 }
 
@@ -155,7 +157,7 @@ onMounted(async () => {
   border: 1px solid #ced4da;
   cursor: pointer;
   transition: all 0.2s ease;
-  display: flex;
+  display: grid;
   justify-content: center;
   align-items: center;
   font-size: 0.7rem;

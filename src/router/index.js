@@ -118,7 +118,7 @@ const router = createRouter({
                         {
                             path: 'receiving/:code',
                             name: 'wmsReceiving',
-                            component: () => import('@/views/Home/WMS/Process/Receiving/Data/StorageReceivingView.vue'),
+                            component: () => import('@/views/Home/WMS/Process/Receiving/StorageReceivingView.vue'),
                             children: [
                                 {
                                     path: 'rec-tsd',

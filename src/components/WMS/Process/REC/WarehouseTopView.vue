@@ -1,22 +1,80 @@
-<!-- components/WarehouseTopView.vue -->
 <template>
   <div class="warehouse-top-view">
     <div class="racks-container">
+      <!-- First Rack (always single) -->
       <div
-          v-for="rack in storageStore.racks"
-          :key="rack.id"
-          class="rack"
+          v-if="storageStore.racks.length > 0"
+          :key="storageStore.racks[0].id"
+          class="rack single-rack first-rack"
           :class="[
-          { 'selected': storageStore.selectedRack === rack.id },
-          { 'section-divider': rack.id % 2 === 0 },
-          getOccupancyClass(rack)
+          { 'selected': storageStore.selectedRack === storageStore.racks[0].id },
+          getOccupancyClass(storageStore.racks[0])
         ]"
-          @click="storageStore.selectRack(rack.id)"
+          @click="storageStore.selectRack(storageStore.racks[0].id)"
       >
         <div class="rack-content">
-          <div class="rack-number">Ряд {{ rack.id }}</div>
+          <div class="rack-number">Ряд {{ storageStore.racks[0].id }}</div>
           <div class="rack-status">
-            <small>{{ getRackStatus(rack) }}</small>
+            <small>{{ getRackStatus(storageStore.racks[0]) }}</small>
+          </div>
+        </div>
+      </div>
+      <!-- Aisle after first rack -->
+      <div class="aisle">
+        <div class="aisle-road">
+          <div class="aisle-number">Проход 1</div>
+          <div class="markings"></div>
+          <div class="aisle-number">Проход 1</div>
+        </div>
+      </div>
+      <!-- Middle Racks (in pairs) with Aisles -->
+      <div v-if="storageStore.racks.length > 2" class="middle-racks-container">
+        <template v-for="(rackPair, index) in middleRackPairs"
+                  :key="`pair-${rackPair[0]?.id}-${rackPair[1]?.id}`"
+        >
+          <div class="rack-pair">
+            <div
+                v-for="rack in rackPair"
+                :key="rack.id"
+                class="rack paired-rack"
+                :class="[
+                { 'selected': storageStore.selectedRack === rack.id },
+                getOccupancyClass(rack)
+              ]"
+                @click="storageStore.selectRack(rack.id)"
+            >
+              <div class="rack-content">
+                <div class="rack-number">Ряд {{ rack.id }}</div>
+                <div class="rack-status">
+                  <small>{{ getRackStatus(rack) }}</small>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="aisle">
+            <div class="aisle-road">
+              <div class="aisle-number">Проход {{ index + 2 }}</div>
+              <div class="markings"></div>
+              <div class="aisle-number">Проход {{ index + 2 }}</div>
+            </div>
+          </div>
+        </template>
+      </div>
+      <!-- Last Rack (always single) -->
+      <div
+          v-if="storageStore.racks.length > 1"
+          :key="storageStore.racks[storageStore.racks.length - 1].id"
+          class="rack single-rack last-rack"
+          :class="[
+          { 'selected': storageStore.selectedRack === storageStore.racks[storageStore.racks.length - 1].id },
+          getOccupancyClass(storageStore.racks[storageStore.racks.length - 1])
+        ]"
+          @click="storageStore.selectRack(storageStore.racks[storageStore.racks.length - 1].id)"
+      >
+        <div class="rack-content">
+          <div class="rack-number">Ряд {{ storageStore.racks[storageStore.racks.length - 1].id }}</div>
+          <div class="rack-status">
+            <small>{{ getRackStatus(storageStore.racks[storageStore.racks.length - 1]) }}</small>
           </div>
         </div>
       </div>
@@ -25,52 +83,62 @@
 </template>
 <script setup>
 import {useStorageStore} from "@/stores/HTTP/StorageStore.js";
+import {computed} from 'vue';
 
-const storageStore = useStorageStore()
+const storageStore = useStorageStore();
 const getRackStatus = (rack) => {
   const totalPallets = rack.cells.reduce((acc, cell) => {
     return acc + cell.levels.reduce((levelAcc, level) => {
-      return levelAcc + level.pallets.filter(p => p.occupied).length
-    }, 0)
-  }, 0)
-  return `${totalPallets}/${11 * 7 * 4}`
-}
+      return levelAcc + level.pallets.filter(p => p.occupied).length;
+    }, 0);
+  }, 0);
+  return `${totalPallets}/${11 * 7 * 4}`;
+};
 const getOccupiedPercentage = (rack) => {
-  const total = 11 * 7 * 4
+  const total = 11 * 7 * 4;
   const occupied = rack.cells.reduce((acc, cell) => {
     return acc + cell.levels.reduce((levelAcc, level) => {
-      return levelAcc + level.pallets.filter(p => p.occupied).length
-    }, 0)
-  }, 0)
-  return Math.round((occupied / total) * 100)
-}
+      return levelAcc + level.pallets.filter(p => p.occupied).length;
+    }, 0);
+  }, 0);
+  return Math.round((occupied / total) * 100);
+};
 const getOccupancyClass = (rack) => {
-  const percentage = getOccupiedPercentage(rack)
-  if (percentage > 90) return 'occupancy-high'
-  if (percentage > 50) return 'occupancy-medium'
-  return 'occupancy-low'
-}
+  const percentage = getOccupiedPercentage(rack);
+  if (percentage > 90) return 'occupancy-high';
+  if (percentage > 50) return 'occupancy-medium';
+  return 'occupancy-low';
+};
+const middleRackPairs = computed(() => {
+  if (storageStore.racks.length <= 2) {
+    return [];
+  }
+  const middleRacks = storageStore.racks.slice(1, storageStore.racks.length - 1);
+  const pairs = [];
+  for (let i = 0; i < middleRacks.length; i += 2) {
+    pairs.push(middleRacks.slice(i, i + 2));
+  }
+  return pairs;
+});
 </script>
 <style scoped>
 .warehouse-top-view {
   display: grid;
   grid-template-columns: 1fr;
-  padding: 20px;
-  max-height: 80vh;
   max-width: 1280px;
-  overflow-y: auto;
-  color: #2F2D2B;
 }
 
 .racks-container {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr;
+  background-color: #2623238f;
+  border: 1px solid #605039e0;
+  border-radius: 1rem;
+  padding: 2rem 5rem 2rem 15rem;
 }
 
 .rack {
-  background-color: #e9ecef;
+  background-color: #0280b0bd;
   padding: 8px 15px;
   cursor: pointer;
   border: 1px solid #dee2e6;
@@ -80,7 +148,7 @@ const getOccupancyClass = (rack) => {
 }
 
 .rack:hover {
-  background-color: #dee2e6;
+  background-color: #311617;
   transform: translateX(5px);
 }
 
@@ -104,14 +172,68 @@ const getOccupancyClass = (rack) => {
   opacity: 0.8;
 }
 
-.rack.section-divider {
-  margin-bottom: 15px;
-  border-bottom: 2px dashed #dee2e6;
+.single-rack {
+  margin-bottom: 0;
 }
 
-.rack.section-divider:last-child {
+.middle-racks-container {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0;
+}
+
+.rack-pair {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.4rem;
+}
+
+.paired-rack {
   margin-bottom: 0;
-  border-bottom: none;
+}
+
+.paired-rack:hover {
+  transform: translateX(5px);
+}
+
+.paired-rack.selected {
+  transform: translateX(10px);
+}
+
+.aisle {
+  display: grid;
+  grid-template-rows: minmax(auto, 4rem);
+}
+
+.aisle-road {
+  display: grid;
+  grid-template-columns: minmax(3rem, auto) 1fr minmax(3rem, auto);
+  align-items: center;
+}
+
+.markings {
+  --stripe-width: 3rem; /* длина каждой полосы */
+  --stripe-gap: 1.6rem; /* промежуток между полосами */
+  display: grid;
+  grid-template-rows: .1rem;
+  background: repeating-linear-gradient(
+      to right,
+      #6c757d 0,
+      #6c757d var(--stripe-width),
+      transparent var(--stripe-width),
+      transparent calc(var(--stripe-width) + var(--stripe-gap))
+  );
+}
+
+.aisle-number {
+  /*text-align: left;*/
+  /*font-size: 1rem;*/
+  color: #6c757d;
+  /*background-color: #ffd700;*/
+  padding: 0 1rem;
+  /*border-radius: 1rem;* /
+  /*white-space: nowrap;*/
+  /*justify-self: start;*/
 }
 
 .rack.occupancy-high {
@@ -126,7 +248,7 @@ const getOccupancyClass = (rack) => {
   border-left-color: #28a745;
 }
 
-/* Стили для скроллбара */
+/* Styles for scrollbar */
 .warehouse-top-view::-webkit-scrollbar {
   width: 8px;
 }
