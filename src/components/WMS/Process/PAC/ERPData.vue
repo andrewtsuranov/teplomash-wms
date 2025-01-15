@@ -148,6 +148,7 @@ const taskScanData = () => {
       warehouse_id: warehouseStore.warehouseData.id,
       to_zone_id: warehouseStore.selectedZone.id,
       from_zone_id: warehouseStore.selectedZone.id,
+      total: 1,
     }
   }
   return JSON.stringify(data)
