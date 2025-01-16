@@ -1,4 +1,3 @@
-
 <template>
   <div class="password-strength mt-2">
     <div class="progress" style="height: 4px;">
@@ -17,9 +16,8 @@
     </small>
   </div>
 </template>
-
 <script setup>
-import { computed } from 'vue';
+import {computed} from 'vue';
 
 const props = defineProps({
   strength: {
@@ -28,7 +26,6 @@ const props = defineProps({
     default: 0
   }
 });
-
 const strengthClass = computed(() => {
   if (props.strength <= 20) return 'bg-danger';
   if (props.strength <= 40) return 'bg-warning';
@@ -36,7 +33,6 @@ const strengthClass = computed(() => {
   if (props.strength <= 80) return 'bg-primary';
   return 'bg-success';
 });
-
 const textColorClass = computed(() => {
   if (props.strength <= 20) return 'text-danger';
   if (props.strength <= 40) return 'text-warning';
@@ -44,7 +40,6 @@ const textColorClass = computed(() => {
   if (props.strength <= 80) return 'text-primary';
   return 'text-success';
 });
-
 const strengthText = computed(() => {
   if (props.strength <= 20) return 'Очень слабый пароль';
   if (props.strength <= 40) return 'Слабый пароль';

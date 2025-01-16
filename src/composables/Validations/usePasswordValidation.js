@@ -1,6 +1,5 @@
-// composables/Validations/usePasswordValidation.js
 import {ref, computed} from 'vue'
-// Вынесли регулярные выражения и требования за пределы функции для оптимизации
+
 const REQUIREMENTS = [
     {
         regex: /^.{8,}$/,
