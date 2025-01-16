@@ -10,9 +10,9 @@ const model = defineModel()
 .input {
   width: 100%;
   border: 1px solid blanchedalmond;
-  border-radius: 10px;
+  border-radius: .5rem;
   color: blanchedalmond;
-  padding: 10px 15px;
+  padding: .5rem 1rem;
   font-size: 1.1rem;
   background: none;
   outline: none;

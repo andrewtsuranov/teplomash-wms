@@ -1,20 +1,19 @@
-import {computed, ref} from "vue";
+import { ref, computed } from 'vue'
 
-export function usePasswordToggle() {
-    const isPasswordVisible = ref(false)
-    const passwordType = computed(() =>
-        isPasswordVisible.value ? 'text' : 'password'
-    )
+export const usePasswordToggle = () => {
+    const showPassword = ref(false)
+
+    const passwordType = computed(() => showPassword.value ? 'text' : 'password')
+
     const passwordIconClass = computed(() =>
-        isPasswordVisible.value
-            ? 'bi bi-eye-slash'
-            : 'bi bi-eye'
+        showPassword.value ? 'bi bi-eye-slash' : 'bi bi-eye'
     )
+
     const togglePasswordVisibility = () => {
-        isPasswordVisible.value = !isPasswordVisible.value
+        showPassword.value = !showPassword.value
     }
+
     return {
-        isPasswordVisible,
         passwordType,
         passwordIconClass,
         togglePasswordVisibility
