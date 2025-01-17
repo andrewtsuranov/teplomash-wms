@@ -22,7 +22,7 @@ const router = createRouter({
                 {
                     path: '/registration/confirm',
                     name: 'Confirmation',
-                    component: () => import('@/views/Authorization/Registration/SignUpCodeEmailView.vue'),
+                    component: () => import('@/views/Authorization/Registration/SixDigitView.vue'),
                 },
             ],
         },

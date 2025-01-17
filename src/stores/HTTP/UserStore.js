@@ -108,7 +108,6 @@ export const useUserStore = defineStore('userStore', () => {
     }
     const SIGNUP = async (userData) => {
         console.log(userData)
-        const errorStore = useErrorStore()
         loading.value = true;
         errorStore.clearError();
         try {
@@ -126,15 +125,15 @@ export const useUserStore = defineStore('userStore', () => {
                 return true
             }
         } catch (err) {
-            errorStore.error = err.message
+            errorStore.setError(err.message)
             throw err;
         } finally {
             loading.value = false
         }
     }
     const REQ_CONFIRM = async (activation_code, email) => {
+        errorStore.clearError()
         try {
-            // const email = userUP.value?.email || JSON.parse(localStorage.getItem('userUP')).email || '{}'
             const response = await kyStd
                 .post('activate/', {json: {activation_code, email}})
                 .json()
@@ -142,12 +141,12 @@ export const useUserStore = defineStore('userStore', () => {
                 if (tempPassword.value) {
                     await LOGIN(email, tempPassword.value)
                 } else {
-                    errorStore.Error = "Не удалось выполнить автоматический вход. Пожалуйста, войдите вручную."
+                    errorStore.setError("Не удалось выполнить автоматический вход. Пожалуйста, войдите вручную.")
                 }
             }
             return response
         } catch (err) {
-            errorStore.Error = err.message
+            errorStore.setError(err.message)
             throw err;
         } finally {
             loading.value = false
@@ -156,7 +155,7 @@ export const useUserStore = defineStore('userStore', () => {
     }
     const VERIFY = async (token_access, token_refresh) => {
         loading.value = true;
-        errorStore.error = null;
+        errorStore.clearError()
         try {
             // Проверяем access token
             try {
@@ -181,7 +180,7 @@ export const useUserStore = defineStore('userStore', () => {
                 }
             }
         } catch (err) {
-            errorStore.error = err.message
+            errorStore.setError(err.message)
             return false
         } finally {
             loading.value = false
