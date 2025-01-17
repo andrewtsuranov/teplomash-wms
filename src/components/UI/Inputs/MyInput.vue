@@ -1,11 +1,29 @@
 <template>
-  <input v-model="model"
-         class="input"
+  <input
+      v-model="model"
+      class="input"
+      :ref="inputRef"
+      v-bind="attrsWithoutRef"
   >
 </template>
+
 <script setup>
-const model = defineModel()
+import { defineModel, ref, useAttrs, computed } from 'vue';
+
+const model = defineModel();
+const inputRef = ref(null);
+const attrs = useAttrs();
+
+const attrsWithoutRef = computed(() => {
+  const { ref, ...rest } = attrs;
+  return rest;
+});
+
+defineExpose({
+  focus: () => inputRef.value?.focus()
+});
 </script>
+
 <style scoped>
 .input {
   width: 100%;
@@ -17,6 +35,4 @@ const model = defineModel()
   background: none;
   outline: none;
 }
-
-
 </style>

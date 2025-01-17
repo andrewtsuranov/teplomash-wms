@@ -45,7 +45,6 @@ import LogoMain from "@/components/UI/SVG/svgLogo.vue"
 
 .authorization {
   grid-area: authorization;
-  padding: 0 1rem;
 }
 
 @media (max-width: 800px) {
