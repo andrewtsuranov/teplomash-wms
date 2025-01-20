@@ -12,7 +12,7 @@
                size="2.7rem"
                text-variant=""
       />
-      <div class="dropdown-menu dropdown-menu-dark" style="background-color: #2e2e2e">
+      <div class="dropdown-menu dropdown-menu-dark p-0" style="background-color: #2e2e2e">
         <div class="profile-dropdown">
           <div class="profile-name">
             <BAvatar :text=userStore.getFullNameUser?.initials
@@ -79,7 +79,7 @@ const logout = async () => {
   grid-template-columns: auto 250px;
   grid-template-rows: 1fr 1fr;
   align-items: center;
-  padding: 0 0 .5rem 1rem;
+  padding: .4rem 1rem;
   column-gap: 1rem;
   row-gap: .5rem;
   color: #A4A4A4;
