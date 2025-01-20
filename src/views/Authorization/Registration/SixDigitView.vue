@@ -16,6 +16,19 @@
         />
       </template>
     </div>
+    <div
+        v-if="error"
+        class="alert alert-danger alert-dismissible fade show"
+        role="alert"
+    >
+      {{ error }}
+      <button
+          type="button"
+          class="btn-close"
+          @click="error = ''"
+          aria-label="Close"
+      ></button>
+    </div>
     <button
         :disabled="!isComplete"
         class="btn btn-outline-warning"
@@ -45,6 +58,7 @@ import {useVerificationCode} from "@/composables/Validations/useVerificationCode
 
 const router = useRouter()
 const userStore = useUserStore()
+const error = ref('')
 const {
   digits,
   code,
@@ -70,18 +84,31 @@ const startTimer = () => {
 }
 const handleSubmit = async () => {
   try {
-    await userStore.REQ_CONFIRM(code.value)
-    router.push('/')
+    const loginSuccess = await userStore.REQ_CONFIRM(code.value)
+    console.log(loginSuccess)
+    if (loginSuccess) {
+      router.push('/')
+    }
   } catch (error) {
-    // Ошибка обработана в сторе
+    error.value = 'Неверный код подтверждения. Пожалуйста, проверьте код или запросите новый.'
   }
 }
 const handleResend = async () => {
   try {
-    await userStore.RESEND_CODE()
+    error.value = '' // Сбрасываем предыдущие ошибки
+    const email = userStore.tempCredentials?.email
+    if (!email) {
+      error.value = 'Ошибка: Email не найден. Заполните регистрационные форму ещё раз.'
+      return
+    }
+
+    await userStore.RESEND_CODE({ email })
     startTimer()
-  } catch (error) {
-    // Ошибка обработана в сторе
+    // Очищаем поля ввода
+    digits.value = Array(6).fill('')
+    focusInput(0)
+  } catch (err) {
+    error.value = 'Не удалось отправить новый код. Попробуйте позже.'
   }
 }
 onMounted(async () => {
@@ -112,8 +139,9 @@ onUnmounted(() => {
   text-align: center;
   aspect-ratio: 1;
   padding: 0 !important;
-  font-size: 2rem !important;
+  font-size: 3rem !important;
   border-color: #ffc107;
+  color: #80FF00;
 }
 
 .timer {

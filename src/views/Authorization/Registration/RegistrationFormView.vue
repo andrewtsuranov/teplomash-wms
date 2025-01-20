@@ -146,22 +146,22 @@ const isFormValid = computed(() => {
 // Обработка отправки формы
 const handleSignup = async () => {
   router.push({name: 'Confirmation'})
-  // if (!isFormValid.value) return
-  // try {
-  //   loading.value = true;
-  //   const signupData = {
-  //     username: `${lastName.value}_${firstName.value}_${middleName.value}`,
-  //     email: emailValidation.email.value,
-  //     password: passwordValidation.password.value,
-  //     role: 'MANAGER'
-  //   }
-  //   await userStore.SIGNUP(signupData)
-  //   router.push({name: 'Login'})
-  // } catch (error) {
-  //   console.error('Ошибка регистрации:', error);
-  // } finally {
-  //   loading.value = false;
-  // }
+  if (!isFormValid.value) return
+  try {
+    loading.value = true;
+    const signupData = {
+      username: `${lastName.value}_${firstName.value}_${middleName.value}`,
+      email: emailValidation.email.value,
+      password: passwordValidation.password.value,
+      role: 'MANAGER'
+    }
+    await userStore.SIGNUP(signupData)
+    // router.push({name: 'Login'})
+  } catch (error) {
+    console.error('Ошибка регистрации:', error);
+  } finally {
+    loading.value = false;
+  }
 };
 </script>
 <style scoped>
