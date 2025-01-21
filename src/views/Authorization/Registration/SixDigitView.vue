@@ -85,7 +85,6 @@ const startTimer = () => {
 const handleSubmit = async () => {
   try {
     const loginSuccess = await userStore.REQ_CONFIRM(code.value)
-    console.log(loginSuccess)
     if (loginSuccess) {
       router.push('/')
     }
@@ -102,7 +101,7 @@ const handleResend = async () => {
       return
     }
 
-    await userStore.RESEND_CODE({ email })
+    await userStore.RESEND_CODE(email)
     startTimer()
     // Очищаем поля ввода
     digits.value = Array(6).fill('')

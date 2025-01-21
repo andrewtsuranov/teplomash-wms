@@ -21,15 +21,21 @@
                v-model="form.password"
         >
         <label for="floatingPassword">Пароль</label>
-        <button class="toggle-btn"
-                type="button"
-                @click="togglePasswordVisibility"
+        <button
+            class="password-toggle btn btn-link"
+            type="button"
+            @click="togglePasswordVisibility"
         >
           <i :class="passwordIconClass"></i>
         </button>
       </div>
       <div v-if="errorStore.error" class="alert alert-danger" role="alert">
         {{ errorStore.error?.message }}
+        <router-link v-if="errorStore.error?.email"
+                     to="/registration/confirm"
+                     @click="userStore.RESEND_CODE(errorStore.error?.email)"
+
+        >Перейти на страницу подтверждения</router-link>
       </div>
       <div class="group-btn-login">
         <my-button
@@ -103,18 +109,28 @@ const handleLogin = async () => {
   font-size: 1.5rem;
 }
 
-.toggle-btn {
-  margin: 0;
-  padding: 0;
+.password-toggle {
+  display: flex;
   position: absolute;
-  right: 1.5rem;
+  right: 1rem;
   top: 50%;
-  transform: translateY(-48%);
+  transform: translateY(-50%);
   background: none;
   border: none;
   cursor: pointer;
+  padding: .2rem .5rem;
+  align-items: center;
+  z-index: 2;
+  color: blanchedalmond;
+  transition: opacity .5s;
+}
+.password-toggle:hover {
+  opacity: .8;
 }
 
+.password-toggle i {
+  font-size: 1.5rem;
+}
 .error-message {
   color: #E32029;
   color: #E32029;

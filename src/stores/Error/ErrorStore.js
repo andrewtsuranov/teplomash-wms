@@ -3,8 +3,8 @@ import {ref} from "vue";
 
 export const useErrorStore = defineStore('errorStore', () => {
     const error = ref(null)
-    const setError = (error) => {
-        error.value = error
+    const setError = (errorData) => {
+        error.value = errorData
     }
     const clearError = () => {
         error.value = null

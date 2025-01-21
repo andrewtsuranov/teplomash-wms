@@ -118,21 +118,23 @@
 import {ref, computed} from 'vue';
 import {useRouter} from 'vue-router';
 import {useUserStore} from '@/stores/HTTP/UserStore';
+import {useErrorStore} from "@/stores/Error/ErrorStore.js";
 import {usePasswordValidation} from '@/composables/Validations/usePasswordValidation';
 import {usePasswordToggle} from '@/composables/Validations/usePasswordToggle';
 import {useEmailValidation} from '@/composables/Validations/useEmailValidation';
 import MyInput from '@/components/UI/Inputs/MyInput.vue';
 import PasswordStrengthMeter from '@/components/UI/PasswordStrengthMeter.vue';
 
-const router = useRouter();
-const userStore = useUserStore();
-const passwordValidation = usePasswordValidation();
-const emailValidation = useEmailValidation();
-const {passwordType, passwordIconClass, togglePasswordVisibility} = usePasswordToggle();
-const loading = ref(false);
-const firstName = ref('');
-const lastName = ref('');
-const middleName = ref('');
+const router = useRouter()
+const userStore = useUserStore()
+const errorStore = useErrorStore()
+const passwordValidation = usePasswordValidation()
+const emailValidation = useEmailValidation()
+const {passwordType, passwordIconClass, togglePasswordVisibility} = usePasswordToggle()
+const loading = ref(false)
+const firstName = ref('')
+const lastName = ref('')
+const middleName = ref('')
 // Валидация формы
 const isFormValid = computed(() => {
   return (
@@ -141,28 +143,28 @@ const isFormValid = computed(() => {
       middleName.value.length > 0 &&
       !emailValidation.emailError.value &&
       passwordValidation.validateForm()
-  );
-});
+  )
+})
 // Обработка отправки формы
 const handleSignup = async () => {
-  router.push({name: 'Confirmation'})
+  loading.value = true
+  errorStore.clearError()
+  const signupData = {
+    username: `${lastName.value}_${firstName.value}_${middleName.value}`,
+    email: emailValidation.email.value,
+    password: passwordValidation.password.value,
+    role: 'MANAGER'
+  }
   if (!isFormValid.value) return
   try {
-    loading.value = true;
-    const signupData = {
-      username: `${lastName.value}_${firstName.value}_${middleName.value}`,
-      email: emailValidation.email.value,
-      password: passwordValidation.password.value,
-      role: 'MANAGER'
-    }
     await userStore.SIGNUP(signupData)
-    // router.push({name: 'Login'})
+    router.push({name: 'Confirmation'})
   } catch (error) {
-    console.error('Ошибка регистрации:', error);
+    console.log(error)
   } finally {
     loading.value = false;
   }
-};
+}
 </script>
 <style scoped>
 .login-wrapper {

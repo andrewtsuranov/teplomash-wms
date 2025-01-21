@@ -33,6 +33,17 @@ const kySignup = kyStd.extend({
                 if (response.ok) {
                     return response
                 }
+                if (response.status === 400) {
+                    const errorData = await response.json()
+                    if (errorData.email?.[0] === "user with this email address already exists.") {
+                        const errorStore = useErrorStore()
+                        errorStore.setError({
+                            status: response.status,
+                            message: 'Такой пользователь существует',  // можно использовать оригинальное сообщение errorData.email[0]
+                            field: 'email'  // добавляем поле, чтобы знать где произошла ошибка
+                        })
+                    }
+                }
             }
         ],
     }
@@ -95,6 +106,17 @@ export const useUserStore = defineStore('userStore', () => {
                     status: e.response?.status,
                     message: 'Ошибка авторизации! Проверьте правильность введённых данных или зарегистрируйтесь!'
                 })
+            } else if (e.response?.status === 403) {
+                const errorData = await e.response.json()
+                console.log(errorData)
+                if (errorData.error === "Email not confirmed") {
+                    errorStore.setError({
+                        status: e.response.status,
+                        email: credentials.email,
+                        message: `Email пользователя не подтверждён.` ,
+                        type: 'email_confirmation'
+                    })
+                }
             } else {
                 errorStore.setError({
                     status: e.response?.status || 500,
@@ -116,8 +138,8 @@ export const useUserStore = defineStore('userStore', () => {
                 .json()
             console.log('Registration successful:', registerResponse)
         } catch (err) {
-            errorStore.setError(err.message)
-            throw err;
+            console.log(err)
+            throw err
         } finally {
             loading.value = false
         }
@@ -136,16 +158,12 @@ export const useUserStore = defineStore('userStore', () => {
                 .json()
             if (confirmResponse.message === "Your account has been activated.") {
                 // Выполняем автологин
-                const loginSuccess = await LOGIN({
+                await LOGIN({
                     email: tempCredentials.value.email,
                     password: tempCredentials.value.password
                 })
-                if (loginSuccess) {
-                    await router.push('/')
-                    return true
-                }
             }
-            return false
+            return true
         } catch (err) {
             errorStore.setError({
                 status: err.response?.status || 500,
@@ -157,10 +175,13 @@ export const useUserStore = defineStore('userStore', () => {
         }
     }
     const RESEND_CODE = async (email) => {
+        const data = {
+            email: email
+        }
         errorStore.clearError()
         try {
             const response = await kyStd
-                .post('resend-activation/', {json: email})
+                .post('resend-activation/', {json: data})
                 .json()
             return response
         } catch (err) {
