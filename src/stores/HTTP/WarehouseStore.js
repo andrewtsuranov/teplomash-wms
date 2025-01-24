@@ -113,9 +113,13 @@ export const useWarehouseStore = defineStore('warehouseStore', () => {
             loading.value = false
         }
     }
-    const setSelectedZone = (zone) => {
-        selectedZone.value = zone
+    const setSelectedZone =  (zone) => {
+       selectedZone.value = zone
        localStorage.setItem('selectedZone', JSON.stringify(zone))
+    }
+    const clearSelectedZone =  (zone) => {
+        selectedZone.value = null
+        localStorage.removeItem('selectedZone')
     }
     return {
 //state
@@ -137,5 +141,6 @@ export const useWarehouseStore = defineStore('warehouseStore', () => {
         GET_ALl_ZONE_TYPES,
         GET_WAREHOUSES_ZONE_BY_ID,
         setSelectedZone,
+        clearSelectedZone,
     }
 })

@@ -1,11 +1,16 @@
 <template>
-  <div class="process-zone-container">
+  <div class="process-zone-container" v-if="zones">
     <div v-for="item in zones"
          :key="item.code"
          class="process-zone"
          @click="handleZoneClick(item)"
     >
-      <span v-if="item">{{ item?.name.replace(/_/g, ' ') }}</span>
+      <div class="process-zone-header">{{ item?.name.replace(/_/g, ' ') }}</div>
+      <div class="process-zone-info">
+      <span>Общая площадь: {{ item?.total_area }} м2</span>
+      <span>Занято: {{ item?.occupied_area }} м2</span>
+      <span>Загруженность: {{ item?.capacity_percentage }} %</span>
+      </div>
     </div>
     <RouterView/>
   </div>
@@ -44,17 +49,24 @@ const handleZoneClick = (zone) => {
 }
 
 .process-zone {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: min-content auto;
   border: 2px double #E32029;
-  font-size: 2rem;
-  text-transform: uppercase;
-  padding: 10px;
+  row-gap: 1rem;
+  padding: .7rem;
   cursor: pointer;
-  align-content: center;
-}
 
-.process-zone span {
-  display: block;
+}
+.process-zone-header {
   text-align: center;
+  text-transform: uppercase;
+  font-size: 2rem;
+}
+.process-zone-info {
+  display: grid;
+  grid-auto-rows: 1fr;
+  font-size: 1.3rem;
 }
 
 .process-zone:hover {

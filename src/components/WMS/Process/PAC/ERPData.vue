@@ -6,6 +6,7 @@
         <span
             class="erp-alert-text">Данные обновляются в автоматическом режиме с периодичностью один раз в 30 минут!</span>
       </div>
+
       <div class="erp-settings-filter">
         <div class="form-check">
           <input id="flexRadioDefault1"
@@ -147,7 +148,6 @@ const taskScanData = () => {
     variables: {
       warehouse_id: warehouseStore.warehouseData.id,
       to_zone_id: warehouseStore.selectedZone.id,
-      from_zone_id: warehouseStore.selectedZone.id,
       total: 1,
     }
   }

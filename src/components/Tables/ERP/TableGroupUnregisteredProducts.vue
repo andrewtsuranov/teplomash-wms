@@ -88,8 +88,7 @@ const handleCreatePallet = async (item) => {
           "variables": {
             "warehouse_id": warehouseStore.getWarehouseId,
             "id_PT": ERPStore.unregItemsById.items[0].product_type_id,
-            "to_zone_id": 1,
-            "from_zone_id": 1,
+            "to_zone_id": warehouseStore.selectedZone.id,
           },
         }
       }

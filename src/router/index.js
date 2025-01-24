@@ -58,7 +58,6 @@ const router = createRouter({
                     path: 'warehouse/:alias',
                     name: 'WMSProcess',
                     component: () => import('@/views/Home/WMS/Process/WarehouseProcess.vue'),
-                    // props: true,
                     meta: {breadcrumb: 'Процессы'},
                     children: [
                         {

@@ -1,6 +1,6 @@
 <template>
   <div class="wms-packing-container">
-    <h2>{{ warehouseStore.selectedZone?.name.replace(/_/g, ' ').toUpperCase() }}</h2>
+    <h2 v-if="warehouseStore.selectedZone">{{ warehouseStore.selectedZone.name.replace(/_/g, ' ').toUpperCase() }}</h2>
     <ERPData/>
     <PackingProductData/>
     <TeplomashTaskManager/>
@@ -15,10 +15,15 @@ import PalletData from "@/components/WMS/Process/PAC/PalletData.vue";
 import {useRouter} from 'vue-router';
 import {usePackingStore} from "@/stores/HTTP/PackingStore.js";
 import {useWarehouseStore} from "@/stores/HTTP/WarehouseStore.js";
+import {onUnmounted} from "vue";
 
 const warehouseStore = useWarehouseStore()
 const router = useRouter();
 const packingStore = usePackingStore();
+
+onUnmounted(() => {
+  warehouseStore.clearSelectedZone()
+})
 </script>
 <style scoped>
 .wms-packing-container {
