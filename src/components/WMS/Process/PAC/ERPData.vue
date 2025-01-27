@@ -40,7 +40,7 @@
           </label>
         </div>
       </div>
-      <table-group-unregistered-products :filterUnregProductByUser="filterUnregProductByUser"/>
+<!--      <table-group-unregistered-products :filterUnregProductByUser="filterUnregProductByUser"/>-->
     </div>
     <svg-logo-erp class="erp-logo"/>
     <div class="erp-settings-group-btn">
