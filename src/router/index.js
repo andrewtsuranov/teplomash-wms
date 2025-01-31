@@ -102,6 +102,7 @@ const router = createRouter({
                             path: 'packing/:code',
                             name: 'wmsPacking',
                             component: () => import('@/views/Home/WMS/Process/Packing/StoragePackingView.vue'),
+                            props: true,
                             meta: {breadcrumb: 'Упаковка'},
                             children: [
                                 {
@@ -111,6 +112,7 @@ const router = createRouter({
                                         default: () => import('@/components/TeplomashTaskManager/Terminal/TTMTerminal.vue'),
                                     },
                                     meta: {breadcrumb: 'Задачи'},
+                                    props: true
                                 },
                             ]
                         },

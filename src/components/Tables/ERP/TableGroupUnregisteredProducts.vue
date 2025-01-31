@@ -26,10 +26,13 @@
       >
         <th scope="row">{{ index + 1 }}</th>
         <td>
-          <i v-if="item.error"
-             v-b-tooltip.hover :title="item?.error.map(e => e)"
-             class="bi bi-exclamation-circle-fill"
-             style="color: #ffc107;"></i>
+          <CustomTooltip :text="handleErrorMessage(item.error)">
+            <i v-if="item.error"
+               class="bi bi-exclamation-circle-fill"
+               style="color: #ffc107;"
+            >
+            </i>
+          </CustomTooltip>
           {{ item.name }}
         </td>
         <td>{{ item.total_items }}</td>
@@ -62,6 +65,8 @@ import {useWebSocketStore} from "@/stores/WebSockets/WebSocketStore.js";
 import {usePackingStore} from "@/stores/HTTP/PackingStore.js";
 import {useERPStore} from "@/stores/HTTP/ERPStore.js";
 import {useWarehouseStore} from "@/stores/HTTP/WarehouseStore.js";
+import CustomTooltip from "@/components/UI/Tooltip/CustomTooltip.vue";
+import {useErrorCodeDictionary} from "@/composables/Dictionary/useErrorCodeDictionary.js";
 
 defineProps({
   filterUnregProductByUser: Object
@@ -92,7 +97,7 @@ const handleCreatePallet = async (item) => {
           },
         }
       }
-    await webSocketStore.createPalletTask(data)
+      await webSocketStore.createPalletTask(data)
     }
   } catch (e) {
     console.log(e)
@@ -108,6 +113,11 @@ const toggleDetailUnregProduct = async (ItemId) => {
     }
   } catch (e) {
     console.log(e)
+  }
+}
+const handleErrorMessage = (errorMessage) => {
+  if (errorMessage !== undefined) {
+    return errorMessage.map(err => useErrorCodeDictionary[err])
   }
 }
 </script>
