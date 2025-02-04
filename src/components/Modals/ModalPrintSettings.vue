@@ -12,7 +12,7 @@
           <h1 id="modalPrintSettingsLabel"
               class="modal-title fs-5"
           >
-            Параметры печати этикетки {{ ERPStore.unregItemsById.items[0]?.name }}
+            Параметры печати этикетки {{ packingStore.detailInfoPackingProduct?.name }}
           </h1>
           <button aria-label="Close"
                   class="btn-close"
@@ -100,7 +100,7 @@
           </button>
           <button class="btn btn-outline-success"
                   type="button"
-                  @click="handlePrint(ERPStore.getBarcodesFromUnregItemsById)"
+                  @click="handlePrint(ERPStore.getBarcodes)"
           >
             Печать
           </button>

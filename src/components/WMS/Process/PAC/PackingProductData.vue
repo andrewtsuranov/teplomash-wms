@@ -1,33 +1,32 @@
 <template>
   <div v-if="packingStore.isShownTableItemUnregProduct"
        class="packing-product-data-container">
+    <label class="packing-product-data-title">
+      Информация об упаковке продукции: {{packingStore.detailInfoPackingProduct?.name}}
+    </label>
     <div class="packing-product-data">
-      <div class="packing-product-data-title">
-        Информация об упаковке продукции: {{ ERPStore.unregItemsById.items[0]?.name }}
-      </div>
-      <div class="packing-product-data-table">
-        <table-item-unregistered-product/>
-      </div>
-      <div class="packing-product-data-printing">
-        <button class="btn btn-outline-primary"
-                data-bs-target="#modalPrintSettings"
-                data-bs-toggle="modal"
-                @click="handlerPrint"
-        >
-          Печать Barcode
-        </button>
-      </div>
+      <TableItemUnregisteredProduct/>
+      <button class="btn btn-outline-primary"
+              data-bs-target="#modalPrintSettings"
+              data-bs-toggle="modal"
+              @click="handlerPrint"
+      >
+        Печать Barcode
+      </button>
+      <PalletConfigurator/>
     </div>
-    <ModalPrintSettings/>
   </div>
+  <ModalPrintSettings v-if="ERPStore.minItemsByIdUnreg"/>
 </template>
 <script setup>
 import {usePackingStore} from "@/stores/HTTP/PackingStore.js";
 import {usePrintingStore} from "@/stores/HTTP/PrintingStore.js";
 import {useWarehouseStore} from "@/stores/HTTP/WarehouseStore.js";
 import {useERPStore} from "@/stores/HTTP/ERPStore.js";
-import TableItemUnregisteredProduct from "@/components/Tables/ERP/TableItemUnregisteredProduct.vue";
+import PalletConfigurator from "@/components/UI/SVG/Pallet/PalletConfigurator.vue";
 import ModalPrintSettings from "@/components/Modals/ModalPrintSettings.vue";
+import TableItemUnregisteredProduct from "@/components/Tables/ERP/TableItemUnregisteredProduct.vue";
+
 
 const ERPStore = useERPStore()
 const packingStore = usePackingStore()
@@ -58,8 +57,8 @@ const handlerPrint = async () => {
 <style scoped>
 .packing-product-data-container {
   display: grid;
-  grid-template-columns: 1fr;
-  grid-template-rows: 1fr;
+  grid-template-columns: minmax(auto, 1fr);
+  grid-template-rows: min-content minmax(auto, 1fr);
   background-color: #2e2e2e;
   border: 1px solid #605039e0;
   border-radius: 1rem;
@@ -68,27 +67,15 @@ const handlerPrint = async () => {
 
 .packing-product-data {
   display: grid;
-  grid-template-columns: auto 1fr;
-  grid-template-rows: min-content 1fr;
+  align-items: start;
+  grid-template-columns: auto auto 400px;
+  grid-template-rows: 1fr;
   gap: 1rem;
 }
 
 .packing-product-data-title {
   font-size: 1.7rem;
-  grid-column: 1/3;
 }
 
-.packing-product-data-table {
-  display: grid;
-  grid-template-columns: minmax(auto, 1fr);
-  overflow: auto;
-  max-height: 370px;
-}
 
-.packing-product-data-printing {
-  display: grid;
-  grid-template-columns: minmax(auto, max-content);
-  grid-template-rows: min-content min-content;
-  row-gap: 1rem;
-}
 </style>

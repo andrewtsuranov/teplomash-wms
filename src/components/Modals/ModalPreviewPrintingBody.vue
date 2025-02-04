@@ -22,10 +22,10 @@
         </div>
         <div class="modal-body">
           <div class="barcodes-container">
-            <div v-for="(barcode, index) in ERPStore.getBarcodesFromUnregItemsById"
+            <div v-for="(barcode, index) in ERPStore.getBarcodes"
                  :key="index"
                  class="barcode-item">
-              <label>{{ ERPStore.unregItemsById.items[0]?.name }}</label>
+              <label>{{ packingStore.detailInfoPackingProduct?.name }}</label>
               <svg :id="'barcode-' + index"></svg>
             </div>
           </div>
@@ -45,13 +45,13 @@
 <script setup>
 import {usePackingStore} from "@/stores/HTTP/PackingStore.js";
 import {useERPStore} from "@/stores/HTTP/ERPStore.js";
-import {onMounted, watch, nextTick} from "vue";
+import {watch, nextTick, onMounted} from "vue";
 import JsBarcode from 'jsbarcode'
 
 const ERPStore = useERPStore()
 const packingStore = usePackingStore()
 const generateBarcodes = () => {
-  ERPStore.getBarcodesFromUnregItemsById.forEach((barcode, index) => {
+  ERPStore.getBarcodes.forEach((barcode, index) => {
     const element = document.getElementById(`barcode-${index}`)
     if (element) {
       try {
@@ -75,9 +75,11 @@ const generateBarcodes = () => {
   })
 }
 onMounted(() => {
-  generateBarcodes()
+  if (ERPStore.getBarcodes) {
+    generateBarcodes()
+  }
 })
-watch(() => ERPStore.unregItemsById.items, () => {
+watch(() => ERPStore.minItemsByIdUnreg, () => {
       nextTick(() => {
         generateBarcodes()
       })

@@ -6,7 +6,7 @@ export const usePackingStore = defineStore('packingStore', () => {
     const loading = ref(false)
     const errorStore = useErrorStore()
     const selectedTSD = ref(JSON.parse(localStorage.getItem('selectedTsd')) || null)
-    const openedItemProductId = ref(null);
+    const detailInfoPackingProduct = ref(null);
     const isShownTableItemUnregProduct = ref(false)
     const packingId = ref(JSON.parse(localStorage.getItem('packingId')) || null)
     const dataYYYYMMDD = ref(new Date().toISOString().slice(0, 10));
@@ -37,14 +37,13 @@ export const usePackingStore = defineStore('packingStore', () => {
         selectedTSD.value = tsdId
         localStorage.setItem('selectedTsd', JSON.stringify(tsdId))
     }
-    const openTableItemUnregProduct = (itemId) => {
-        openedItemProductId.value = itemId;
+    const openTableItemUnregProduct = (item) => {
+        detailInfoPackingProduct.value = item;
         isShownTableItemUnregProduct.value = true;
     }
     const closeTableItemUnregProduct = () => {
-        openedItemProductId.value = null;
+        detailInfoPackingProduct.value = null;
         isShownTableItemUnregProduct.value = false;
-        selectedGroupUnregProduct.value = null;
     }
     const clearSelectedTSD = () => {
         selectedTSD.value = null
@@ -54,7 +53,7 @@ export const usePackingStore = defineStore('packingStore', () => {
 //state
         errorStore,
         loading,
-        openedItemProductId,
+        detailInfoPackingProduct,
         isShownTableItemUnregProduct,
         palletData,
         palletStatus,

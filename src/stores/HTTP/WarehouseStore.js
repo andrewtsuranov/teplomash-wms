@@ -117,7 +117,7 @@ export const useWarehouseStore = defineStore('warehouseStore', () => {
        selectedZone.value = zone
        localStorage.setItem('selectedZone', JSON.stringify(zone))
     }
-    const clearSelectedZone =  (zone) => {
+    const clearSelectedZone =  () => {
         selectedZone.value = null
         localStorage.removeItem('selectedZone')
     }

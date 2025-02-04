@@ -5,6 +5,7 @@ import {computed, ref} from "vue"
 import {useErrorStore} from "@/stores/Error/ErrorStore.js"
 import {useUserStore} from "@/stores/HTTP/UserStore.js";
 import {requestUrls} from "@/stores/request-urls.js";
+import {log} from "qrcode/lib/core/galois-field.js";
 
 const userStore = useUserStore()
 const kyStd = ky.create({
@@ -18,18 +19,20 @@ export const useERPStore = defineStore('ERPStore', () => {
 //State
     const errorStore = useErrorStore()
     const loading = ref(false)
-    const unregItemsById = ref(null)
     const palletTypeByProductId = ref(null)
+    const minItemsByIdUnreg = ref(null)
+    const productTypeId = ref(null)
 //Getters
-    const getBarcodesFromUnregItemsById = computed(() =>
-        unregItemsById.value.items.map(item => item.barcode
+    const getBarcodes = computed(() =>
+        minItemsByIdUnreg.value.map(item => item.barcode
         ))
 //Actions
-    const GET_UNREG_ITEMS_BY_ID = async (ItemId) => {
+
+    const GET_MIN_ITEMS_BY_ID_UNREG = async (item, unregistered = true) => {
         loading.value = true;
         errorStore.clearError();
         try {
-            unregItemsById.value = await kyStd(`items/unregistered/?product_type_id=${ItemId}`).json()
+            minItemsByIdUnreg.value = await kyStd(`min-items-list/?product_type_id=${item.id}&unreg=${unregistered}`).json()
             return true
         } catch (e) {
             errorStore.setError(e)
@@ -53,13 +56,29 @@ export const useERPStore = defineStore('ERPStore', () => {
             loading.value = false
         }
     }
+    const GET_PRODUCT_TYPE_BY_ID = async (item) => {
+        loading.value = true;
+        errorStore.clearError();
+        try {
+            productTypeId.value = await kyStd(`product-type/${item.id}/`).json()
+            return true
+        } catch (e) {
+            errorStore.setError(e)
+            console.log(e)
+            throw e
+        } finally {
+            loading.value = false
+        }
+    }
     return {
         errorStore,
         loading,
         palletTypeByProductId,
-        unregItemsById,
-        getBarcodesFromUnregItemsById,
+        minItemsByIdUnreg,
+        getBarcodes,
+        productTypeId,
         GET_PALLET_TYPE_BY_PRODUCT_ID,
-        GET_UNREG_ITEMS_BY_ID,
+        GET_MIN_ITEMS_BY_ID_UNREG,
+        GET_PRODUCT_TYPE_BY_ID,
     }
 })

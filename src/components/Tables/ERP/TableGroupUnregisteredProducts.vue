@@ -22,7 +22,7 @@
       <tr v-for="(item, index) in filterUnregProductByUser"
           :key="index"
           style="cursor: pointer;"
-          @click="toggleDetailUnregProduct(item.id)"
+          @click="toggleDetailUnregProduct(item)"
       >
         <th scope="row">{{ index + 1 }}</th>
         <td>
@@ -43,9 +43,8 @@
           </button>
         </td>
         <td>
-          <i :class="packingStore.openedItemProductId === item?.id ? 'bi-circle-fill text-primary' : 'bi-circle'"
+          <i :class="packingStore.detailInfoPackingProduct?.id === item.id ? 'bi-circle-fill text-primary' : 'bi-circle'"
              class="bi toggle-icon"
-             @click="toggleDetailUnregProduct(item)"
           ></i>
         </td>
       </tr>
@@ -60,7 +59,6 @@
   </div>
 </template>
 <script setup>
-import {useUserStore} from "@/stores/HTTP/UserStore.js";
 import {useWebSocketStore} from "@/stores/WebSockets/WebSocketStore.js";
 import {usePackingStore} from "@/stores/HTTP/PackingStore.js";
 import {useERPStore} from "@/stores/HTTP/ERPStore.js";
@@ -72,19 +70,14 @@ defineProps({
   filterUnregProductByUser: Object
 })
 const warehouseStore = useWarehouseStore()
-const userStore = useUserStore()
 const ERPStore = useERPStore()
 const webSocketStore = useWebSocketStore()
 const packingStore = usePackingStore()
 const handleCreatePallet = async (item) => {
-  console.log(item)
   if (!packingStore.selectedTSD) {
     alert('Выберите активный ТСД')
   }
   try {
-    await ERPStore.GET_UNREG_ITEMS_BY_ID(item.id)
-    if (ERPStore.unregItemsById.items) {
-      await ERPStore.GET_PALLET_TYPE_BY_PRODUCT_ID(ERPStore.unregItemsById.items[0].product_type_id)
       const data = {
         "action": "create_task",
         "taskData": {
@@ -92,24 +85,24 @@ const handleCreatePallet = async (item) => {
           "assigned_to_id": packingStore.selectedTSD,
           "variables": {
             "warehouse_id": warehouseStore.getWarehouseId,
-            "id_PT": ERPStore.unregItemsById.items[0].product_type_id,
+            "id_PT": item.id,
             "to_zone_id": warehouseStore.selectedZone.id,
           },
         }
       }
       await webSocketStore.createPalletTask(data)
-    }
   } catch (e) {
     console.log(e)
   }
 }
-const toggleDetailUnregProduct = async (ItemId) => {
+const toggleDetailUnregProduct = async (item) => {
   try {
-    if (packingStore.openedItemProductId === ItemId) {
+    if (packingStore.detailInfoPackingProduct?.id === item.id) {
       packingStore.closeTableItemUnregProduct()
     } else {
-      await ERPStore.GET_UNREG_ITEMS_BY_ID(ItemId)
-      await packingStore.openTableItemUnregProduct(ItemId)
+      await ERPStore.GET_MIN_ITEMS_BY_ID_UNREG(item)
+      await ERPStore.GET_PRODUCT_TYPE_BY_ID(item)
+      await packingStore.openTableItemUnregProduct(item)
     }
   } catch (e) {
     console.log(e)

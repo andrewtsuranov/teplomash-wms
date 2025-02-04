@@ -12,13 +12,11 @@ import ERPData from "@/components/WMS/Process/PAC/ERPData.vue";
 import PackingProductData from "@/components/WMS/Process/PAC/PackingProductData.vue";
 import TeplomashTaskManager from "@/components/TeplomashTaskManager/TeplomashTaskManager.vue";
 import PalletData from "@/components/WMS/Process/PAC/PalletData.vue";
-import {useRouter} from 'vue-router';
 import {usePackingStore} from "@/stores/HTTP/PackingStore.js";
 import {useWarehouseStore} from "@/stores/HTTP/WarehouseStore.js";
 import {onUnmounted} from "vue";
 
 const warehouseStore = useWarehouseStore()
-const router = useRouter();
 const packingStore = usePackingStore();
 
 onUnmounted(() => {
