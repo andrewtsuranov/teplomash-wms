@@ -1,7 +1,6 @@
 import {defineStore} from 'pinia'
 import ky from "ky"
 import {computed, ref} from "vue"
-
 import {useErrorStore} from "@/stores/Error/ErrorStore.js"
 import {useUserStore} from "@/stores/HTTP/UserStore.js";
 import {requestUrls} from "@/stores/request-urls.js";
@@ -19,15 +18,20 @@ export const useERPStore = defineStore('ERPStore', () => {
 //State
     const errorStore = useErrorStore()
     const loading = ref(false)
-    const palletTypeByProductId = ref(null)
+    const palletTypeId = ref(null)
     const minItemsByIdUnreg = ref(null)
     const productTypeId = ref(null)
 //Getters
     const getBarcodes = computed(() =>
         minItemsByIdUnreg.value.map(item => item.barcode
         ))
+    const getPalletType = computed(() =>
+        productTypeId.value?.pallet_types[0]
+    )
+    const getBasePallet = computed(() =>
+        palletTypeId.value?.base_pallet
+    )
 //Actions
-
     const GET_MIN_ITEMS_BY_ID_UNREG = async (item, unregistered = true) => {
         loading.value = true;
         errorStore.clearError();
@@ -42,11 +46,11 @@ export const useERPStore = defineStore('ERPStore', () => {
             loading.value = false
         }
     }
-    const GET_PALLET_TYPE_BY_PRODUCT_ID = async (id) => {
+    const GET_PALLET_TYPE_VIA_PRODUCT_TYPE = async (id) => {
         loading.value = true;
         errorStore.clearError();
         try {
-            palletTypeByProductId.value = await kyStd(`pallet-types/by-product/${id}/`).json()
+            palletTypeId.value = await kyStd(`pallet-types/${id}/`).json()
             return true
         } catch (e) {
             errorStore.setError(e)
@@ -73,11 +77,13 @@ export const useERPStore = defineStore('ERPStore', () => {
     return {
         errorStore,
         loading,
-        palletTypeByProductId,
         minItemsByIdUnreg,
         getBarcodes,
         productTypeId,
-        GET_PALLET_TYPE_BY_PRODUCT_ID,
+        palletTypeId,
+        getPalletType,
+        getBasePallet,
+        GET_PALLET_TYPE_VIA_PRODUCT_TYPE,
         GET_MIN_ITEMS_BY_ID_UNREG,
         GET_PRODUCT_TYPE_BY_ID,
     }

@@ -68,8 +68,8 @@ const handlerPrint = async () => {
 .packing-product-data {
   display: grid;
   align-items: start;
-  grid-template-columns: auto auto 400px;
-  grid-template-rows: 1fr;
+  grid-template-columns: auto auto;
+  grid-template-rows: 1fr 1fr;
   gap: 1rem;
 }
 

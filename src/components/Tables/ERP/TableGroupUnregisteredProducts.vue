@@ -102,6 +102,9 @@ const toggleDetailUnregProduct = async (item) => {
     } else {
       await ERPStore.GET_MIN_ITEMS_BY_ID_UNREG(item)
       await ERPStore.GET_PRODUCT_TYPE_BY_ID(item)
+      if (ERPStore.getPalletType !== undefined) {
+      await ERPStore.GET_PALLET_TYPE_VIA_PRODUCT_TYPE(ERPStore.getPalletType)
+      }
       await packingStore.openTableItemUnregProduct(item)
     }
   } catch (e) {
