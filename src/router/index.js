@@ -78,25 +78,29 @@ const router = createRouter({
                             path: 'storage',
                             name: 'wmsStorageZone',
                             component: () => import('@/views/Home/WMS/Process/ProcessZones.vue'),
-                            props: {process: 'Хранение', processRouteName: 'wmsStorage'}
+                            props: {process: 'Хранение', processRouteName: 'wmsStorage'},
+                            meta: {breadcrumb: 'Хранение'}
                         },
                         {
                             path: 'picking',
                             name: 'wmsPickingZone',
                             component: () => import('@/views/Home/WMS/Process/ProcessZones.vue'),
-                            props: {process: 'Ассортимент', processRouteName: 'wmsPicking'}
+                            props: {process: 'Ассортимент', processRouteName: 'wmsPicking'},
+                            meta: {breadcrumb: 'Ассортимент'}
                         },
                         {
                             path: 'shipping',
                             name: 'wmsShippingZone',
                             component: () => import('@/views/Home/WMS/Process/ProcessZones.vue'),
-                            props: {process: 'Отгрузка', processRouteName: 'wmsShipping'}
+                            props: {process: 'Отгрузка', processRouteName: 'wmsShipping'},
+                            meta: {breadcrumb: 'Отгрузка'}
                         },
                         {
                             path: 'returns',
                             name: 'wmsDefectZone',
                             component: () => import('@/views/Home/WMS/Process/ProcessZones.vue'),
-                            props: {process: 'Брак', processRouteName: 'wmsDefect'}
+                            props: {process: 'Брак', processRouteName: 'wmsDefect'},
+                            meta: {breadcrumb: 'Брак'}
                         },
                         {
                             path: 'packing/:code',
@@ -111,7 +115,7 @@ const router = createRouter({
                                     components: {
                                         default: () => import('@/components/TeplomashTaskManager/Terminal/TTMTerminal.vue'),
                                     },
-                                    meta: {breadcrumb: 'Задачи'},
+                                    meta: {breadcrumb: 'ТСД'},
                                     props: true
                                 },
                             ]
@@ -154,11 +158,13 @@ const router = createRouter({
                             path: 'inventory',
                             name: 'wmsInventory',
                             component: () => import('@/views/Home/WMS/Process/Inventory/StorageInventoryView.vue'),
+                            meta: {breadcrumb: 'Инвентаризация'}
                         },
                         {
                             path: 'reporting',
                             name: 'wmsReporting',
                             component: () => import('@/views/Home/WMS/Process/Reporting/StorageReportingView.vue'),
+                            meta: {breadcrumb: 'Аналитика'}
                         },
                     ]
                 },

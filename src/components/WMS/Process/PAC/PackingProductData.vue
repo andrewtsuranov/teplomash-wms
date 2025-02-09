@@ -2,9 +2,11 @@
   <div v-if="packingStore.isShownTableItemUnregProduct"
        class="packing-product-data-container">
     <label class="packing-product-data-title">
-      Информация об упаковке продукции: {{packingStore.detailInfoPackingProduct?.name}}
+      Информация об упаковке продукции: {{ packingStore.detailInfoPackingProduct?.name }}
     </label>
     <div class="packing-product-data">
+      <div>Характеристики</div>
+      <PalletConfigurator/>
       <TableItemUnregisteredProduct/>
       <button class="btn btn-outline-primary"
               data-bs-target="#modalPrintSettings"
@@ -13,7 +15,6 @@
       >
         Печать Barcode
       </button>
-      <PalletConfigurator/>
     </div>
   </div>
   <ModalPrintSettings v-if="ERPStore.minItemsByIdUnreg"/>
@@ -26,7 +27,6 @@ import {useERPStore} from "@/stores/HTTP/ERPStore.js";
 import PalletConfigurator from "@/components/UI/SVG/Pallet/PalletConfigurator.vue";
 import ModalPrintSettings from "@/components/Modals/ModalPrintSettings.vue";
 import TableItemUnregisteredProduct from "@/components/Tables/ERP/TableItemUnregisteredProduct.vue";
-
 
 const ERPStore = useERPStore()
 const packingStore = usePackingStore()
@@ -59,6 +59,7 @@ const handlerPrint = async () => {
   display: grid;
   grid-template-columns: minmax(auto, 1fr);
   grid-template-rows: min-content minmax(auto, 1fr);
+  row-gap: 1rem;
   background-color: #2e2e2e;
   border: 1px solid #605039e0;
   border-radius: 1rem;
@@ -76,6 +77,4 @@ const handlerPrint = async () => {
 .packing-product-data-title {
   font-size: 1.7rem;
 }
-
-
 </style>

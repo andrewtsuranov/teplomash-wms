@@ -97,6 +97,23 @@
               x2="-70"
               y1="0"
           />
+          <!-- Выносные линии -->
+          <line
+              :x1="(palletWideWidth -  gridTotalWidth) / 2"
+              x2="-90"
+              y1="0"
+              y2="0"
+              stroke="#ffebcd"
+              stroke-width="3"
+          />
+          <line
+              x1="0"
+              x2="-90"
+              :y1="gridTotalHeight + palletHeight"
+              :y2="gridTotalHeight + palletHeight"
+              stroke="#ffebcd"
+              stroke-width="3"
+          />
           <!-- Стрелки -->
           <path d="M -85 50 L -70 0 L -55 50"
                 fill="#ffebcd"
@@ -127,6 +144,23 @@
               stroke="#ffebcd"
               stroke-width="3"
               x1="0"
+          />
+          <!-- Выносные линии -->
+          <line
+              x1="0"
+              x2="0"
+              :y1="gridTotalHeight + palletHeight"
+              :y2="gridTotalHeight + palletHeight + 170"
+              stroke="#ffebcd"
+              stroke-width="3"
+          />
+          <line
+              :x1="getMaxWidth(index)"
+              :x2="getMaxWidth(index)"
+              :y1="gridTotalHeight + palletHeight"
+              :y2="gridTotalHeight + palletHeight + 170"
+              stroke="#ffebcd"
+              stroke-width="3"
           />
           <!-- Стрелки -->
           <path
@@ -182,8 +216,7 @@ const getPalletWidth = (index) => {
     return palletLength.value
   }
   // Для вида сбоку всегда возвращаем длину 1200
-    return ERPStore.getBasePallet.width === 1200 ? palletWideWidth.value : palletStandardWidth.value
-
+  return ERPStore.getBasePallet.width === 1200 ? palletWideWidth.value : palletStandardWidth.value
 }
 // Новые реактивные вычисления для габаритов
 const getMaxWidth = (index) => {
@@ -240,7 +273,7 @@ const viewBoxes = computed(() => {
   return rectangles.value.map((_, index) => {
     const totalWidth = Math.max(gridWidths.value[index], getPalletWidth(index)) + 200
     const totalHeight = gridTotalHeight.value + palletHeight.value + 200
-    return `-200 0 ${totalWidth} ${totalHeight}`
+    return `-180 -5 ${totalWidth} ${totalHeight}`
   })
 })
 const palletTransform = (index) => {
@@ -271,6 +304,7 @@ function calculateCellCenters(rect) {
 </script>
 <style scoped>
 .svg-container {
+  place-self: center;
   aspect-ratio: auto;
 }
 
@@ -279,12 +313,9 @@ function calculateCellCenters(rect) {
   gap: 2rem;
 }
 
-
 .svg-pallet svg {
   height: 300px;
-
 }
-
 
 .dimension-text {
   font-family: 'Arial', sans-serif;
@@ -292,6 +323,14 @@ function calculateCellCenters(rect) {
   fill: blanchedalmond;
 }
 
+.dimension-line line {
+  stroke-linecap: round;
+}
+
+.dimension-line path {
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
 
 .fil1 {
   fill: #E32029

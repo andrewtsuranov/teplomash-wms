@@ -1,6 +1,7 @@
 <template>
-  <nav aria-label="breadcrumb" style="--bs-breadcrumb-divider: '>'; --bs-breadcrumb-divider-color: #2d3da2;" class="my-breadcrumbs">
-    <ol class="breadcrumb"  >
+  <nav aria-label="breadcrumb" style="--bs-breadcrumb-divider: '>'; --bs-breadcrumb-divider-color: #2d3da2;"
+       class="my-breadcrumbs">
+    <ol class="breadcrumb">
       <li
           class="breadcrumb-item"
           v-for="(breadcrumb, index) in breadcrumbs"
@@ -9,7 +10,9 @@
           style="color: white"
       >
         <router-link v-if="index < breadcrumbs.length - 1" :to="breadcrumb.path">
-          <span class="breadcrumb-item-style">{{ breadcrumb.meta.breadcrumb || breadcrumb.name || formatRouteName(breadcrumb.path) }}</span>
+          <span class="breadcrumb-item-style">{{
+              breadcrumb.meta.breadcrumb || breadcrumb.name || formatRouteName(breadcrumb.path)
+            }}</span>
         </router-link>
         <span v-else>
     {{ breadcrumb.meta.breadcrumb || breadcrumb.name || formatRouteName(breadcrumb.path) }}
@@ -41,18 +44,19 @@ function formatRouteName(path) {
 <style scoped>
 .my-breadcrumbs {
   padding: 0 2rem;
-
 }
+
 .breadcrumb {
-
-
 }
-.breadcrumb-item {
 
+.breadcrumb-item::before {
+  color: #E9BD5D;
 }
+
 .breadcrumb-item-style {
   /*color: #4CAF50;*/
 }
+
 a {
   color: inherit;
   text-decoration: none;
