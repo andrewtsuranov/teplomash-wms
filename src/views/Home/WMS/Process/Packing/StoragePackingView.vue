@@ -18,7 +18,6 @@ import {onUnmounted} from "vue";
 
 const warehouseStore = useWarehouseStore()
 const packingStore = usePackingStore();
-
 onUnmounted(() => {
   warehouseStore.clearSelectedZone()
 })
@@ -28,6 +27,6 @@ onUnmounted(() => {
   display: grid;
   grid-template-columns: 1fr;
   grid-auto-rows: min-content;
-  row-gap: 1rem;
+  row-gap: 2rem;
 }
 </style>
