@@ -6,13 +6,11 @@
            :viewBox="viewBoxes[index]"
            preserveAspectRatio="xMidYMid slice">
         <!-- Поддон -->
-        <g :transform="palletTransform(index)">
-          <rect
-              :height="palletHeight"
+        <g>
+          <PalletSVG
+              :transform="palletTransform(index)"
+              :type="getPalletType(index)"
               :width="getPalletWidth(index)"
-              fill="#8B4513"
-              stroke="#582C0C"
-              stroke-width="1"
           />
         </g>
         <!-- Сетка коробок -->
@@ -48,12 +46,10 @@
         </g>
         <!-- Логотипы для второй сетки -->
         <template v-if="index === 1">
-          <g
-              v-for="cell in calculateCellCenters(rect)"
-              :key="`logo-${cell.x}-${cell.y}`"
-              :transform="`translate(${cell.x}, ${cell.y})`"
-          >
-            <g :transform="`scale(${logoScale})`" type="pic">
+          <g v-for="cell in calculateCellCenters(rect, index)"
+             :key="`logo-${cell.x}-${cell.y}`"
+             :transform="`translate(${cell.x}, ${cell.y})`">
+            <g :transform="`scale(${logoScale(index)})`" type="pic">
               <path class="fil0"
                     d="M1765.9 167.46c1.24,2.98 2.94,5.49 5.11,7.51 2.17,2.02 4.71,3.56 7.6,4.61 2.9,1.06 6.04,1.59 9.41,1.59 3.26,0 6.33,-0.53 9.23,-1.59 2.9,-1.05 5.44,-2.59 7.64,-4.61 2.21,-2.02 3.94,-4.53 5.21,-7.51 1.27,-2.98 1.9,-6.41 1.9,-10.27 0,-3.86 -0.62,-7.28 -1.85,-10.27 -1.24,-2.99 -2.95,-5.49 -5.12,-7.51 -2.17,-2.02 -4.72,-3.56 -7.65,-4.62 -2.92,-1.05 -6.04,-1.58 -9.36,-1.58 -3.25,0 -6.33,0.53 -9.23,1.58 -2.89,1.06 -5.44,2.6 -7.64,4.62 -2.2,2.02 -3.94,4.52 -5.2,7.51 -1.27,2.99 -1.9,6.41 -1.9,10.27 0,3.86 0.61,7.29 1.85,10.27zm5.2 -18.46c0.91,-2.32 2.17,-4.25 3.8,-5.79 1.63,-1.54 3.56,-2.7 5.79,-3.48 2.23,-0.78 4.68,-1.18 7.33,-1.18 2.53,0 4.9,0.4 7.11,1.18 2.2,0.78 4.13,1.94 5.78,3.48 1.66,1.54 2.98,3.47 3.94,5.79 0.97,2.32 1.45,5.05 1.45,8.19 0,3.2 -0.47,5.96 -1.41,8.28 -0.93,2.32 -2.21,4.25 -3.84,5.79 -1.63,1.54 -3.56,2.68 -5.79,3.44 -2.23,0.75 -4.65,1.13 -7.24,1.13 -2.47,0 -4.83,-0.39 -7.05,-1.18 -2.24,-0.78 -4.19,-1.94 -5.84,-3.48 -1.66,-1.54 -2.97,-3.47 -3.94,-5.79 -0.96,-2.32 -1.44,-5.05 -1.44,-8.19 0,-3.14 0.45,-5.87 1.35,-8.19zm7.6 19.86l4.71 0 0 -10.76 4.34 1.35 6.51 9.41 5.53 0 -6.7 -9.86 -2.54 -1.27c1.81,-0.12 3.34,-0.69 4.58,-1.71 1.23,-1.03 1.85,-2.51 1.85,-4.44 0,-2.59 -0.9,-4.42 -2.72,-5.47 -1.8,-1.06 -3.98,-1.59 -6.51,-1.59 -1.57,0 -3.23,0.08 -4.98,0.23 -1.75,0.15 -3.11,0.38 -4.07,0.68l0 23.43zm13.3 -17.1c0,1.33 -0.48,2.26 -1.45,2.81 -0.96,0.54 -2.32,0.81 -4.07,0.81l-3.07 0 0 -6.42c0.36,-0.18 0.84,-0.29 1.44,-0.32 0.61,-0.03 1.24,-0.05 1.9,-0.05 3.5,0 5.25,1.06 5.25,3.17z"/>
               <path class="fil0"
@@ -100,19 +96,19 @@
           <!-- Выносные линии -->
           <line
               :x1="(palletWideWidth -  gridTotalWidth) / 2"
-              x2="-70"
-              y1="0"
-              y2="0"
               stroke="#ffebcd"
               stroke-width="3"
+              x2="-90"
+              y1="0"
+              y2="0"
           />
           <line
-              x1="0"
-              :x2="-70"
               :y1="gridTotalHeight + palletHeight"
               :y2="gridTotalHeight + palletHeight"
               stroke="#ffebcd"
               stroke-width="3"
+              x1="0"
+              x2="-90"
           />
           <!-- Стрелки -->
           <path d="M -85 50 L -70 0 L -55 50"
@@ -147,18 +143,18 @@
           />
           <!-- Выносные линии -->
           <line
-              x1="0"
-              x2="0"
-              :y1="gridTotalHeight + palletHeight"
-              :y2="gridTotalHeight + palletHeight + 150"
+              :y1="getStartPointY(index)"
+              :y2="gridTotalHeight + palletHeight + 170"
               stroke="#ffebcd"
               stroke-width="3"
+              x1="0"
+              x2="0"
           />
           <line
               :x1="getMaxWidth(index)"
               :x2="getMaxWidth(index)"
-              :y1="gridTotalHeight + palletHeight"
-              :y2="gridTotalHeight + palletHeight + 150"
+              :y1="getStartPointY(index)"
+              :y2="gridTotalHeight + palletHeight + 170"
               stroke="#ffebcd"
               stroke-width="3"
           />
@@ -190,6 +186,7 @@
 <script setup>
 import {computed, ref, watchEffect} from 'vue'
 import {useERPStore} from "@/stores/HTTP/ERPStore.js"
+import PalletSVG from "@/components/UI/SVG/Pallet/PalletSVG.vue";
 
 const ERPStore = useERPStore()
 // Размеры поддона
@@ -207,8 +204,10 @@ const matrixHeight = ref(null)
 const gridTotalWidth = ref(null)
 const gridTotalHeight = ref(null)
 const gridTotalLength = ref(null)
-const logoScale = computed(() => gridTotalWidth.value * 0.00023)
-const rectangles = ref([])
+const gridWidths = computed(() => [
+  boxWidth.value * matrixWidth.value,
+  boxLength.value * matrixLength.value
+])
 // Получаем ширину поддона в зависимости от вида
 const getPalletWidth = (index) => {
   // Для вида спереди используем актуальную ширину поддона
@@ -218,14 +217,61 @@ const getPalletWidth = (index) => {
   // Для вида сбоку всегда возвращаем длину 1200
   return ERPStore.getBasePallet.width === 1200 ? palletWideWidth.value : palletStandardWidth.value
 }
+const palletTransform = (index) => {
+  const x = (Math.max(gridWidths.value[index], getPalletWidth(index)) - getPalletWidth(index)) / 2
+  return `translate(${x}, ${gridTotalHeight.value})`
+}
+const gridTransform = (index) => {
+  const x = (Math.max(gridWidths.value[index], getPalletWidth(index)) - gridWidths.value[index]) / 2
+  return `translate(${x}, 0)`
+}
 // Новые реактивные вычисления для габаритов
 const getMaxWidth = (index) => {
   const gridWidth = index === 0 ? gridTotalWidth.value : gridTotalLength.value
   const palletWidth = getPalletWidth(index)
   return Math.max(gridWidth, palletWidth)
 }
+const LOGO_SCALE_RATIO = {
+  width: 0.6,  // Занимает 80% ширины коробки
+  height: 0.4  // Занимает 60% высоты коробки
+}
+const logoScale = computed(() => (index) => {
+  const SVG = {
+    width: 1812,
+    height: 346.98
+  }
+  const box = {
+    width: index === 0 ? boxWidth.value : boxLength.value,
+    height: boxHeight.value
+  }
+  // 💡 Вот тут регулируем размер через LOGO_SCALE_RATIO
+  const scaleByHeight = (box.height * LOGO_SCALE_RATIO.height) / SVG.height
+  const scaleByWidth = (box.width * LOGO_SCALE_RATIO.width) / SVG.width
+  return Math.min(scaleByHeight, scaleByWidth)
+})
+const singleBoxDimensions = computed(() => ({
+  width: boxWidth.value,
+  length: boxLength.value,
+  height: boxHeight.value
+}))
+const rectangles = ref([])
 const getTotalHeight = (rect) => {
   return rect.height + palletHeight.value
+}
+// Добавляем computed для определения начальной точки выносных линий
+const getStartPointY = computed(() => (index) => {
+  const gridWidth = index === 0 ? gridTotalWidth.value : gridTotalLength.value
+  const palletWidth = getPalletWidth(index)
+  // Если сетка шире поддона - берем высоту только от сетки
+  if (gridWidth > palletWidth) {
+    return gridTotalHeight.value
+  }
+  // Если поддон шире - берем высоту с учетом поддона
+  return gridTotalHeight.value + palletHeight.value
+})
+const getPalletType = (index) => {
+  if (index === 0) return 'front'
+  return ERPStore.getBasePallet.width === 1200 ? 'side-1200' : 'side-800'
 }
 watchEffect(() => {
   // Обновляем значения при изменении в ERPStore
@@ -239,6 +285,11 @@ watchEffect(() => {
   gridTotalLength.value = boxLength.value * matrixLength.value
   gridTotalWidth.value = boxWidth.value * matrixWidth.value
   gridTotalHeight.value = boxHeight.value * matrixHeight.value
+  watchEffect(() => {
+    console.log('Pallet Type:', getPalletType(0))
+    console.log('Pallet Width:', getPalletWidth(0))
+    console.log('Pallet Transform:', palletTransform(0))
+  })
   // Обновляем rectangles с учетом центрирования по поддону
   rectangles.value = [
     {
@@ -265,10 +316,6 @@ const calculateHorizontalLines = (index) => {
   const cellHeight = gridTotalHeight.value / matrixHeight.value
   return Array.from({length: matrixHeight.value - 1}, (_, i) => (i + 1) * cellHeight)
 }
-const gridWidths = computed(() => [
-  boxWidth.value * matrixWidth.value,
-  boxLength.value * matrixLength.value
-])
 const viewBoxes = computed(() => {
   return rectangles.value.map((_, index) => {
     const totalWidth = Math.max(gridWidths.value[index], getPalletWidth(index)) + 200
@@ -276,34 +323,39 @@ const viewBoxes = computed(() => {
     return `-180 -5 ${totalWidth} ${totalHeight}`
   })
 })
-const palletTransform = (index) => {
-  const x = (Math.max(gridWidths.value[index], getPalletWidth(index)) - getPalletWidth(index)) / 2
-  return `translate(${x}, ${gridTotalHeight.value})`
-}
-const gridTransform = (index) => {
-  const x = (Math.max(gridWidths.value[index], getPalletWidth(index)) - gridWidths.value[index]) / 2
-  return `translate(${x}, 0)`
-}
 
-function calculateCellCenters(rect) {
-  const cellWidth = rect.width / rect.colCount
-  const cellHeight = rect.height / rect.rowCount
-  const centers = []
-  for (let row = 0; row < rect.rowCount; row++) {
-    for (let col = 0; col < rect.colCount; col++) {
-      const logoCurrentWidth = 1812 * logoScale.value
-      const logoCurrentHeight = 346.98 * logoScale.value
-      centers.push({
-        x: cellWidth * (col + 0.5) - (logoCurrentWidth / 2),
-        y: cellHeight * (row + 0.5) - (logoCurrentHeight / 2)
-      })
-    }
+function calculateCellCenters(rect, index) {
+  const cellDimensions = {
+    width: index === 0 ? boxWidth.value : boxLength.value,
+    height: boxHeight.value
   }
-  return centers
+  const currentScale = logoScale.value(index)
+  const logoSize = {
+    width: 1812 * currentScale,
+    height: 346.98 * currentScale
+  }
+  // Важно! Добавляем отступ с учетом общей ширины сетки
+  const gridOffset = (
+      index === 0
+          ? (Math.max(gridTotalWidth.value, getPalletWidth(index)) - gridTotalWidth.value)
+          : (Math.max(gridTotalLength.value, getPalletWidth(index)) - gridTotalLength.value)
+  ) / 2
+  return Array.from({length: rect.rowCount * rect.colCount}, (_, i) => {
+    const row = Math.floor(i / rect.colCount)
+    const col = i % rect.colCount
+    // Учитываем отступ и точно центрируем
+    return {
+      x: gridOffset + (cellDimensions.width * col) +
+          (cellDimensions.width / 2) - (logoSize.width / 2),
+      y: (cellDimensions.height * row) +
+          (cellDimensions.height / 2) - (logoSize.height / 2)
+    }
+  })
 }
 </script>
 <style scoped>
 .svg-container {
+  place-self: center;
   aspect-ratio: auto;
 }
 
