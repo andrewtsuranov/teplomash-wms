@@ -1,14 +1,11 @@
-import {defineStore} from 'pinia'
-import {useUserStore} from '@/stores/HTTP/UserStore.js'
 import {computed, ref} from "vue";
+import {useUserStore} from '@/stores/HTTP/UserStore.js'
 import {useTransactionStore} from "@/stores/WebSockets/transactionStore.js";
-import {usePackingStore} from "@/stores/HTTP/PackingStore.js";
-import {useGroupByKey} from "@/composables/useGroupByKey.js";
+import {defineStore} from 'pinia'
 
 export const useWebSocketStore = defineStore('websocket', () => {
-//Подключаем UserStore
+//Store
     const userStore = useUserStore()
-    const packingStore = usePackingStore()
     const transactionStore = useTransactionStore()
 //State
     const isConnected = ref(false)
@@ -22,28 +19,17 @@ export const useWebSocketStore = defineStore('websocket', () => {
     const maxReconnectAttempts = ref(5)
     const reconnectDelay = ref(3000)
     const lastPongTime = ref(null)
-    const privateMessage = ref(null)
-    const privateMessageID = ref(null)
-    const receivedMessage = ref(null)
+    const productTypes = ref(null)
     const wsUnregisteredProducts = ref(JSON.parse(localStorage.getItem('wsUnregisteredProducts')) || null)
-    // const productTypes = ref(JSON.parse(localStorage.getItem('productTypes')) || null)
     const transactionStatus = ref(JSON.parse(localStorage.getItem('transactionStatus')) || null)
 //Getters
     const lastMessage = computed(() => message.value)
     const connectionStatus = computed(() => isConnected.value ? 'В сети' : 'Не в сети')
-    const getPrivateMessage = computed(() => privateMessage.value)
-    const getPrivateMessageID = computed(() => privateMessageID.value)
-    const foundIdUser = computed((itemId) => {
-        return onlineDevices.value.find(item => item.id === itemId)
-    })
-    const getUnregisteredProducts = computed(() => {
-        return wsUnregisteredProducts.value
-    })
-
+    const getUnregisteredProducts = computed(() => wsUnregisteredProducts.value)
 //Actions
-    function initWebSocket() {
-        // const wsUrl = `ws://lab:8081/ws/inventory/?token=${userStore.getTokenAccess}`
-        const wsUrl = `ws://38.180.192.229/ws/inventory/?token=${userStore.getTokenAccess}`
+    const initWebSocket = () => {
+        const wsUrl = `ws://lab:8081/ws/inventory/?token=${userStore.getTokenAccess}`
+        // const wsUrl = `ws://38.180.192.229/ws/inventory/?token=${userStore.getTokenAccess}`
         // const wsUrl = `ws://192.168.1.144/ws/inventory/?token=${userStore.getTokenAccess}`
         socket.value = new WebSocket(wsUrl)
         socket.value.onopen = onOpen.bind(this)
@@ -51,24 +37,21 @@ export const useWebSocketStore = defineStore('websocket', () => {
         socket.value.onmessage = onMessage.bind(this)
         socket.value.onerror = onError.bind(this)
     }
-
-    function onOpen() {
+    const onOpen = () => {
         isConnected.value = true
         reconnectError.value = false
         error.value = null
         reconnectAttempts.value = 0
         console.log('WebSocket connected')
     }
-
-    function sendPong() {
+    const sendPong = () => {
         if (isConnected.value && socket.value?.readyState === WebSocket.OPEN) {
             // Отправляем pong в том же формате, в котором получили ping
             socket.value.send(JSON.stringify({type: 'pong'}))
             lastPongTime.value = Date.now()
         }
     }
-
-    function onClose(event) {
+    const onClose = (event) => {
         isConnected.value = false
         console.log(`WebSocket disconnected. Code: ${event.code}, reason: ${event.reason}`)
         if (!event.wasClean) {
@@ -76,16 +59,14 @@ export const useWebSocketStore = defineStore('websocket', () => {
             reconnect()
         }
     }
-
-    function disconnect() {
+    const disconnect = () => {
         if (socket.value) {
             socket.value.close()
             isConnected.value = false
             console.log('WebSocket disconnected by user')
         }
     }
-
-    function reconnect() {
+    const reconnect = () => {
         if (reconnectAttempts.value < maxReconnectAttempts.value) {
             reconnectAttempts.value++
             console.log(`Attempting to reconnect (${reconnectAttempts.value}/${maxReconnectAttempts.value})`)
@@ -97,14 +78,12 @@ export const useWebSocketStore = defineStore('websocket', () => {
             reconnectError.value = true
         }
     }
-
-    function onError(error) {
+    const onError = (error) => {
         console.error('WebSocket Error:', error)
         error.value = 'WebSocket Error occurred'
         reconnectError.value = true
     }
-
-    function onMessage(event) {
+    const onMessage = (event) => {
         try {
             // Проверяем, является ли сообщение бинарным (ping frame)
             if (event.data instanceof Blob) {
@@ -130,7 +109,7 @@ export const useWebSocketStore = defineStore('websocket', () => {
             }
             //Обработка сообщения: перенос продукции из ERP в БД
             if (data.type === 'items_created' && data.status === 'success') {
-                getUnregisteredItems()
+                GET_UNREGISTERED_ITEMS()
             }
             if (data.type === 'items_list' && data.status === 'success') {
                 wsUnregisteredProducts.value = data.items
@@ -155,28 +134,12 @@ export const useWebSocketStore = defineStore('websocket', () => {
         }
     }
 
-    function sendMessage(message, id) {
-        const data = {
-            action: 'send_private_message',
-            to: id,
-            message: message
-        }
-        if (isConnected.value && socket.value && socket.value.readyState === WebSocket.OPEN) {
-            console.log(data)
-            socket.value.send(JSON.stringify(data))
-        } else {
-            console.error('Cannot send message: WebSocket is not connected')
-            error.value = 'Cannot send message: WebSocket is not connected'
-        }
-    }
-
-//Отправляем запрос на получение сгруппированных незарегестрированных изделий
-    function createItemsBulk(array) {
+//Запросы
+    const CREATE_ITEMS_BULK = (array) => {
         const data = {
             'action': 'create_items_bulk',
             "items": array
         }
-        console.log(data)
         if (isConnected.value && socket.value && socket.value.readyState === WebSocket.OPEN) {
             socket.value.send(JSON.stringify(data))
         } else {
@@ -184,8 +147,36 @@ export const useWebSocketStore = defineStore('websocket', () => {
             error.value = 'Cannot send message: WebSocket is not connected'
         }
     }
-
-    const getUnregisteredItems = () => {
+    const CREATE_WAREHOUSE = () => {
+        const data = {
+            action: 'create_warehouse',
+            number: 4,
+            name: 'Екатеринбург'
+        }
+        if (isConnected.value && socket.value && socket.value.readyState === WebSocket.OPEN) {
+            socket.value.send(JSON.stringify(data))
+        } else {
+            console.error('Cannot send message: WebSocket is not connected')
+            error.value = 'Cannot send message: WebSocket is not connected'
+        }
+    }
+    const TASK_CREATE_PALLET = (payload) => {
+        if (isConnected.value && socket.value && socket.value.readyState === WebSocket.OPEN) {
+            socket.value.send(JSON.stringify(payload))
+        } else {
+            console.error('Cannot send message: WebSocket is not connected')
+            error.value = 'Cannot send message: WebSocket is not connected'
+        }
+    }
+    const TASK_CHECK_PALLET = (payload) => {
+        if (isConnected.value && socket.value && socket.value.readyState === WebSocket.OPEN) {
+            socket.value.send(JSON.stringify(payload))
+        } else {
+            console.error('Cannot send message: WebSocket is not connected')
+            error.value = 'Cannot send message: WebSocket is not connected'
+        }
+    }
+    const GET_UNREGISTERED_ITEMS = () => {
         const data = {
             "action": "get_product_types",
             "settings": {
@@ -200,7 +191,7 @@ export const useWebSocketStore = defineStore('websocket', () => {
             error.value = 'Cannot send message: WebSocket is not connected'
         }
     }
-    const getProductTypes = () => {
+    const GET_PRODUCT_TYPES = () => {
         const data = {
             "action": "get_product_types"
         }
@@ -211,7 +202,13 @@ export const useWebSocketStore = defineStore('websocket', () => {
             error.value = 'Cannot send message: WebSocket is not connected'
         }
     }
-    const getTransactionData = (id, min = true, max = false) => {
+    const GET_WAREHOUSE = () => {
+        socket.value.send(JSON.stringify({
+            action: 'get_warehouse',
+            warehouse_id: 1
+        }));
+    }
+    const GET_TRANSACTION_DATA = (id, min = true, max = false) => {
         const data = {
             "action": "get_transaction_data",
             "id": id,
@@ -225,46 +222,7 @@ export const useWebSocketStore = defineStore('websocket', () => {
             error.value = 'Cannot send message: WebSocket is not connected'
         }
     }
-    const createPalletTask = (payload) => {
-        if (isConnected.value && socket.value && socket.value.readyState === WebSocket.OPEN) {
-            socket.value.send(JSON.stringify(payload))
-        } else {
-            console.error('Cannot send message: WebSocket is not connected')
-            error.value = 'Cannot send message: WebSocket is not connected'
-        }
-    }
-
-    function createWarehouse() {
-        const data = {
-            action: 'create_warehouse',
-            number: 4,
-            name: 'Екатеринбург'
-        }
-        if (isConnected.value && socket.value && socket.value.readyState === WebSocket.OPEN) {
-            socket.value.send(JSON.stringify(data))
-        } else {
-            console.error('Cannot send message: WebSocket is not connected')
-            error.value = 'Cannot send message: WebSocket is not connected'
-        }
-    }
-
-    const checkPalletTask = (payload) => {
-        if (isConnected.value && socket.value && socket.value.readyState === WebSocket.OPEN) {
-            socket.value.send(JSON.stringify(payload))
-        } else {
-            console.error('Cannot send message: WebSocket is not connected')
-            error.value = 'Cannot send message: WebSocket is not connected'
-        }
-    }
-
-    function getWarehouse() {
-        socket.value.send(JSON.stringify({
-            action: 'get_warehouse',
-            warehouse_id: 1
-        }));
-    }
-
-    const linkPallet = () => {
+    const LINK_PALLET = () => {
         const data = {
             "action": "link_pallet"
         }
@@ -275,6 +233,8 @@ export const useWebSocketStore = defineStore('websocket', () => {
             error.value = 'Cannot send message: WebSocket is not connected'
         }
     }
+
+
     return {
 //state
         socket,
@@ -286,39 +246,30 @@ export const useWebSocketStore = defineStore('websocket', () => {
         maxReconnectAttempts,
         reconnectDelay,
         onlineDevices,
-        privateMessage,
-        privateMessageID,
-        receivedMessage,
         wsUnregisteredProducts,
-        // productTypes,
         transactionStatus,
         unknownError,
 //getters
         lastMessage,
         connectionStatus,
         lastPongTime,
-        getPrivateMessage,
-        getPrivateMessageID,
-        foundIdUser,
         getUnregisteredProducts,
 //actions
         initWebSocket,
-        getUnregisteredItems,
         onOpen,
         onClose,
-        onMessage,
         onError,
-        sendMessage,
-        createWarehouse,
-        // createPallet,
-        getWarehouse,
         disconnect,
-        createItemsBulk,
         reconnect,
-        getProductTypes,
-        createPalletTask,
-        getTransactionData,
-        checkPalletTask,
-        linkPallet,
+        onMessage,
+        CREATE_WAREHOUSE,
+        CREATE_ITEMS_BULK,
+        TASK_CREATE_PALLET,
+        TASK_CHECK_PALLET,
+        GET_UNREGISTERED_ITEMS,
+        GET_PRODUCT_TYPES,
+        GET_WAREHOUSE,
+        GET_TRANSACTION_DATA,
+        LINK_PALLET,
     }
 })

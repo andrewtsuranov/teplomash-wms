@@ -14,7 +14,7 @@
           <label>Габариты паллеты:</label>
           <ul>
             <li>{{ ERPStore.palletTypeId.length }} x {{ ERPStore.palletTypeId.width }} x
-              {{ ERPStore.palletTypeId.height }} (мм)
+                {{ ERPStore.palletTypeId.height }} (мм)
             </li>
           </ul>
           <label>Тип поддона:</label>
@@ -25,10 +25,12 @@
           <label>Изделий в паллете:</label>
           <ul>
             <li>
-              {{
-                ERPStore.palletTypeId.rows_length * ERPStore.palletTypeId.rows_width * ERPStore.palletTypeId.rows_height
-              }}
-              шт.
+              {{ totalCountProductPallet }} шт.
+            </li>
+          </ul>
+          <label>Масса паллеты:</label>
+          <ul>
+            <li>{{ totalWeightPallet}} &#177; 1 кг.
             </li>
           </ul>
         </div>
@@ -64,11 +66,19 @@ import {useERPStore} from "@/stores/HTTP/ERPStore.js";
 import PalletConfigurator from "@/components/UI/SVG/Pallet/PalletConfigurator.vue";
 import ModalPrintSettings from "@/components/Modals/ModalPrintSettings.vue";
 import TableItemUnregisteredProduct from "@/components/Tables/ERP/TableItemUnregisteredProduct.vue";
+import {computed} from "vue";
 
 const ERPStore = useERPStore()
 const packingStore = usePackingStore()
 const printingStore = usePrintingStore()
 const warehouseStore = useWarehouseStore()
+
+const totalCountProductPallet = computed(() => {
+  return  ERPStore.palletTypeId.rows_length * ERPStore.palletTypeId.rows_width * ERPStore.palletTypeId.rows_height
+})
+const totalWeightPallet = computed(() => {
+  return Number(ERPStore.getBasePallet.weight) + (Math.round(Number(ERPStore.productTypeId.max_weight) * totalCountProductPallet.value))
+})
 const handlerPrint = async () => {
   try {
     await printingStore.getZPLPrinters()

@@ -111,9 +111,13 @@ const transactionError = computed(() => {
 
 .ttm-terminal-view-status {
   display: grid;
+  padding: 1rem;
   grid-template-columns: auto 1fr;
   grid-auto-rows: min-content;
   column-gap: 1rem;
+  place-self: start;
+  background-color: #46464682;
+  border-radius: 10px;
 }
 
 @media (max-width: 800px) {

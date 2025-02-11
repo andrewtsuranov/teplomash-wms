@@ -90,7 +90,7 @@ const handleCreatePallet = async (item) => {
           },
         }
       }
-      await webSocketStore.createPalletTask(data)
+      await webSocketStore.TASK_CREATE_PALLET(data)
   } catch (e) {
     console.log(e)
   }

@@ -27,7 +27,7 @@ export const useWarehouseStore = defineStore('warehouseStore', () => {
     const warehouseZoneTypeById = ref(JSON.parse(localStorage.getItem('warehouseZoneTypeById')) || null)
     const warehouseAliasMap = ref({})
 //getters
-    const getWarehouseId = computed(() => {
+    const GET_WAREHOUSE = computed(() => {
         return warehouseData.value.id
     })
     const groupByZone = computed(() => {
@@ -134,7 +134,7 @@ export const useWarehouseStore = defineStore('warehouseStore', () => {
 //getters
         groupByZone,
         customSortByZone,
-        getWarehouseId,
+        GET_WAREHOUSE,
 //actions
         GET_WAREHOUSES,
         WAREHOUSE_ID,

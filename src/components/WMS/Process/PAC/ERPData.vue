@@ -46,7 +46,7 @@
     <div class="erp-settings-group-btn">
       <button class="btn btn-outline-info"
               type="button"
-              @click="webSocketStore.getUnregisteredItems()"
+              @click="webSocketStore.GET_UNREGISTERED_ITEMS()"
       >
         TEST (Обновить данные)
       </button>
@@ -56,7 +56,7 @@
       </div>
       <!--      <button class="btn btn-outline-info"-->
       <!--              type="button"-->
-      <!--              @click="webSocketStore.getTransactionData(400, true, true)"-->
+      <!--              @click="webSocketStore.GET_TRANSACTION_DATA(400, true, true)"-->
       <!--      >-->
       <!--        TEST (Получить транзакцию)-->
       <!--      </button>-->
@@ -68,7 +68,7 @@
       <!--      </button>-->
 <!--            <button class="btn btn-outline-info"-->
 <!--                    type="button"-->
-<!--                    @click="webSocketStore.linkPallet"-->
+<!--                    @click="webSocketStore.LINK_PALLET"-->
 <!--            >-->
 <!--              TEST (Связать тип паллеты)-->
 <!--            </button>-->
@@ -119,7 +119,7 @@ const filterUnregProductByUser = computed(() => {
 //     }
 //   }
 //   try {
-//     await webSocketStore.checkPalletTask(data)
+//     await webSocketStore.TASK_CHECK_PALLET(data)
 //   } catch (e) {
 //     console.log(e)
 //   }
@@ -157,9 +157,6 @@ const taskScanData = () => {
 onMounted(async () => {
   try {
     qrcode.value = await generateQR(taskScanData())
-    // if (webSocketStore.isConnected) {
-    //   await webSocketStore.getUnregisteredItems()
-    // }
   } catch (e) {
     console.log(e)
   }
