@@ -28,8 +28,8 @@ export const useWebSocketStore = defineStore('websocket', () => {
     const getUnregisteredProducts = computed(() => wsUnregisteredProducts.value)
 //Actions
     const initWebSocket = () => {
-        const wsUrl = `ws://lab:8081/ws/inventory/?token=${userStore.getTokenAccess}`
-        // const wsUrl = `ws://38.180.192.229/ws/inventory/?token=${userStore.getTokenAccess}`
+        // const wsUrl = `ws://lab:8081/ws/inventory/?token=${userStore.getTokenAccess}`
+        const wsUrl = `ws://38.180.192.229/ws/inventory/?token=${userStore.getTokenAccess}`
         // const wsUrl = `ws://192.168.1.144/ws/inventory/?token=${userStore.getTokenAccess}`
         socket.value = new WebSocket(wsUrl)
         socket.value.onopen = onOpen.bind(this)
@@ -125,15 +125,11 @@ export const useWebSocketStore = defineStore('websocket', () => {
             if (data.type === 'transaction_update') {
                 transactionStore.addTransaction(data.transaction)
             }
-            if (data.type === 'без понятия' && data.status === 'success') {
-                alert(data.message)
-            }
         } catch (e) {
             console.error('Error parsing WebSocket message:', e)
             error.value = 'Error parsing WebSocket message'
         }
     }
-
 //Запросы
     const CREATE_ITEMS_BULK = (array) => {
         const data = {
@@ -233,8 +229,6 @@ export const useWebSocketStore = defineStore('websocket', () => {
             error.value = 'Cannot send message: WebSocket is not connected'
         }
     }
-
-
     return {
 //state
         socket,
@@ -248,11 +242,11 @@ export const useWebSocketStore = defineStore('websocket', () => {
         onlineDevices,
         wsUnregisteredProducts,
         transactionStatus,
+        lastPongTime,
         unknownError,
 //getters
         lastMessage,
         connectionStatus,
-        lastPongTime,
         getUnregisteredProducts,
 //actions
         initWebSocket,

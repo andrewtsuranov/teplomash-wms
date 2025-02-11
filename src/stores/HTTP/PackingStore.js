@@ -7,9 +7,9 @@ export const usePackingStore = defineStore('packingStore', () => {
     const errorStore = useErrorStore()
     const selectedTSD = ref(JSON.parse(localStorage.getItem('selectedTsd')) || null)
     const detailInfoPackingProduct = ref(null);
-    const isShownTableItemUnregProduct = ref(false)
     const packingId = ref(JSON.parse(localStorage.getItem('packingId')) || null)
     const dataYYYYMMDD = ref(new Date().toISOString().slice(0, 10));
+    const isShownTableItemUnregProduct = ref(false)
 //state
     const palletData = {
         issue: dataYYYYMMDD.value,
@@ -31,7 +31,6 @@ export const usePackingStore = defineStore('packingStore', () => {
         error: "Ошибка действия",
     }
 //getters
-
 //actions
     const setSelectedTSD = (tsdId) => {
         selectedTSD.value = tsdId
@@ -60,7 +59,6 @@ export const usePackingStore = defineStore('packingStore', () => {
         selectedTSD,
         packingId,
 //getters
-
 //actions
         setSelectedTSD,
         openTableItemUnregProduct,

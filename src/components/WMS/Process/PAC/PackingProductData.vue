@@ -14,7 +14,7 @@
           <label>Габариты паллеты:</label>
           <ul>
             <li>{{ ERPStore.palletTypeId.length }} x {{ ERPStore.palletTypeId.width }} x
-                {{ ERPStore.palletTypeId.height }} (мм)
+              {{ ERPStore.palletTypeId.height }} (мм)
             </li>
           </ul>
           <label>Тип поддона:</label>
@@ -30,7 +30,7 @@
           </ul>
           <label>Масса паллеты:</label>
           <ul>
-            <li>{{ totalWeightPallet}} &#177; 1 кг.
+            <li>{{ totalWeightPallet }} &#177; 1 кг.
             </li>
           </ul>
         </div>
@@ -45,14 +45,6 @@
         >
           Печать Barcode
         </button>
-      </div>
-      <div class="barcodes-container">
-        <div v-for="(barcode, index) in ERPStore.getBarcodes"
-             :key="index"
-             class="barcode-item">
-          <label>{{ packingStore.detailInfoPackingProduct?.name }}</label>
-          <svg :id="'barcode-' + index"></svg>
-        </div>
       </div>
     </div>
   </div>
@@ -72,9 +64,8 @@ const ERPStore = useERPStore()
 const packingStore = usePackingStore()
 const printingStore = usePrintingStore()
 const warehouseStore = useWarehouseStore()
-
 const totalCountProductPallet = computed(() => {
-  return  ERPStore.palletTypeId.rows_length * ERPStore.palletTypeId.rows_width * ERPStore.palletTypeId.rows_height
+  return ERPStore.palletTypeId.rows_length * ERPStore.palletTypeId.rows_width * ERPStore.palletTypeId.rows_height
 })
 const totalWeightPallet = computed(() => {
   return Number(ERPStore.getBasePallet.weight) + (Math.round(Number(ERPStore.productTypeId.max_weight) * totalCountProductPallet.value))
@@ -121,7 +112,7 @@ const handlerPrint = async () => {
   display: grid;
   align-items: start;
   grid-template-columns: minmax(auto, 1fr);
-  grid-template-rows: min-content min-content 400px;
+  grid-template-rows: min-content min-content;
   overflow: auto;
   row-gap: 2rem;
 }
@@ -140,31 +131,5 @@ const handlerPrint = async () => {
 
 .grp-btn {
   align-self: start;
-}
-
-.barcodes-container {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  grid-auto-rows: minmax(auto, 1fr);
-  justify-items: center;
-  gap: 1rem;
-}
-
-.barcode-item {
-  display: grid;
-  padding: 1rem;
-  grid-template-columns: 330px;
-  background: #FFFFFF;
-  border-radius: 1rem;
-  justify-items: center;
-}
-
-.barcode-item label {
-  color: #000;
-  font-size: 1.6rem;
-  font-weight: bold;
-  padding: 0 1.2rem;
-  font-family: "Arial Narrow";
-  line-height: 1.2;
 }
 </style>

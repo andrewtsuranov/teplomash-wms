@@ -27,12 +27,8 @@ export const useWarehouseStore = defineStore('warehouseStore', () => {
     const warehouseZoneTypeById = ref(JSON.parse(localStorage.getItem('warehouseZoneTypeById')) || null)
     const warehouseAliasMap = ref({})
 //getters
-    const GET_WAREHOUSE = computed(() => {
-        return warehouseData.value.id
-    })
-    const groupByZone = computed(() => {
-        return useGroupByKey(warehouseZoneTypeById.value, 'zone')
-    })
+    const getWarehouseId = computed(() => warehouseData.value.id)
+    const groupByZone = computed(() => useGroupByKey(warehouseZoneTypeById.value, 'zone'))
     const customSortByZone = computed(() => {
         if (allZoneTypes.value) {
             const orderKeys = allZoneTypes.value.map(zone => zone.name)
@@ -41,7 +37,7 @@ export const useWarehouseStore = defineStore('warehouseStore', () => {
         return "Ошибка"
     })
 //actions
-    const GET_WAREHOUSES = async () => {
+    const GET_ALL_WAREHOUSES = async () => {
         loading.value = true;
         errorStore.clearError();
         try {
@@ -58,7 +54,7 @@ export const useWarehouseStore = defineStore('warehouseStore', () => {
             loading.value = false
         }
     }
-    const WAREHOUSE_ID = async (id) => {
+    const GET_WAREHOUSE_BY_ID = async (id) => {
         loading.value = true;
         errorStore.clearError();
         try {
@@ -113,11 +109,11 @@ export const useWarehouseStore = defineStore('warehouseStore', () => {
             loading.value = false
         }
     }
-    const setSelectedZone =  (zone) => {
-       selectedZone.value = zone
-       localStorage.setItem('selectedZone', JSON.stringify(zone))
+    const setSelectedZone = (zone) => {
+        selectedZone.value = zone
+        localStorage.setItem('selectedZone', JSON.stringify(zone))
     }
-    const clearSelectedZone =  () => {
+    const clearSelectedZone = () => {
         selectedZone.value = null
         localStorage.removeItem('selectedZone')
     }
@@ -134,10 +130,10 @@ export const useWarehouseStore = defineStore('warehouseStore', () => {
 //getters
         groupByZone,
         customSortByZone,
-        GET_WAREHOUSE,
+        getWarehouseId,
 //actions
-        GET_WAREHOUSES,
-        WAREHOUSE_ID,
+        GET_ALL_WAREHOUSES,
+        GET_WAREHOUSE_BY_ID,
         GET_ALl_ZONE_TYPES,
         GET_WAREHOUSES_ZONE_BY_ID,
         setSelectedZone,

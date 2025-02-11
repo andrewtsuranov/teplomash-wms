@@ -20,7 +20,7 @@ const warehouseStore = useWarehouseStore()
 const router = useRouter()
 onMounted(async () => {
   try {
-    await warehouseStore.GET_WAREHOUSES()
+    await warehouseStore.GET_ALL_WAREHOUSES()
   } catch (e) {
     errorStore.setError({
       error: e,
@@ -32,7 +32,7 @@ onMounted(async () => {
 })
 const handlerClickWarehouse = async (id) => {
   try {
-    await warehouseStore.WAREHOUSE_ID(id)
+    await warehouseStore.GET_WAREHOUSE_BY_ID(id)
     if (warehouseStore.warehouseData) {
       await router.push({
         name: 'WMSProcess',
