@@ -44,6 +44,7 @@ const webSocketStore = useWebSocketStore()
 onMounted(async () => {
   try {
     await webSocketStore.initWebSocket()
+    await userStore.GET_USERS()
   } catch (e) {
     console.log(e)
     errorStore.setError({

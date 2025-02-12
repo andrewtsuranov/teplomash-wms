@@ -65,6 +65,7 @@ export const useUserStore = defineStore('userStore', () => {
     const user = ref(JSON.parse(localStorage.getItem('userData')) || null)
     const loading = ref(false)
     const tempCredentials = ref(null)
+    const fullListUsers = ref(JSON.parse(localStorage.getItem('fullListUsers')) || null)
 //getters
     const isAuthenticated = computed(() => !!user.value)
     const getFullNameUser = computed(() => {
@@ -82,13 +83,8 @@ export const useUserStore = defineStore('userStore', () => {
     const getTokenAccess = computed(() => user.value?.access);
     const getUserId = computed(() => user.value?.user?.id);
     const getUserEmail = computed(() => user.value?.user?.email);
-    const getUserById = computed(() => (id) => {
-        if (user.value.user && user.value.user.id === id) {
-            return getFullNameUser.value;
-        } else {
-            return null; // Или undefined, в зависимости от ваших предпочтений
-        }
-    });
+
+
 //actions
     const LOGIN = async (credentials) => {
         loading.value = true;
@@ -229,17 +225,38 @@ export const useUserStore = defineStore('userStore', () => {
         user.value = null
         tempCredentials.value = null
     }
+    const GET_USERS = async () => {
+        loading.value = true;
+        errorStore.clearError();
+        try {
+            const response = await kyStd('users/', {
+                headers: {
+                    Authorization: `Bearer ${getTokenAccess.value}`
+                },
+            }).json()
+            fullListUsers.value = response
+            localStorage.setItem('fullListUsers', JSON.stringify(response))
+            return true
+        } catch (e) {
+            errorStore.setError(e)
+            console.log(e)
+            throw e
+        } finally {
+            loading.value = false
+        }
+    }
     return {
         user,
         loading,
         tempCredentials,
         isAuthenticated,
-        getUserById,
+        fullListUsers,
         LOGIN,
         SIGNUP,
         VERIFY,
         REQ_CONFIRM,
         RESEND_CODE,
+        GET_USERS,
         getFullNameUser,
         roleUser,
         getTokenAccess,

@@ -11,7 +11,7 @@
         <span>Дата создания:{{ dataYYYYMMDD }}</span>
       </div>
       <div class="pallet-item-row-two">
-        <svg-eur-one100-mini841/>
+
       </div>
       <div class="pallet-item-row-three">
         <div class="in-table-item-container">

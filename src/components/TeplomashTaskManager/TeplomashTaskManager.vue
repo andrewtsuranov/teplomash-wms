@@ -335,9 +335,8 @@ onMounted(async () => {
   grid-area: task;
   display: grid;
   grid-template-columns: minmax(auto, 1fr);
-  grid-template-rows: minmax(33.1rem, 1fr);
+  grid-template-rows: 33.1rem;
   border-radius: 10px;
-  overflow-y: auto;
 }
 
 .ttm-terminal-view {

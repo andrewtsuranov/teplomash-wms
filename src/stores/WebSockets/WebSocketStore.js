@@ -21,15 +21,14 @@ export const useWebSocketStore = defineStore('websocket', () => {
     const lastPongTime = ref(null)
     const productTypes = ref(null)
     const wsUnregisteredProducts = ref(JSON.parse(localStorage.getItem('wsUnregisteredProducts')) || null)
-    const transactionStatus = ref(JSON.parse(localStorage.getItem('transactionStatus')) || null)
 //Getters
     const lastMessage = computed(() => message.value)
     const connectionStatus = computed(() => isConnected.value ? 'В сети' : 'Не в сети')
     const getUnregisteredProducts = computed(() => wsUnregisteredProducts.value)
 //Actions
     const initWebSocket = () => {
-        // const wsUrl = `ws://lab:8081/ws/inventory/?token=${userStore.getTokenAccess}`
-        const wsUrl = `ws://38.180.192.229/ws/inventory/?token=${userStore.getTokenAccess}`
+        const wsUrl = `ws://lab:8081/ws/inventory/?token=${userStore.getTokenAccess}`
+        // const wsUrl = `ws://38.180.192.229/ws/inventory/?token=${userStore.getTokenAccess}`
         // const wsUrl = `ws://192.168.1.144/ws/inventory/?token=${userStore.getTokenAccess}`
         socket.value = new WebSocket(wsUrl)
         socket.value.onopen = onOpen.bind(this)
@@ -241,7 +240,6 @@ export const useWebSocketStore = defineStore('websocket', () => {
         reconnectDelay,
         onlineDevices,
         wsUnregisteredProducts,
-        transactionStatus,
         lastPongTime,
         unknownError,
 //getters

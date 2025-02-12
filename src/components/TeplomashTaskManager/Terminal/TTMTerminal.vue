@@ -1,39 +1,43 @@
 <template>
   <div class="ttm-terminal-container">
     <div class="ttm-terminal-active-tsd"> {{ getDeviceById?.username }}</div>
-    <div class="ttm-terminal-view">
-      <div
-          v-if="transactionStore.currentTransactions.length > 0 && transactionStore.lastTransaction?.assigned_to_id === getDeviceById?.id"
-          class="ttm-terminal-view-status">
-        <span>Задача:</span>
-        <div>
-          {{ transactionTaskTranslated.toUpperCase() }}
-        </div>
-        <span>Инициатор:</span>
-        <div>
-          {{ foundUserById?.lastName }} {{ foundUserById?.initialsDot }}
-        </div>
-        <span>Место сборки:</span>
-        <div>
-          {{ transactionStore.lastTransaction?.warehouse_id }}
-        </div>
-        <span>Статус выполнение:</span>
-        <div :style="{ color: transactionColor}" style="font-weight: bold">
-          {{ transactionStatusTranslated }}
-        </div>
-        <span>Создано:</span>
-        <div>
-          {{ formatTimestamp(transactionStore.lastTransaction?.timestamp).date }}
-          {{ formatTimestamp(transactionStore.lastTransaction?.timestamp).time }}
-        </div>
-        <span v-if="transactionError">Ошибка:</span>
-        <div v-if="transactionError">
-          {{transactionError}}
+    <div v-if="getAllTransactionByCreatedUser"
+         class="ttm-terminal-view"
+    >
+      <div v-if="transactionError">
+        {{ transactionError }}
+      </div>
+      <div v-for="item in getAllTransactionByCreatedUser"
+           :key="item.id"
+           class="ttm-terminal-view-container"
+      >
+        <div class="ttm-terminal-view-transaction">
+          <span>Задача:</span>
+          <div>
+            {{ item.stage_progress.stage_name }}
+          </div>
+          <span>Инициатор:</span>
+          <div>
+            {{ item.created_by_id }} {{getUserById}}
+          </div>
+          <span>Место сборки:</span>
+          <div>
+            {{ item.warehouse_id }}
+          </div>
+          <span>Статус выполнение:</span>
+          <div :style="{ color: transactionColorTranslated}" style="font-weight: bold">
+            {{ item.status }}
+          </div>
+          <span>Создано:</span>
+          <div>
+            {{ formatTimestamp(item.timestamp).date }}
+            {{ formatTimestamp(item.timestamp).time }}
+          </div>
         </div>
       </div>
-      <div v-else>
-        Нет транзакций
-      </div>
+    </div>
+    <div v-else>
+      Нет транзакций
     </div>
   </div>
 </template>
@@ -43,7 +47,7 @@ import {useTransactionStore} from "@/stores/WebSockets/transactionStore.js";
 import {usePackingStore} from "@/stores/HTTP/PackingStore.js";
 import {useUserStore} from "@/stores/HTTP/UserStore.js";
 import {useRoute} from "vue-router";
-import {computed, onMounted, onUnmounted} from "vue";
+import {computed} from "vue";
 import {useFormatDate} from "@/composables/Date/useFormatDate.js";
 import {useTranslationsDictionary} from "@/composables/Dictionary/useTransactionsDictionary.js";
 import {useTransactionsColorDictionary} from "@/composables/Dictionary/useTransactionsColorDictionary.js";
@@ -65,24 +69,45 @@ const getDeviceById = computed(() => {
   } else
     return null
 })
-const foundUserById = computed(() => userStore.getUserById(transactionStore.lastTransaction.created_by_id));
-const transactionColor = computed(() => {
-  const lastTransaction = transactionStore.lastTransaction;
-  return lastTransaction ? transactionsColorDictionary[lastTransaction.status] || 'gray' : 'gray';
-})
-const transactionStatusTranslated = computed(() => {
-  const lastTransaction = transactionStore.lastTransaction;
-  return lastTransaction ? translationsDictionary[lastTransaction.status] || lastTransaction.status : '';
-})
-const transactionTaskTranslated = computed(() => {
-  const lastTransaction = transactionStore.lastTransaction;
-  return lastTransaction ? translationsDictionary[lastTransaction.transaction_type] || lastTransaction.transaction_type : '';
-})
-const transactionError = computed(() => {
-  return webSocketStore.unknownError ? webSocketStore.unknownError.message : null
-})
 
-
+const transactionColorTranslated = computed(() =>
+    transactionStore.last10Transactions
+        ? transactionsColorDictionary[transactionStore.last10Transactions.status]
+        || 'gray'
+        : 'gray'
+)
+const transactionStatusTranslated = computed(() =>
+    transactionStore.last10Transactions
+        ? translationsDictionary[transactionStore.last10Transactions.status]
+        || transactionStore.last10Transactions.status
+        : ''
+)
+const transactionTaskTranslated = computed(() =>
+    transactionStore.last10Transactions
+        ? translationsDictionary[transactionStore.last10Transactions.transaction_type]
+        || transactionStore.last10Transactions.transaction_type
+        : ''
+)
+const transactionError = computed(() =>
+    webSocketStore.unknownError
+        ? webSocketStore.unknownError.message
+        : null
+)
+const getAllTransactionByCreatedUser = computed(() => {
+  // Early return для защиты от пустых данных
+  if (!transactionStore?.allTransactionsList100?.length) {
+    return []
+  }
+  return transactionStore.allTransactionsList100.reduce((acc, item) => {
+    if (item.assigned_to_id === getDeviceById.value.id) {
+      acc.push(item)
+    }
+    return acc
+  }, [])
+})
+const getUserById = computed(() => {
+  return (id) => userStore.fullListUsers.value.find(user => user.id === id)
+})
 </script>
 <style scoped>
 .ttm-terminal-container {
@@ -90,7 +115,6 @@ const transactionError = computed(() => {
   grid-template-columns: 1fr;
   grid-template-rows: min-content 1fr min-content;
   row-gap: 1rem;
-  overflow-y: auto;
 }
 
 .ttm-terminal-active-tsd {
@@ -106,18 +130,23 @@ const transactionError = computed(() => {
   grid-template-columns: minmax(auto, 1fr);
   font-size: 1.2rem;
   padding: 0 1rem;
-  /*overflow-y: auto;*/
+  row-gap: 1rem;
+  overflow-y: auto;
 }
 
-.ttm-terminal-view-status {
+.ttm-terminal-view-container {
   display: grid;
+  place-self: start;
   padding: 1rem;
+  background-color: #46464682;
+  border-radius: 10px;
+}
+
+.ttm-terminal-view-transaction {
+  display: grid;
   grid-template-columns: auto 1fr;
   grid-auto-rows: min-content;
   column-gap: 1rem;
-  place-self: start;
-  background-color: #46464682;
-  border-radius: 10px;
 }
 
 @media (max-width: 800px) {
