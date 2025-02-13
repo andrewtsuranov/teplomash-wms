@@ -14,7 +14,6 @@ export const useWebSocketStore = defineStore('websocket', () => {
     const message = ref(null)
     const reconnectError = ref(false)
     const error = ref()
-    const unknownError = ref()
     const reconnectAttempts = ref(0)
     const maxReconnectAttempts = ref(5)
     const reconnectDelay = ref(3000)
@@ -118,8 +117,8 @@ export const useWebSocketStore = defineStore('websocket', () => {
                 productTypes.value = data.products
                 localStorage.setItem('productTypes', JSON.stringify(data.products))
             }
-            if (data.type === 'error' && data.code === 'UNKNOWN_ERROR') {
-                unknownError.value = data.message
+            if (data.type === 'error') {
+                error.value = data.message
             }
             if (data.type === 'transaction_update') {
                 transactionStore.addTransaction(data.transaction)
@@ -241,7 +240,6 @@ export const useWebSocketStore = defineStore('websocket', () => {
         onlineDevices,
         wsUnregisteredProducts,
         lastPongTime,
-        unknownError,
 //getters
         lastMessage,
         connectionStatus,

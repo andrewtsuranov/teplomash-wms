@@ -10,8 +10,8 @@
           >{{ webSocketStore.connectionStatus }}
         </span>
         </div>
-        <div class="ttm-setting-panel-items"
-             v-if="webSocketStore.isConnected"
+        <div v-if="webSocketStore.isConnected"
+             class="ttm-setting-panel-items"
         >
           <span>ТСД в сети:</span>
           <span v-if="webSocketStore.isConnected && webSocketStore.onlineDevices.length"
@@ -66,24 +66,24 @@
                :key="device.id"
                class="ttm-tsd-item-online gold-black-block"
           >
-            <router-link :to="{name: 'TTM-packing', query: {id: device.id }}"
+            <router-link :class="{'active' : packingStore.selectedTSD===device.id || route.query.id === device.id}"
+                         :to="{name: 'TTM-packing', query: {id: device.id }}"
                          class="ttm-tsd-item-name-online"
-                         :class="{'active' : packingStore.selectedTSD===device.id || route.query.id === device.id}"
                          @click="packingStore.setSelectedTSD(device.id)"
             >
               <span class="item-title">{{ device.username }}</span>
-              <span :class="{
-                'no-task': device.current_task === null,
-                'has-task': device.current_task !== null
-              }"
-                    class="item-title"
-              >
-                <i v-if="device.current_task === null"
-                   class="bi bi-circle-fill"
-                ></i>
-                <i v-else class="bi bi-circle-fill"></i>
-                {{ device.current_task?.type ?? 'Доступен' }}
-              </span>
+<!--              <span :class="{-->
+<!--                'no-task': device.current_task === null,-->
+<!--                'has-task': device.current_task !== null-->
+<!--              }"-->
+<!--                    class="item-title"-->
+<!--              >-->
+<!--                <i v-if="device.current_task === null"-->
+<!--                   class="bi bi-circle-fill"-->
+<!--                ></i>-->
+<!--                <i v-else class="bi bi-circle-fill"></i>-->
+<!--                {{ device.current_task?.type ?? 'Доступен' }}-->
+<!--              </span>-->
             </router-link>
           </div>
         </div>
@@ -94,7 +94,10 @@
       </div>
     </div>
     <div class="ttm-terminal gold-gray-block">
-      <div v-if="!webSocketStore.isConnected" class="ttm-terminal-name-offline">Терминал</div>
+      <div v-if="!webSocketStore.isConnected"
+           class="ttm-terminal-name-offline"
+      >Терминал
+      </div>
       <RouterView v-if="webSocketStore.isConnected && route.query.id"/>
       <div v-if="webSocketStore.isConnected && !route.query.id"
            class="ttm-terminal-name-offline"
@@ -107,9 +110,13 @@
 import {useWebSocketStore} from '@/stores/WebSockets/WebSocketStore.js'
 import MyButton from "@/components/UI/Buttons/MyButton.vue"
 import {usePackingStore} from "@/stores/HTTP/PackingStore.js";
+import {useUserStore} from "@/stores/HTTP/UserStore.js";
+import {useErrorStore} from "@/stores/Error/ErrorStore.js";
 import {useRouter, useRoute} from "vue-router";
 import {onMounted, onUnmounted} from "vue";
 
+const userStore = useUserStore()
+const errorStore = useErrorStore()
 const packingStore = usePackingStore()
 const router = useRouter()
 const route = useRoute()
@@ -153,6 +160,21 @@ onMounted(async () => {
     console.error(e)
     throw e
   }
+})
+onMounted(async () => {
+  try {
+    await userStore.GET_USERS()
+  } catch (e) {
+    console.log(e)
+    errorStore.setError({
+      status: e.response?.status || 500,
+      message: 'Ошибка получения списка пользователей'
+    })
+    throw e
+  }
+})
+onUnmounted(() => {
+  localStorage.removeItem('fullListUsers')
 })
 </script>
 <style scoped>
@@ -337,10 +359,6 @@ onMounted(async () => {
   grid-template-columns: minmax(auto, 1fr);
   grid-template-rows: 33.1rem;
   border-radius: 10px;
-}
-
-.ttm-terminal-view {
-  display: grid;
 }
 
 a,

@@ -1,18 +1,12 @@
-import {ref, reactive} from 'vue';
+import {ref} from 'vue';
 
 export function useFormatDate() {
-    const formattedDateTime = reactive({
+    const formattedDateTime = ref({
         date: '',
         time: '',
     });
 
-    /**
-     * Форматирует Unix-время (timestamp) в объект с датой и временем.
-     *
-     * @param {number} timestamp - Unix-время в миллисекундах.
-     * @returns {object} Объект с датой и временем в формате { date: 'гггг-мм-дд', time: 'чч:мм:сс' }.
-     */
-    function formatTimestamp(timestamp) {
+    const formatTimestamp = (timestamp) => {
         const date = new Date(timestamp);
         const year = date.getFullYear();
         const month = (date.getMonth() + 1).toString().padStart(2, '0');

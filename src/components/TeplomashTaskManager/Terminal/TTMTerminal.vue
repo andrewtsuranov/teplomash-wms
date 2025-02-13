@@ -1,33 +1,28 @@
 <template>
   <div class="ttm-terminal-container">
-    <div class="ttm-terminal-active-tsd"> {{ getDeviceById?.username }}</div>
-    <div v-if="getAllTransactionByCreatedUser"
-         class="ttm-terminal-view"
-    >
-      <div v-if="transactionError">
-        {{ transactionError }}
-      </div>
-      <div v-for="item in getAllTransactionByCreatedUser"
+    <div class="ttm-terminal-active-tsd">
+      {{ deviceUsername }}
+    </div>
+    <div class="ttm-terminal-view">
+      <div v-for="item in transactions"
            :key="item.id"
            class="ttm-terminal-view-container"
       >
         <div class="ttm-terminal-view-transaction">
           <span>Задача:</span>
-          <div>
-            {{ item.stage_progress.stage_name }}
-          </div>
+          <div>{{ item.stage_progress.stage_name }}</div>
+
           <span>Инициатор:</span>
-          <div>
-            {{ item.created_by_id }} {{getUserById}}
-          </div>
+          <div>{{ getUsername(item.created_by_id) }}</div>
+
           <span>Место сборки:</span>
-          <div>
-            {{ item.warehouse_id }}
-          </div>
+          <div>{{getWarehouseInStatus(item.warehouse_id)}}</div>
+
           <span>Статус выполнение:</span>
-          <div :style="{ color: transactionColorTranslated}" style="font-weight: bold">
-            {{ item.status }}
+          <div :style="{ color: getStatusColor(item.status) }" style="font-weight: bold">
+            {{ getStatusText(item.status) }}
           </div>
+
           <span>Создано:</span>
           <div>
             {{ formatTimestamp(item.timestamp).date }}
@@ -36,84 +31,108 @@
         </div>
       </div>
     </div>
-    <div v-else>
-      Нет транзакций
-    </div>
   </div>
 </template>
-<script setup>
-import {useWebSocketStore} from '@/stores/WebSockets/WebSocketStore.js'
-import {useTransactionStore} from "@/stores/WebSockets/transactionStore.js";
-import {usePackingStore} from "@/stores/HTTP/PackingStore.js";
-import {useUserStore} from "@/stores/HTTP/UserStore.js";
-import {useRoute} from "vue-router";
-import {computed} from "vue";
-import {useFormatDate} from "@/composables/Date/useFormatDate.js";
-import {useTranslationsDictionary} from "@/composables/Dictionary/useTransactionsDictionary.js";
-import {useTransactionsColorDictionary} from "@/composables/Dictionary/useTransactionsColorDictionary.js";
 
+<script setup>
+import { useWebSocketStore } from '@/stores/WebSockets/WebSocketStore.js'
+import { useTransactionStore } from "@/stores/WebSockets/transactionStore.js"
+import { usePackingStore } from "@/stores/HTTP/PackingStore.js"
+import { useUserStore } from "@/stores/HTTP/UserStore.js"
+import {useWarehouseStore} from "@/stores/HTTP/WarehouseStore.js";
+import { useRoute } from "vue-router"
+import { computed, ref } from "vue"
+import { useFormatDate } from "@/composables/Date/useFormatDate.js"
+import { useTranslationsDictionary } from "@/composables/Dictionary/useTransactionsDictionary.js"
+import { useTransactionsColorDictionary } from "@/composables/Dictionary/useTransactionsColorDictionary.js"
+
+const warehouseStore = useWarehouseStore()
 const transactionsColorDictionary = useTransactionsColorDictionary
 const translationsDictionary = useTranslationsDictionary
-const {formattedDateTime, formatTimestamp} = useFormatDate();
+const {formatTimestamp} = useFormatDate()
 const transactionStore = useTransactionStore()
 const route = useRoute()
 const userStore = useUserStore()
 const packingStore = usePackingStore()
 const webSocketStore = useWebSocketStore()
-const tsdID = route.query.id
-const getDeviceById = computed(() => {
+
+// Кэш для пользователей
+const usersCache = ref(new Map())
+
+// Кэш для мест сборки
+const warehouseCache = ref(new Map())
+
+// Получаем ID устройства
+const deviceId = computed(() => {
   if (packingStore.selectedTSD !== null) {
-    return webSocketStore.onlineDevices.find(device => device.id === packingStore.selectedTSD);
-  } else if (tsdID) {
-    return webSocketStore.onlineDevices.find(device => device.id === tsdID);
-  } else
-    return null
+    return packingStore.selectedTSD
+  }
+  return route.query.id || null
 })
 
-const transactionColorTranslated = computed(() =>
-    transactionStore.last10Transactions
-        ? transactionsColorDictionary[transactionStore.last10Transactions.status]
-        || 'gray'
-        : 'gray'
-)
-const transactionStatusTranslated = computed(() =>
-    transactionStore.last10Transactions
-        ? translationsDictionary[transactionStore.last10Transactions.status]
-        || transactionStore.last10Transactions.status
-        : ''
-)
-const transactionTaskTranslated = computed(() =>
-    transactionStore.last10Transactions
-        ? translationsDictionary[transactionStore.last10Transactions.transaction_type]
-        || transactionStore.last10Transactions.transaction_type
-        : ''
-)
-const transactionError = computed(() =>
-    webSocketStore.unknownError
-        ? webSocketStore.unknownError.message
-        : null
-)
-const getAllTransactionByCreatedUser = computed(() => {
-  // Early return для защиты от пустых данных
-  if (!transactionStore?.allTransactionsList100?.length) {
+// Получаем устройство
+const currentDevice = computed(() => {
+  if (!deviceId.value) return null
+  return webSocketStore.onlineDevices.find(device => device.id === deviceId.value)
+})
+
+// Username устройства
+const deviceUsername = computed(() => currentDevice.value?.username)
+
+// Получение имени пользователя с кэшированием
+const getUsername = (userId) => {
+  if (!userId) return ''
+
+  if (!usersCache.value.has(userId)) {
+    const user = userStore.fullListUsers.find(user => user.id === userId)
+    if (user) {
+      usersCache.value.set(userId, user.username)
+    }
+  }
+  return usersCache.value.get(userId) || 'Неизвестный пользователь'
+}
+
+// Получение место сборки с кэшированием
+const getWarehouseInStatus = (warehouseId) => {
+  if (!warehouseId) return ''
+
+  if (!warehouseCache.value.has(warehouseId)) {
+    const warehouse = warehouseStore.allWarehouses?.find(warehouse => warehouse.id === warehouseId)
+    if (warehouse) {
+      warehouseCache.value.set(warehouseId, warehouse.name)
+    }
+  }
+  return warehouseCache.value.get(warehouseId) || 'Неизвестное место'
+}
+
+// Получение цвета статуса
+const getStatusColor = (status) => {
+  return transactionsColorDictionary[status] || 'gray'
+}
+
+// Получение текста статуса
+const getStatusText = (status) => {
+  return translationsDictionary[status] || status
+}
+
+// Список транзакций
+const transactions = computed(() => {
+  if (!transactionStore?.allTransactionsList100?.length || !currentDevice.value?.id) {
     return []
   }
-  return transactionStore.allTransactionsList100.reduce((acc, item) => {
-    if (item.assigned_to_id === getDeviceById.value.id) {
-      acc.push(item)
-    }
-    return acc
-  }, [])
+
+  return transactionStore.allTransactionsList100.filter(item =>
+      item.assigned_to_id === currentDevice.value.id
+  )
 })
-const getUserById = computed(() => {
-  return (id) => userStore.fullListUsers.value.find(user => user.id === id)
-})
+
 </script>
+
 <style scoped>
 .ttm-terminal-container {
   display: grid;
   grid-template-columns: 1fr;
-  grid-template-rows: min-content 1fr min-content;
+  grid-template-rows: min-content 1fr;
   row-gap: 1rem;
 }
 
@@ -136,7 +155,6 @@ const getUserById = computed(() => {
 
 .ttm-terminal-view-container {
   display: grid;
-  place-self: start;
   padding: 1rem;
   background-color: #46464682;
   border-radius: 10px;
@@ -147,8 +165,5 @@ const getUserById = computed(() => {
   grid-template-columns: auto 1fr;
   grid-auto-rows: min-content;
   column-gap: 1rem;
-}
-
-@media (max-width: 800px) {
 }
 </style>

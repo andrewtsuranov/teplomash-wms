@@ -1,42 +1,19 @@
 <template>
   <div class="wms-packing-pallet">
-    <div v-for="n in 2"
+    <div v-for="n in 7"
          :key="n"
+         :class="['pallet-status', 'pallet-background', { 'pending': true, 'finish': false, 'error': false }]"
          class="pallet-item-content"
-         :class="['pallet-status', 'pallet-background', { 'pending': true, 'finish': false, 'error': f }]"
     >
       <div class="pallet-item-row-one">
-        <span>Зона:{{ packingStore.palletData.zoneStorage }}</span>
-        <span>Паллета №{{ n }}</span>
-        <span>Дата создания:{{ dataYYYYMMDD }}</span>
+        <div class="piro-id">ID:</div>
+        <div class="piro-date">Создано:</div>
       </div>
       <div class="pallet-item-row-two">
-
+        <div>Content</div>
+        <div class="pirt-qr">QR code</div>
       </div>
       <div class="pallet-item-row-three">
-        <div class="in-table-item-container">
-          <table class="table table-dark table-hover"
-          >
-            <thead>
-            <tr>
-              <th scope="col">№</th>
-              <th scope="col">Изделие</th>
-              <th scope="col">Кол-во</th>
-              <th scope="col">Штрихкод</th>
-              <th scope="col">Дата выпуска</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr v-for="(item, index) in packingStore.selectedGroupUnregProduct?.data" :key="index">
-              <th scope="row">{{ index+1 }}</th>
-              <td>{{ packingStore.selectedGroupUnregProduct.key }}</td>
-              <td>1</td>
-                            <td>{{ item.barcode }}</td>
-                            <td>{{ item.created_at }}</td>
-            </tr>
-            </tbody>
-          </table>
-        </div>
       </div>
     </div>
   </div>
@@ -78,37 +55,49 @@ onMounted(async () => {
 .wms-packing-pallet {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  grid-template-rows: repeat(auto-fit, 365px);
   gap: 1rem;
-  width: 100%;
-  padding: 1rem 0;
 }
 
 .pallet-item-content {
   display: grid;
   grid-template-columns: 1fr;
-  grid-template-rows: repeat(auto-fill, 1fr);
-  /*padding: 1rem;*/
-  /*row-gap: .5rem;*/
+  grid-auto-rows: min-content;
+  row-gap: .7rem;
   border-radius: 1rem;
-  min-height: 400px;
-
+  color: #2F2D2B;
+  background-color: #D9D9D9;
+  font-family: Helvetica, Arial, sans-serif;
+  padding: 1rem;
 }
 
 .pallet-item-row-one {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  color: #2e2e2e;
-  /*border: 2px solid #ecaf0e;*/
-  font-size: 1.2rem;
+  grid-template-columns: auto 1fr;
   font-weight: bold;
-  /*border-radius: 1rem;*/
+
+}
+
+.piro-id {
+  font-size: 1.7rem;
+}
+
+.piro-date {
+  justify-self: end;
+  font-size: 1.2rem;
 }
 
 .pallet-item-row-two {
   display: grid;
-  grid-template-columns: 1fr;
-  padding: 1rem;
-  background-color: #2F2D2B;
+  grid-template-columns: auto 1fr;
+}
+
+.pirt-qr {
+  justify-self: end;
+  display: grid;
+  grid-template-columns: 150px;
+  grid-template-rows: 150px;
+  border: 1px solid #2F2D2B;
 }
 
 .pallet-item-row-three {
@@ -124,23 +113,24 @@ onMounted(async () => {
   grid-area: qrcode;
   align-self: end;
 }
+
 .pallet-background.error,
 .pallet-status.error {
-  background-color:#e80f0f ;
-  border: 2px solid #e80f0f;
+  border: .7rem solid #e80f0f;
   animation-name: blinking;
   animation-duration: 1s;
   animation-iteration-count: 50;
 }
+
 .pallet-background.pending,
 .pallet-status.pending {
-  background-color: #ecaf0e;
-  border: 2px solid #ecaf0e;
+  border: .7rem solid #ecaf0e;
 }
+
 .pallet-background.finish,
 .pallet-status.finish {
-  background-color: #19da21;
-  border: 2px solid #19da21;
+
+  border: .7rem solid #19da21;
 }
 
 @media (max-width: 800px) {
@@ -153,7 +143,6 @@ onMounted(async () => {
 @keyframes blinking {
   50% {
     border-color: #ecaf0e;
-    background-color:#ecaf0e ;
   }
 }
 </style>

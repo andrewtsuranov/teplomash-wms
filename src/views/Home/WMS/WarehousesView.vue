@@ -50,9 +50,7 @@ const handlerClickWarehouse = async (id) => {
     console.log(e)
   }
 }
-onUnmounted(() => {
-  localStorage.removeItem('warehouses')
-})
+
 </script>
 <style scoped>
 .wms-home-container {
