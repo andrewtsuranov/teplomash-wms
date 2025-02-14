@@ -6,6 +6,10 @@
     </label>
     <div class="packing-product-data">
       <div class="packing-product-data-pallet">
+        <PalletConfigurator/>
+      </div>
+      <div class="packing-product-data-detail">
+        <TableItemUnregisteredProduct/>
         <div>
           <label>Тип паллеты:</label>
           <ul>
@@ -14,7 +18,7 @@
           <label>Габариты паллеты:</label>
           <ul>
             <li>{{ ERPStore.palletTypeId.length }} x {{ ERPStore.palletTypeId.width }} x
-              {{ ERPStore.palletTypeId.height }} (мм)
+                {{ ERPStore.palletTypeId.height }} (мм)
             </li>
           </ul>
           <label>Тип поддона:</label>
@@ -34,10 +38,6 @@
             </li>
           </ul>
         </div>
-        <PalletConfigurator/>
-      </div>
-      <div class="packing-product-data-detail">
-        <TableItemUnregisteredProduct/>
         <button class="btn btn-outline-primary grp-btn"
                 data-bs-target="#modalPrintSettings"
                 data-bs-toggle="modal"
@@ -119,12 +119,12 @@ const handlerPrint = async () => {
 
 .packing-product-data-pallet {
   display: grid;
-  grid-template-columns: max-content minmax(auto, 1fr);
+  grid-template-columns: minmax(auto, 1fr);
 }
 
 .packing-product-data-detail {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: auto auto auto;
   grid-template-rows: 1fr;
   column-gap: 2rem;
 }

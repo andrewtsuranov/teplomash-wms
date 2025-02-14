@@ -8,7 +8,7 @@ export const requestUrls = new Proxy({
         storage: 'api/manager/',
     }, {
         get: (target, property) => {
-            const baseUrl = baseUrls.USA;
+            const baseUrl = baseUrls.lab;
             return `${baseUrl}${target[property]}`;
         }
     }

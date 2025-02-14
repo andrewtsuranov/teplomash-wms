@@ -6,16 +6,21 @@
          class="pallet-item-content"
     >
       <div class="pallet-item-row-one">
-        <div class="piro-id">Паллета ID:339875446</div>
+        <div class="piro">
+          <div class="piro-id">Паллета ID: 339875446</div>
+          <div class="piro-abc">Класс: А</div>
+          <div class="piro-size">Габарит: 1200х1200х145 (мм)</div>
+          <div class="piro-qyt">Кол-во груза: 9 шт </div>
+          <div class="piro-weight">Масса с грузом: 200 кг </div>
+        </div>
         <div class="pirt-qr" v-html="qrcode"></div>
       </div>
       <div class="pallet-item-row-two">
         <div class="pirt-content">
-          <div style="font-size: 1.5rem; font-weight: bold">А-2024101600-П-1200-[КЭВ-9П2021Е Панель из глянцевой
-            нержавеющей стали]-9
+          <div style="font-size: 1.75rem; font-weight: bold">КЭВ-9П2021Е Панель из глянцевой
+            нержавеющей стали [2024-02-12]
           </div>
-          <!--          <div style="font-size: 1.5rem; font-weight: bold">КЭВ-9П2021Е Панель из глянцевой нержавеющей стали</div>-->
-          <div>Content</div>
+<!--          <div v-for="item in test">{{ item.status }}</div>-->
           <div>Content</div>
         </div>
       </div>
@@ -26,18 +31,18 @@
   </div>
 </template>
 <script setup>
-import SvgEurOne100Mini841 from "@/components/UI/SVG/svgEurOne100Mini841.vue";
 import {useSplitDateByT} from "@/composables/SpliDateByT.js";
-import {useWebSocketStore} from "@/stores/WebSockets/WebSocketStore.js";
-import {usePackingStore} from "@/stores/HTTP/PackingStore.js";
+import {useTransactionStore} from "@/stores/WebSockets/transactionStore.js";
 import QRCode from 'qrcode'
-import {onMounted, ref} from "vue";
+import {computed, onMounted, ref} from "vue";
 
-const packingStore = usePackingStore()
-const webSocketStore = useWebSocketStore()
+const transactionStore = useTransactionStore()
 const text = ref('А-2024101600-П-1200-[КЭВ-9П2021Е Панель из глянцевой нержавеющей стали]-9')
 const qrcode = ref(null)
 const dataYYYYMMDD = ref(new Date().toISOString().slice(0, 10));
+
+const test = computed(() => transactionStore.allTransactionsList100.filter(item => item.status === 'PENDING'))
+
 const generateQR = async (data) => {
   const opts = {
     errorCorrectionLevel: 'H',
@@ -69,7 +74,7 @@ onMounted(async () => {
 .pallet-item-content {
   display: grid;
   grid-template-columns: 1fr;
-  grid-auto-rows: min-content;
+  grid-template-rows: min-content auto min-content;
   row-gap: .7rem;
   border-radius: 1rem;
   color: #2F2D2B;
@@ -83,8 +88,14 @@ onMounted(async () => {
   grid-template-columns: auto 1fr;
   font-weight: bold;
 }
+.piro {
+  display: grid;
+  grid-template-columns: minmax(auto, 1fr);
+  grid-auto-rows: min-content;
 
+}
 .piro-id {
+
   font-size: 1.7rem;
 }
 
@@ -96,6 +107,7 @@ onMounted(async () => {
 .pallet-item-row-two {
   display: grid;
   grid-template-columns: auto 1fr;
+  overflow-y: auto;
 }
 
 .pirt-qr {
@@ -103,16 +115,11 @@ onMounted(async () => {
   display: grid;
   grid-template-columns: 150px;
   grid-template-rows: 150px;
-  border: 1px solid #2F2D2B;
 }
 
 .pallet-item-row-three {
   display: grid;
   grid-template-columns: 1fr;
-  grid-template-rows: minmax(auto, 200px);
-  overflow: auto;
-  border-bottom-left-radius: 1rem;
-  border-bottom-right-radius: 1rem;
 }
 
 .pallet-qrcode {

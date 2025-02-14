@@ -18,6 +18,7 @@ export const usePalletStore = defineStore('palletStore', () => {
     const loading = ref(false)
     const errorStore = useErrorStore()
     const palletType = ref(null)
+    const palletId = ref(null)
 //getters
 //actions
     const GET_PALLET_TYPE_LIST = async () => {
@@ -34,13 +35,29 @@ export const usePalletStore = defineStore('palletStore', () => {
             loading.value = false
         }
     }
+    const GET_PALLET_BY_ID = async (id) => {
+        loading.value = true;
+        errorStore.clearError();
+        try {
+            palletType.value = await kyStd(`pallets/${id}`).json()
+            return true
+        } catch (e) {
+            errorStore.setError(e)
+            console.log(e)
+            throw e
+        } finally {
+            loading.value = false
+        }
+    }
     return {
 //state
         errorStore,
         loading,
         palletType,
+        palletId,
 //getters
 //actions
         GET_PALLET_TYPE_LIST,
+        GET_PALLET_BY_ID,
     }
 })
