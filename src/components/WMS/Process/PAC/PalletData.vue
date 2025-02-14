@@ -6,14 +6,21 @@
          class="pallet-item-content"
     >
       <div class="pallet-item-row-one">
-        <div class="piro-id">ID:</div>
-        <div class="piro-date">Создано:</div>
+        <div class="piro-id">Паллета ID:339875446</div>
+        <div class="pirt-qr" v-html="qrcode"></div>
       </div>
       <div class="pallet-item-row-two">
-        <div>Content</div>
-        <div class="pirt-qr">QR code</div>
+        <div class="pirt-content">
+          <div style="font-size: 1.5rem; font-weight: bold">А-2024101600-П-1200-[КЭВ-9П2021Е Панель из глянцевой
+            нержавеющей стали]-9
+          </div>
+          <!--          <div style="font-size: 1.5rem; font-weight: bold">КЭВ-9П2021Е Панель из глянцевой нержавеющей стали</div>-->
+          <div>Content</div>
+          <div>Content</div>
+        </div>
       </div>
       <div class="pallet-item-row-three">
+        <div class="piro-date">Создано: 2024-10-16 13:22:21</div>
       </div>
     </div>
   </div>
@@ -28,18 +35,18 @@ import {onMounted, ref} from "vue";
 
 const packingStore = usePackingStore()
 const webSocketStore = useWebSocketStore()
-const text = ref('[А]-[2024101600]-[П]-[800]-[КЭВ-9П2021Е]-[Панель из глянцевой нержавеющей стали]-[9]')
+const text = ref('А-2024101600-П-1200-[КЭВ-9П2021Е Панель из глянцевой нержавеющей стали]-9')
 const qrcode = ref(null)
 const dataYYYYMMDD = ref(new Date().toISOString().slice(0, 10));
 const generateQR = async (data) => {
   const opts = {
     errorCorrectionLevel: 'H',
     quality: 0.3,
-    width: 130,
+    width: 150,
     margin: 1,
     color: {
       dark: "#000",
-      light: '#EEE'
+      light: "none"
     }
   }
   await QRCode.toString(data, opts, (err, string) => {
@@ -75,7 +82,6 @@ onMounted(async () => {
   display: grid;
   grid-template-columns: auto 1fr;
   font-weight: bold;
-
 }
 
 .piro-id {
@@ -129,7 +135,6 @@ onMounted(async () => {
 
 .pallet-background.finish,
 .pallet-status.finish {
-
   border: .7rem solid #19da21;
 }
 

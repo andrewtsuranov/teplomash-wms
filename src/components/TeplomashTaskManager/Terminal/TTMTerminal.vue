@@ -11,18 +11,14 @@
         <div class="ttm-terminal-view-transaction">
           <span>Задача:</span>
           <div>{{ item.stage_progress.stage_name }}</div>
-
           <span>Инициатор:</span>
           <div>{{ getUsername(item.created_by_id) }}</div>
-
           <span>Место сборки:</span>
-          <div>{{getWarehouseInStatus(item.warehouse_id)}}</div>
-
+          <div>{{ getWarehouseInStatus(item.warehouse_id) }}</div>
           <span>Статус выполнение:</span>
           <div :style="{ color: getStatusColor(item.status) }" style="font-weight: bold">
             {{ getStatusText(item.status) }}
           </div>
-
           <span>Создано:</span>
           <div>
             {{ formatTimestamp(item.timestamp).date }}
@@ -33,18 +29,17 @@
     </div>
   </div>
 </template>
-
 <script setup>
-import { useWebSocketStore } from '@/stores/WebSockets/WebSocketStore.js'
-import { useTransactionStore } from "@/stores/WebSockets/transactionStore.js"
-import { usePackingStore } from "@/stores/HTTP/PackingStore.js"
-import { useUserStore } from "@/stores/HTTP/UserStore.js"
+import {useWebSocketStore} from '@/stores/WebSockets/WebSocketStore.js'
+import {useTransactionStore} from "@/stores/WebSockets/transactionStore.js"
+import {usePackingStore} from "@/stores/HTTP/PackingStore.js"
+import {useUserStore} from "@/stores/HTTP/UserStore.js"
 import {useWarehouseStore} from "@/stores/HTTP/WarehouseStore.js";
-import { useRoute } from "vue-router"
-import { computed, ref } from "vue"
-import { useFormatDate } from "@/composables/Date/useFormatDate.js"
-import { useTranslationsDictionary } from "@/composables/Dictionary/useTransactionsDictionary.js"
-import { useTransactionsColorDictionary } from "@/composables/Dictionary/useTransactionsColorDictionary.js"
+import {useRoute} from "vue-router"
+import {computed, ref} from "vue"
+import {useFormatDate} from "@/composables/Date/useFormatDate.js"
+import {useTranslationsDictionary} from "@/composables/Dictionary/useTransactionsDictionary.js"
+import {useTransactionsColorDictionary} from "@/composables/Dictionary/useTransactionsColorDictionary.js"
 
 const warehouseStore = useWarehouseStore()
 const transactionsColorDictionary = useTransactionsColorDictionary
@@ -55,13 +50,10 @@ const route = useRoute()
 const userStore = useUserStore()
 const packingStore = usePackingStore()
 const webSocketStore = useWebSocketStore()
-
 // Кэш для пользователей
 const usersCache = ref(new Map())
-
 // Кэш для мест сборки
 const warehouseCache = ref(new Map())
-
 // Получаем ID устройства
 const deviceId = computed(() => {
   if (packingStore.selectedTSD !== null) {
@@ -69,33 +61,27 @@ const deviceId = computed(() => {
   }
   return route.query.id || null
 })
-
 // Получаем устройство
 const currentDevice = computed(() => {
   if (!deviceId.value) return null
   return webSocketStore.onlineDevices.find(device => device.id === deviceId.value)
 })
-
 // Username устройства
 const deviceUsername = computed(() => currentDevice.value?.username)
-
 // Получение имени пользователя с кэшированием
 const getUsername = (userId) => {
   if (!userId) return ''
-
   if (!usersCache.value.has(userId)) {
-    const user = userStore.fullListUsers.find(user => user.id === userId)
+    const user = userStore.fullListUsers?.find(user => user.id === userId)
     if (user) {
       usersCache.value.set(userId, user.username)
     }
   }
   return usersCache.value.get(userId) || 'Неизвестный пользователь'
 }
-
 // Получение место сборки с кэшированием
 const getWarehouseInStatus = (warehouseId) => {
   if (!warehouseId) return ''
-
   if (!warehouseCache.value.has(warehouseId)) {
     const warehouse = warehouseStore.allWarehouses?.find(warehouse => warehouse.id === warehouseId)
     if (warehouse) {
@@ -104,30 +90,24 @@ const getWarehouseInStatus = (warehouseId) => {
   }
   return warehouseCache.value.get(warehouseId) || 'Неизвестное место'
 }
-
 // Получение цвета статуса
 const getStatusColor = (status) => {
   return transactionsColorDictionary[status] || 'gray'
 }
-
 // Получение текста статуса
 const getStatusText = (status) => {
   return translationsDictionary[status] || status
 }
-
 // Список транзакций
 const transactions = computed(() => {
   if (!transactionStore?.allTransactionsList100?.length || !currentDevice.value?.id) {
     return []
   }
-
   return transactionStore.allTransactionsList100.filter(item =>
       item.assigned_to_id === currentDevice.value.id
   )
 })
-
 </script>
-
 <style scoped>
 .ttm-terminal-container {
   display: grid;
