@@ -1,8 +1,8 @@
 <template>
   <div class="wms-packing-pallet">
-    <div v-for="n in 7"
+    <div v-for="n in 3"
          :key="n"
-         :class="['pallet-status', 'pallet-background', { 'pending': true, 'finish': false, 'error': false }]"
+         :class="['pallet-status', 'pallet-background', { 'pending': false, 'finish': true, 'error': false }]"
          class="pallet-item-content"
     >
       <div class="pallet-item-row-one">
