@@ -28,16 +28,26 @@ import {usePackingStore} from "@/stores/HTTP/PackingStore.js";
 const packingStore = usePackingStore()
 const ERPStore = useERPStore()
 </script>
-<style scoped>
+<style lang="scss" scoped>
 .packing-product-data-table {
   display: grid;
   grid-template-columns: minmax(auto, 1fr);
   overflow: auto;
   max-height: 370px;
+
+}
+table {
+  margin: 0;
 }
 table thead {
   position: sticky;
   top: 0;
   z-index: 10;
 }
+//table th {
+//  white-space: nowrap;
+//  height: 42px; /* или любое другое подходящее значение */
+//  vertical-align: middle;
+//}
+
 </style>
