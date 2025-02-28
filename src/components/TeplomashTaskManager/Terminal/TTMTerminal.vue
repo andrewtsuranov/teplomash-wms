@@ -4,11 +4,13 @@
       {{ deviceUsername }}
     </div>
     <div class="ttm-terminal-view">
-      <div v-for="item in transactions"
+      <div v-for="item in deviceLatestTransactions"
            :key="item.id"
            class="ttm-terminal-view-container"
       >
         <div class="ttm-terminal-view-transaction">
+          <span>Транзакция:</span>
+          <div>#{{ item.id }}</div>
           <span>Задача:</span>
           <div>{{ item.stage_progress.stage_name }}</div>
           <span>Инициатор:</span>
@@ -68,6 +70,11 @@ const currentDevice = computed(() => {
 })
 // Username устройства
 const deviceUsername = computed(() => currentDevice.value?.username)
+// Получаем последние транзакции для устройства напрямую из store
+const deviceLatestTransactions = computed(() => {
+  if (!currentDevice.value?.id) return []
+  return transactionStore.getLatestTransactionsByDevice(currentDevice.value.id)
+})
 // Получение имени пользователя с кэшированием
 const getUsername = (userId) => {
   if (!userId) return ''
@@ -98,15 +105,6 @@ const getStatusColor = (status) => {
 const getStatusText = (status) => {
   return translationsDictionary[status] || status
 }
-// Список транзакций
-const transactions = computed(() => {
-  if (!transactionStore?.allTransactionsList100?.length || !currentDevice.value?.id) {
-    return []
-  }
-  return transactionStore.allTransactionsList100.filter(item =>
-      item.assigned_to_id === currentDevice.value.id
-  )
-})
 </script>
 <style scoped>
 .ttm-terminal-container {

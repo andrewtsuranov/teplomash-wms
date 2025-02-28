@@ -11,14 +11,48 @@ export const useTransactionStore = defineStore('transaction', () => {
 //Getters
     const last10Transactions = computed(() => allTransactionsList100.value.slice(0, 10))
     const getStageProgress = computed(() => last10Transactions.value.map(progress => progress.stage_progress))
-
-
+    // Новый getter для получения сгруппированных по ID транзакций
+    const getLatestTransactionsByDevice = computed(() => {
+        return (deviceId) => {
+            if (!deviceId || !allTransactionsList100.value.length) return []
+            // Фильтруем по устройству
+            const deviceTransactions = allTransactionsList100.value.filter(
+                item => item.assigned_to_id === deviceId
+            )
+            // Группируем по ID
+            const transactionsMap = new Map()
+            for (const transaction of deviceTransactions) {
+                const existingTransaction = transactionsMap.get(transaction.id)
+                if (!existingTransaction || transaction.timestamp > existingTransaction.timestamp) {
+                    transactionsMap.set(transaction.id, transaction)
+                }
+            }
+            // Сортируем
+            return Array.from(transactionsMap.values())
+                .sort((a, b) => b.timestamp - a.timestamp)
+        }
+    })
 //Actions
     const addTransaction = (transaction) => {
-        allTransactionsList100.value.unshift({
-            ...transaction,
-            timestamp: Date.now()
-        })
+        // Проверяем, существует ли транзакция с таким ID уже
+        const existingIndex = allTransactionsList100.value.findIndex(
+            t => t.id === transaction.id
+        )
+        if (existingIndex !== -1) {
+            // Если существует - обновляем статус
+            allTransactionsList100.value[existingIndex] = {
+                ...allTransactionsList100.value[existingIndex],
+                ...transaction,
+                timestamp: Date.now()
+            }
+        } else {
+            // Если новая - добавляем
+            allTransactionsList100.value.unshift({
+                ...transaction,
+                timestamp: Date.now()
+            })
+        }
+        // Ограничиваем длину массива
         if (allTransactionsList100.value.length > 100) {
             allTransactionsList100.value = allTransactionsList100.value.slice(0, 100)
         }
@@ -40,7 +74,6 @@ export const useTransactionStore = defineStore('transaction', () => {
         )
         localStorage.setItem('transactions', JSON.stringify(allTransactionsList100.value))
     }
-
     // Method to handle WebSocket updates
     const updateTransactionStatus = (transactionId, newStatus) => {
         const transactionIndex = allTransactionsList100.value.findIndex(t => t.id === transactionId)
@@ -55,6 +88,7 @@ export const useTransactionStore = defineStore('transaction', () => {
         allTransactionsList100,
         last10Transactions,
         getStageProgress,
+        getLatestTransactionsByDevice,
         addTransaction,
         updateTransactionStatus,
         clearOldTransactions
