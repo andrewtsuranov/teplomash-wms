@@ -71,7 +71,7 @@
                          class="ttm-tsd-item-name-online"
                          @click="packingStore.setSelectedTSD(device.id)"
             >
-              <span class="item-title">{{ device.username }}</span>
+              <span class="item-title">{{ device.username }} (ID={{device.id}})</span>
 <!--              <span :class="{-->
 <!--                'no-task': device.current_task === null,-->
 <!--                'has-task': device.current_task !== null-->
