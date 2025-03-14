@@ -86,7 +86,7 @@ export const usePrintingStore = defineStore('printingStore', () => {
             "template_code": selectedLabelTemplate.value.code,
             "printer_id": selectedPrinter.value.id,
             "data": barcode.map(item => ({
-                "product_name": ERPStore.unregItemsById.items[0].name,
+                "product_name": ERPStore.productTypeId?.name,
                 "body": item,
                 // "qty": selectedQuantityLabel.value,
             })),

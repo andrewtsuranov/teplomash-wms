@@ -22,7 +22,7 @@
       <tr v-for="(item, index) in filterUnregProductByUser"
           :key="index"
           style="cursor: pointer;"
-          @click="toggleDetailUnregProduct(item)"
+          @click="item.error ? openModal(item) : toggleDetailUnregProduct(item)"
       >
         <th scope="row">{{ index + 1 }}</th>
         <td>
@@ -57,14 +57,25 @@
       </tbody>
     </table>
   </div>
+  <!-- Добавляем скрытый элемент для запуска модального окна -->
+  <button
+      ref="modalTrigger"
+      class="d-none"
+      data-bs-target="#ModalLinkPallet"
+      data-bs-toggle="modal">
+  </button>
+  <!-- Передаем текущий элемент в модальное окно через provide/inject -->
+  <ModalLinkPallet/>
 </template>
 <script setup>
+import {ref, provide} from 'vue';
 import {useWebSocketStore} from "@/stores/WebSockets/WebSocketStore.js";
 import {usePackingStore} from "@/stores/HTTP/PackingStore.js";
 import {useERPStore} from "@/stores/HTTP/ERPStore.js";
 import {useWarehouseStore} from "@/stores/HTTP/WarehouseStore.js";
 import CustomTooltip from "@/components/UI/Tooltip/CustomTooltip.vue";
 import {useErrorCodeDictionary} from "@/composables/Dictionary/useErrorCodeDictionary.js";
+import ModalLinkPallet from "@/components/Modals/ModalLinkPallet.vue";
 
 defineProps({
   filterUnregProductByUser: Object
@@ -73,24 +84,36 @@ const warehouseStore = useWarehouseStore()
 const ERPStore = useERPStore()
 const webSocketStore = useWebSocketStore()
 const packingStore = usePackingStore()
+const currentErrorItem = ref(null)
+const modalTrigger = ref(null)
+// Делаем текущий элемент с ошибкой доступным для инжекта в дочерних компонентах
+provide('errorItem', currentErrorItem)
+// Открываем модальное окно через кнопку-триггер
+const openModal = (item) => {
+  currentErrorItem.value = item
+  // Используем небольшую задержку для гарантированного обновления реактивного состояния
+  setTimeout(() => {
+    modalTrigger.value?.click()
+  }, 0)
+}
 const handleCreatePallet = async (item) => {
   if (!packingStore.selectedTSD) {
     alert('Выберите активный ТСД')
   }
   try {
-      const data = {
-        "action": "create_task",
-        "taskData": {
-          "task_code": "CREATE_PALLET",
-          "assigned_to_id": packingStore.selectedTSD,
-          "variables": {
-            "warehouse_id": warehouseStore.getWarehouseId,
-            "id_PT": item.id,
-            "to_zone_id": warehouseStore.selectedZone.id,
-          },
-        }
+    const data = {
+      "action": "create_task",
+      "taskData": {
+        "task_code": "CREATE_PALLET",
+        "assigned_to_id": packingStore.selectedTSD,
+        "variables": {
+          "warehouse_id": warehouseStore.getWarehouseId,
+          "id_PT": item.id,
+          "to_zone_id": warehouseStore.selectedZone.id,
+        },
       }
-      await webSocketStore.TASK_CREATE_PALLET(data)
+    }
+    await webSocketStore.TASK_CREATE_PALLET(data)
   } catch (e) {
     console.log(e)
   }
@@ -103,7 +126,7 @@ const toggleDetailUnregProduct = async (item) => {
       await ERPStore.GET_MIN_ITEMS_BY_ID_UNREG(item)
       await ERPStore.GET_PRODUCT_TYPE_BY_ID(item)
       if (ERPStore.getPalletType !== undefined) {
-      await ERPStore.GET_PALLET_TYPE_VIA_PRODUCT_TYPE(ERPStore.getPalletType)
+        await ERPStore.GET_PALLET_TYPE_VIA_PRODUCT_TYPE(ERPStore.getPalletType)
       }
       await packingStore.openTableItemUnregProduct(item)
     }

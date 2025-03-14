@@ -170,7 +170,7 @@
 <!--         :class="['pallet-status', 'pallet-background', {-->
 <!--            'pending': pallet.status === 'IN_PROGRESS',-->
 <!--            'finish': pallet.status === 'COMPLETED',-->
-<!--            'error': pallet.status === 'DELETED'-->
+<!--            'error': pallet.status === 'CANCELED'-->
 <!--         }]"-->
 <!--         class="pallet-item-content"-->
 <!--    >-->
@@ -516,13 +516,13 @@ const formatDate = (date) => {
 const TRANSACTION_STATUS = {
   PENDING: 'PENDING',
   COMPLETED: 'COMPLETED',
-  DELETED: 'DELETED'
+  CANCELED: 'CANCELED'
 }
 
 // Проверка статусов
 const isPending = (pallet) => pallet.status === TRANSACTION_STATUS.PENDING
 const isCompleted = (pallet) => pallet.status === TRANSACTION_STATUS.COMPLETED
-const isDeleted = (pallet) => pallet.status === TRANSACTION_STATUS.DELETED
+const isDeleted = (pallet) => pallet.status === TRANSACTION_STATUS.CANCELED
 
 // Получение текста статуса из словаря
 const getStatusText = (status) => {
@@ -587,7 +587,7 @@ const createPalletFromTransaction = async (transaction) => {
   return palletData
 }
 
-// Обработка статуса DELETED - запуск анимации и удаление через 30 секунд
+// Обработка статуса CANCELED - запуск анимации и удаление через 30 секунд
 const handleDeletedStatus = (palletIndex) => {
   const pallet = palletsList.value[palletIndex]
   if (!pallet) return
@@ -624,8 +624,8 @@ const updatePalletFromTransaction = async (transaction, existingPalletIndex) => 
       }
     }
 
-    // Если статус DELETED
-    if (transaction.status === TRANSACTION_STATUS.DELETED) {
+    // Если статус CANCELED
+    if (transaction.status === TRANSACTION_STATUS.CANCELED) {
       handleDeletedStatus(existingPalletIndex)
     }
 
@@ -653,7 +653,7 @@ watch(() => transactionStore.allTransactionsList100, async (newTransactions, old
         const wasUpdated = await updatePalletFromTransaction(transaction, existingPalletIndex)
 
         // Если были изменения и это не удаление
-        if (wasUpdated && transaction.status !== TRANSACTION_STATUS.DELETED) {
+        if (wasUpdated && transaction.status !== TRANSACTION_STATUS.CANCELED) {
           // Удаляем и вставляем в начало списка для сортировки
           const updatedPallet = palletsList.value.splice(existingPalletIndex, 1)[0]
           palletsList.value.unshift(updatedPallet)
@@ -664,8 +664,8 @@ watch(() => transactionStore.allTransactionsList100, async (newTransactions, old
         if (newPallet) {
           palletsList.value.unshift(newPallet)
 
-          // Если статус DELETED, запускаем обработку сразу
-          if (transaction.status === TRANSACTION_STATUS.DELETED) {
+          // Если статус CANCELED, запускаем обработку сразу
+          if (transaction.status === TRANSACTION_STATUS.CANCELED) {
             handleDeletedStatus(0)
           }
         }
@@ -704,8 +704,8 @@ onMounted(async () => {
             if (pallet) {
               palletsList.value.unshift(pallet)
 
-              // Если статус DELETED, запускаем обработку
-              if (transaction.status === TRANSACTION_STATUS.DELETED) {
+              // Если статус CANCELED, запускаем обработку
+              if (transaction.status === TRANSACTION_STATUS.CANCELED) {
                 handleDeletedStatus(0)
               }
             }
@@ -798,7 +798,7 @@ onMounted(async () => {
 
 .pallet-status.error,
 .pallet-background.error {
-  border: .7rem solid #e80f0f; /* Красная рамка для DELETED */
+  border: .7rem solid #e80f0f; /* Красная рамка для CANCELED */
 }
 
 /* Стиль для мигания */

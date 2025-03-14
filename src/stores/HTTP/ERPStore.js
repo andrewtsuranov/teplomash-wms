@@ -46,11 +46,12 @@ export const useERPStore = defineStore('ERPStore', () => {
             loading.value = false
         }
     }
-    const GET_PALLET_TYPE_VIA_PRODUCT_TYPE = async (id) => {
+
+    const GET_PRODUCT_TYPE_BY_ID = async (item) => {
         loading.value = true;
         errorStore.clearError();
         try {
-            palletTypeId.value = await kyStd(`pallet-types/${id}/`).json()
+            productTypeId.value = await kyStd(`product-type/${item.id}/`).json()
             return true
         } catch (e) {
             errorStore.setError(e)
@@ -60,11 +61,11 @@ export const useERPStore = defineStore('ERPStore', () => {
             loading.value = false
         }
     }
-    const GET_PRODUCT_TYPE_BY_ID = async (item) => {
+    const GET_PALLET_TYPE_VIA_PRODUCT_TYPE = async (id) => {
         loading.value = true;
         errorStore.clearError();
         try {
-            productTypeId.value = await kyStd(`product-type/${item.id}/`).json()
+            palletTypeId.value = await kyStd(`pallet-types/${id}/`).json()
             return true
         } catch (e) {
             errorStore.setError(e)
