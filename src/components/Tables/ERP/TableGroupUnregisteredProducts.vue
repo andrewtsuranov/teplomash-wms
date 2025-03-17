@@ -22,7 +22,7 @@
       <tr v-for="(item, index) in filterUnregProductByUser"
           :key="index"
           style="cursor: pointer;"
-          @click="handleItemClick(item)"
+          @click="toggleDetailUnregProduct(item)"
       >
         <th scope="row">{{ index + 1 }}</th>
         <td>
@@ -59,7 +59,7 @@
   </div>
 </template>
 <script setup>
-import {ref, provide} from 'vue';
+import {ref} from 'vue';
 import {useWebSocketStore} from "@/stores/WebSockets/WebSocketStore.js";
 import {usePackingStore} from "@/stores/HTTP/PackingStore.js";
 import {useERPStore} from "@/stores/HTTP/ERPStore.js";
@@ -74,39 +74,6 @@ const warehouseStore = useWarehouseStore()
 const ERPStore = useERPStore()
 const webSocketStore = useWebSocketStore()
 const packingStore = usePackingStore()
-
-// Создаем новый реф для отслеживания элемента с ошибкой
-const errorItem = ref(null)
-// Делаем его доступным для инжекта в дочерних компонентах
-provide('errorItem', errorItem)
-
-// Объединенный обработчик клика по строке
-const handleItemClick = async (item) => {
-  // Устанавливаем элемент с ошибкой (или null, если ошибки нет)
-  errorItem.value = item.error ? item : null
-
-  // Если элемент уже открыт, закрываем его
-  if (packingStore.detailInfoPackingProduct?.id === item.id) {
-    packingStore.closeTableItemUnregProduct()
-    return
-  }
-
-  // Открываем информацию о продукте, загружая необходимые данные
-  try {
-    // Загрузка данных только если нет ошибки
-    if (!item.error) {
-      await ERPStore.GET_MIN_ITEMS_BY_ID_UNREG(item)
-      await ERPStore.GET_PRODUCT_TYPE_BY_ID(item)
-      if (ERPStore.getPalletType !== undefined) {
-        await ERPStore.GET_PALLET_TYPE_VIA_PRODUCT_TYPE(ERPStore.getPalletType)
-      }
-    }
-    // Открываем панель с информацией независимо от наличия ошибки
-    await packingStore.openTableItemUnregProduct(item)
-  } catch (e) {
-    console.log(e)
-  }
-}
 
 const handleCreatePallet = async (item) => {
   if (!packingStore.selectedTSD) {
@@ -130,7 +97,22 @@ const handleCreatePallet = async (item) => {
     console.log(e)
   }
 }
-
+const toggleDetailUnregProduct = async (item) => {
+  try {
+    if (packingStore.detailInfoPackingProduct?.id === item.id) {
+      packingStore.closeTableItemUnregProduct()
+    } else {
+      await ERPStore.GET_MIN_ITEMS_BY_ID_UNREG(item)
+      await ERPStore.GET_PRODUCT_TYPE_BY_ID(item)
+      if (ERPStore.getPalletType !== undefined) {
+        await ERPStore.GET_PALLET_TYPE_VIA_PRODUCT_TYPE(ERPStore.getPalletType)
+      }
+      await packingStore.openTableItemUnregProduct(item)
+    }
+  } catch (e) {
+    console.log(e)
+  }
+}
 const handleErrorMessage = (errorMessage) => {
   if (errorMessage !== undefined) {
     return errorMessage.map(err => useErrorCodeDictionary[err])
