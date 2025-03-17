@@ -2,9 +2,34 @@
   <div v-if="packingStore.isShownTableItemUnregProduct"
        class="packing-product-data-container">
     <label class="packing-product-data-title">
-      Информация об упаковке продукции {{ packingStore.detailInfoPackingProduct?.name }}:
+      {{ getTitle }}
     </label>
-    <div class="packing-product-data">
+
+    <!-- Отображаем контент для элемента с ошибкой -->
+    <div v-if="errorItem" class="packing-product-data-error">
+      <div class="error-content">
+        <div v-if="errorItem.error && errorItem.error.length">
+          <label>Найдены следующие ошибки:</label>
+          <ul>
+            <li v-for="(err, index) in errorMessages" :key="index">
+              {{ err }}
+            </li>
+          </ul>
+        </div>
+        <div class="pallet-type-creation">
+          <label>Создать тип паллеты</label>
+          <!-- Здесь будет ваш UI для создания типа паллеты -->
+        </div>
+      </div>
+      <div class="error-actions">
+        <button class="btn btn-primary" @click="packingStore.closeTableItemUnregProduct">
+          Закрыть
+        </button>
+      </div>
+    </div>
+
+    <!-- Отображаем стандартный контент, если нет ошибки -->
+    <div v-else class="packing-product-data">
       <div class="packing-product-data-pallet">
         <PalletConfigurator/>
       </div>
@@ -48,7 +73,7 @@
       </div>
     </div>
   </div>
-  <ModalPrintSettings v-if="ERPStore.minItemsByIdUnreg"/>
+  <ModalPrintSettings v-if="ERPStore.minItemsByIdUnreg && !errorItem"/>
 </template>
 <script setup>
 import {usePackingStore} from "@/stores/HTTP/PackingStore.js";
@@ -58,18 +83,39 @@ import {useERPStore} from "@/stores/HTTP/ERPStore.js";
 import PalletConfigurator from "@/components/UI/SVG/Pallet/PalletConfigurator.vue";
 import ModalPrintSettings from "@/components/Modals/ModalPrintSettings.vue";
 import TableItemUnregisteredProduct from "@/components/Tables/ERP/TableItemUnregisteredProduct.vue";
-import {computed} from "vue";
+import {computed, inject, ref} from "vue";
+import {useErrorCodeDictionary} from "@/composables/Dictionary/useErrorCodeDictionary.js";
 
 const ERPStore = useERPStore()
 const packingStore = usePackingStore()
 const printingStore = usePrintingStore()
 const warehouseStore = useWarehouseStore()
+
+// Получаем значение из provide
+const errorItem = inject('errorItem', ref(null))
+
+// Преобразуем коды ошибок в читаемые сообщения
+const errorMessages = computed(() => {
+  if (!errorItem.value?.error) return []
+  return errorItem.value.error.map(err => useErrorCodeDictionary[err] || `Неизвестная ошибка (${err})`)
+})
+
+// Вычисляем заголовок в зависимости от типа отображаемой информации
+const getTitle = computed(() => {
+  if (errorItem.value) {
+    return `Ошибка в изделии: ${errorItem.value.name}`
+  }
+  return `Информация об упаковке продукции ${packingStore.detailInfoPackingProduct?.name}:`
+})
+
 const totalCountProductPallet = computed(() => {
   return ERPStore.palletTypeId.rows_length * ERPStore.palletTypeId.rows_width * ERPStore.palletTypeId.rows_height
 })
+
 const totalWeightPallet = computed(() => {
   return Number(ERPStore.getBasePallet.weight) + (Math.round(Number(ERPStore.productTypeId.max_weight) * totalCountProductPallet.value))
 })
+
 const handlerPrint = async () => {
   try {
     await printingStore.getZPLPrinters()
@@ -116,6 +162,7 @@ const handlerPrint = async () => {
   overflow: auto;
   row-gap: 2rem;
 }
+
 
 .packing-product-data-pallet {
   display: grid;

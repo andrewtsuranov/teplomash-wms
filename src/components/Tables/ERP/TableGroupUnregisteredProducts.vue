@@ -22,7 +22,7 @@
       <tr v-for="(item, index) in filterUnregProductByUser"
           :key="index"
           style="cursor: pointer;"
-          @click="item.error ? openModal(item) : toggleDetailUnregProduct(item)"
+          @click="handleItemClick(item)"
       >
         <th scope="row">{{ index + 1 }}</th>
         <td>
@@ -57,15 +57,6 @@
       </tbody>
     </table>
   </div>
-  <!-- Добавляем скрытый элемент для запуска модального окна -->
-  <button
-      ref="modalTrigger"
-      class="d-none"
-      data-bs-target="#ModalLinkPallet"
-      data-bs-toggle="modal">
-  </button>
-  <!-- Передаем текущий элемент в модальное окно через provide/inject -->
-  <ModalLinkPallet/>
 </template>
 <script setup>
 import {ref, provide} from 'vue';
@@ -75,7 +66,6 @@ import {useERPStore} from "@/stores/HTTP/ERPStore.js";
 import {useWarehouseStore} from "@/stores/HTTP/WarehouseStore.js";
 import CustomTooltip from "@/components/UI/Tooltip/CustomTooltip.vue";
 import {useErrorCodeDictionary} from "@/composables/Dictionary/useErrorCodeDictionary.js";
-import ModalLinkPallet from "@/components/Modals/ModalLinkPallet.vue";
 
 defineProps({
   filterUnregProductByUser: Object
@@ -84,18 +74,40 @@ const warehouseStore = useWarehouseStore()
 const ERPStore = useERPStore()
 const webSocketStore = useWebSocketStore()
 const packingStore = usePackingStore()
-const currentErrorItem = ref(null)
-const modalTrigger = ref(null)
-// Делаем текущий элемент с ошибкой доступным для инжекта в дочерних компонентах
-provide('errorItem', currentErrorItem)
-// Открываем модальное окно через кнопку-триггер
-const openModal = (item) => {
-  currentErrorItem.value = item
-  // Используем небольшую задержку для гарантированного обновления реактивного состояния
-  setTimeout(() => {
-    modalTrigger.value?.click()
-  }, 0)
+
+// Создаем новый реф для отслеживания элемента с ошибкой
+const errorItem = ref(null)
+// Делаем его доступным для инжекта в дочерних компонентах
+provide('errorItem', errorItem)
+
+// Объединенный обработчик клика по строке
+const handleItemClick = async (item) => {
+  // Устанавливаем элемент с ошибкой (или null, если ошибки нет)
+  errorItem.value = item.error ? item : null
+
+  // Если элемент уже открыт, закрываем его
+  if (packingStore.detailInfoPackingProduct?.id === item.id) {
+    packingStore.closeTableItemUnregProduct()
+    return
+  }
+
+  // Открываем информацию о продукте, загружая необходимые данные
+  try {
+    // Загрузка данных только если нет ошибки
+    if (!item.error) {
+      await ERPStore.GET_MIN_ITEMS_BY_ID_UNREG(item)
+      await ERPStore.GET_PRODUCT_TYPE_BY_ID(item)
+      if (ERPStore.getPalletType !== undefined) {
+        await ERPStore.GET_PALLET_TYPE_VIA_PRODUCT_TYPE(ERPStore.getPalletType)
+      }
+    }
+    // Открываем панель с информацией независимо от наличия ошибки
+    await packingStore.openTableItemUnregProduct(item)
+  } catch (e) {
+    console.log(e)
+  }
 }
+
 const handleCreatePallet = async (item) => {
   if (!packingStore.selectedTSD) {
     alert('Выберите активный ТСД')
@@ -118,22 +130,7 @@ const handleCreatePallet = async (item) => {
     console.log(e)
   }
 }
-const toggleDetailUnregProduct = async (item) => {
-  try {
-    if (packingStore.detailInfoPackingProduct?.id === item.id) {
-      packingStore.closeTableItemUnregProduct()
-    } else {
-      await ERPStore.GET_MIN_ITEMS_BY_ID_UNREG(item)
-      await ERPStore.GET_PRODUCT_TYPE_BY_ID(item)
-      if (ERPStore.getPalletType !== undefined) {
-        await ERPStore.GET_PALLET_TYPE_VIA_PRODUCT_TYPE(ERPStore.getPalletType)
-      }
-      await packingStore.openTableItemUnregProduct(item)
-    }
-  } catch (e) {
-    console.log(e)
-  }
-}
+
 const handleErrorMessage = (errorMessage) => {
   if (errorMessage !== undefined) {
     return errorMessage.map(err => useErrorCodeDictionary[err])

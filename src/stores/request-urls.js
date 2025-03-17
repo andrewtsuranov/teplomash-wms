@@ -8,7 +8,7 @@ export const requestUrls = new Proxy({
         storage: 'api/manager/',
     }, {
         get: (target, property) => {
-            const baseUrl = baseUrls.USA;
+            const baseUrl = baseUrls.teplomash;
             return `${baseUrl}${target[property]}`;
         }
     }

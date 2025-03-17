@@ -6,16 +6,22 @@
           <h5 id="ModalLinkPalletLabel" class="modal-title">Ошибка в изделии</h5>
           <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"></button>
         </div>
-        <div class="modal-body">
-          <div v-if="errorItem">
+        <div class="modal-body modal-grid">
+          <div v-if="errorItem"
+               class="modal-grid-msg"
+          >
             <p>Название изделия: {{ errorItem.name }}</p>
             <div v-if="errorItem.error && errorItem.error.length">
-              <h6>Найдены следующие ошибки:</h6>
+              <label>Найдены следующие ошибки:</label>
               <ul>
                 <li v-for="(err, index) in errorMessages" :key="index">
                   {{ err }}
                 </li>
               </ul>
+            </div>
+            <div>
+              <label>Создать тип паллеты</label>
+
             </div>
           </div>
           <div v-else>
@@ -41,5 +47,13 @@ const errorMessages = computed(() => {
 })
 </script>
 <style scoped>
+.modal-grid {
+  display: grid;
+  grid-template-columns: minmax(auto, 1fr);
+  grid-template-rows: minmax(auto, 1fr);
+}
+.modal-grid-msg {
+  display: grid;
 
+}
 </style>
