@@ -5,19 +5,54 @@
       Информация об упаковке продукции {{ packingStore.detailInfoPackingProduct?.name }}:
     </label>
     <div v-if="packingStore.detailInfoPackingProduct?.error">
-        <div class="modal-grid-msg">
-          <div>
-            <label>Найдены следующие ошибки:</label>
-            <ul>
-              <li v-for="(err, index) in errorMessages" :key="index">
-                {{ err }}
-              </li>
-            </ul>
-          </div>
-          <div>
-            <label>Создать тип паллеты</label>
+      <div class="modal-grid-msg">
+        <div>
+          <label>Найдены следующие ошибки:</label>
+          <ul>
+            <li v-for="(err, index) in errorMessages" :key="index">
+              {{ err }}
+            </li>
+          </ul>
+        </div>
+        <div>
+          <label>Создать тип паллеты</label>
+          <div class="template-link-pallet-container">
+            <div class="template-link-pallet">
+              <label>Наименование</label>
+              <input aria-label="default input example" class="form-control" data-bs-theme="dark" placeholder="Default input"
+                     type="text">
+              <label>Выберите тип поддона</label>
+              <select aria-label="Default select example" class="form-select" data-bs-theme="dark">
+                <option selected>Open this select menu</option>
+                <option value="1">One</option>
+                <option value="2">Two</option>
+                <option value="3">Three</option>
+              </select>
+              <label>Кол-во:</label>
+              <div class="counter">
+                <button @click="printingStore.decrement">&ndash;</button>
+                <input v-model.number.trim="printingStore.quantityLabel"
+                       min="1"
+                       v-on:keypress="useNumbersOnlyWithoutDot"
+                />
+                <button @click="printingStore.increment">+</button>
+              </div>
+              <label>Габариты:</label>
+              <div></div>
+              <label>Длина:</label>
+              <input aria-label="default input example" class="form-control" data-bs-theme="dark" placeholder="Default input"
+                     type="text">
+              <label>Ширина:</label>
+              <input aria-label="default input example" class="form-control" data-bs-theme="dark" placeholder="Default input"
+                     type="text">
+              <label>Высота:</label>
+              <input aria-label="default input example" class="form-control" data-bs-theme="dark" placeholder="Default input"
+                     type="text">
+            </div>
+            <button>Создать</button>
           </div>
         </div>
+      </div>
     </div>
     <div v-else class="packing-product-data">
       <div class="packing-product-data-pallet">
@@ -28,17 +63,17 @@
         <div>
           <label>Тип паллеты:</label>
           <ul>
-            <li>{{ ERPStore.palletTypeId.name }}</li>
+            <li>{{ ERPStore.palletTypeId?.name }}</li>
           </ul>
           <label>Габариты паллеты:</label>
           <ul>
-            <li>{{ ERPStore.palletTypeId.length }} x {{ ERPStore.palletTypeId.width }} x
-                {{ ERPStore.palletTypeId.height }} (мм)
+            <li>{{ ERPStore.palletTypeId?.length }} x {{ ERPStore.palletTypeId?.width }} x
+                {{ ERPStore.palletTypeId?.height }} (мм)
             </li>
           </ul>
           <label>Тип поддона:</label>
           <ul>
-            <li>{{ ERPStore.getBasePallet.code }} &mdash; 1200 x {{ ERPStore.getBasePallet.width }} x 145 (мм)
+            <li>{{ ERPStore.getBasePallet?.code }} &mdash; 1200 x {{ ERPStore.getBasePallet?.width }} x 145 (мм)
             </li>
           </ul>
           <label>Изделий в паллете:</label>
@@ -75,6 +110,7 @@ import ModalPrintSettings from "@/components/Modals/ModalPrintSettings.vue";
 import TableItemUnregisteredProduct from "@/components/Tables/ERP/TableItemUnregisteredProduct.vue";
 import {computed} from "vue";
 import {useErrorCodeDictionary} from "@/composables/Dictionary/useErrorCodeDictionary.js";
+import {useNumbersOnlyWithoutDot} from "@/composables/NumbersOnlyWithoutDot.js";
 
 const ERPStore = useERPStore()
 const packingStore = usePackingStore()
@@ -150,5 +186,23 @@ const handlerPrint = async () => {
 
 .grp-btn {
   align-self: start;
+}
+
+.template-link-pallet-container {
+  display: grid;
+  grid-template-columns: minmax(auto, 400px);
+  grid-template-rows: minmax(auto, 1fr);
+}
+
+.template-link-pallet {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr;
+}
+
+.counter {
+  display: grid;
+  grid-template-columns: 3rem 5rem 3rem;
+  font-size: 1.2rem;
 }
 </style>
