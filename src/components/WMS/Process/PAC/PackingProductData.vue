@@ -28,7 +28,7 @@
                 <option value="2">Two</option>
                 <option value="3">Three</option>
               </select>
-              <label>Кол-во:</label>
+              <label>Кол-во изделий на поддоне:</label>
               <div class="counter">
                 <button @click="printingStore.decrement">&ndash;</button>
                 <input v-model.number.trim="printingStore.quantityLabel"
@@ -49,7 +49,7 @@
               <input aria-label="default input example" class="form-control" data-bs-theme="dark" placeholder="Default input"
                      type="text">
             </div>
-            <button>Создать</button>
+            <button>Создать и привязать</button>
           </div>
         </div>
       </div>

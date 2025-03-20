@@ -66,12 +66,12 @@
       <!--      >-->
       <!--        TEST (Проверить паллету)-->
       <!--      </button>-->
-<!--            <button class="btn btn-outline-info"-->
-<!--                    type="button"-->
-<!--                    @click="webSocketStore.LINK_PALLET"-->
-<!--            >-->
-<!--              TEST (Связать тип паллеты)-->
-<!--            </button>-->
+            <button class="btn btn-outline-info"
+                    type="button"
+                    @click="webSocketStore.LINK_PALLET"
+            >
+              TEST (Связать тип паллеты)
+            </button>
     </div>
   </div>
 </template>
