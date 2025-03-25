@@ -14,44 +14,7 @@
             </li>
           </ul>
         </div>
-        <div>
-          <label>Создать тип паллеты</label>
-          <div class="template-link-pallet-container">
-            <div class="template-link-pallet">
-              <label>Наименование</label>
-              <input aria-label="default input example" class="form-control" data-bs-theme="dark" placeholder="Default input"
-                     type="text">
-              <label>Выберите тип поддона</label>
-              <select aria-label="Default select example" class="form-select" data-bs-theme="dark">
-                <option selected>Open this select menu</option>
-                <option value="1">One</option>
-                <option value="2">Two</option>
-                <option value="3">Three</option>
-              </select>
-              <label>Кол-во изделий на поддоне:</label>
-              <div class="counter">
-                <button @click="printingStore.decrement">&ndash;</button>
-                <input v-model.number.trim="printingStore.quantityLabel"
-                       min="1"
-                       v-on:keypress="useNumbersOnlyWithoutDot"
-                />
-                <button @click="printingStore.increment">+</button>
-              </div>
-              <label>Габариты:</label>
-              <div></div>
-              <label>Длина:</label>
-              <input aria-label="default input example" class="form-control" data-bs-theme="dark" placeholder="Default input"
-                     type="text">
-              <label>Ширина:</label>
-              <input aria-label="default input example" class="form-control" data-bs-theme="dark" placeholder="Default input"
-                     type="text">
-              <label>Высота:</label>
-              <input aria-label="default input example" class="form-control" data-bs-theme="dark" placeholder="Default input"
-                     type="text">
-            </div>
-            <button>Создать и привязать</button>
-          </div>
-        </div>
+      <FormCreatePalletType/>
       </div>
     </div>
     <div v-else class="packing-product-data">
@@ -63,17 +26,17 @@
         <div>
           <label>Тип паллеты:</label>
           <ul>
-            <li>{{ ERPStore.palletTypeId?.name }}</li>
+            <li>{{ palletStore.palletTypeByID?.name }}</li>
           </ul>
           <label>Габариты паллеты:</label>
           <ul>
-            <li>{{ ERPStore.palletTypeId?.length }} x {{ ERPStore.palletTypeId?.width }} x
-                {{ ERPStore.palletTypeId?.height }} (мм)
+            <li>{{ palletStore.palletTypeByID?.length }} x {{ palletStore.palletTypeByID?.width }} x
+                {{ palletStore.palletTypeByID?.height }} (мм)
             </li>
           </ul>
           <label>Тип поддона:</label>
           <ul>
-            <li>{{ ERPStore.getBasePallet?.code }} &mdash; 1200 x {{ ERPStore.getBasePallet?.width }} x 145 (мм)
+            <li>{{ palletStore.basePalletTypeById?.code }} &mdash; 1200 x {{ palletStore.basePalletTypeById?.width }} x 145 (мм)
             </li>
           </ul>
           <label>Изделий в паллете:</label>
@@ -111,16 +74,19 @@ import TableItemUnregisteredProduct from "@/components/Tables/ERP/TableItemUnreg
 import {computed} from "vue";
 import {useErrorCodeDictionary} from "@/composables/Dictionary/useErrorCodeDictionary.js";
 import {useNumbersOnlyWithoutDot} from "@/composables/NumbersOnlyWithoutDot.js";
+import {usePalletStore} from "@/stores/HTTP/PalletStore.js";
+import FormCreatePalletType from "@/components/Forms/FormCreatePalletType.vue";
 
 const ERPStore = useERPStore()
 const packingStore = usePackingStore()
+const palletStore = usePalletStore()
 const printingStore = usePrintingStore()
 const warehouseStore = useWarehouseStore()
 const totalCountProductPallet = computed(() => {
-  return ERPStore.palletTypeId.rows_length * ERPStore.palletTypeId.rows_width * ERPStore.palletTypeId.rows_height
+  return palletStore.palletTypeByID.rows_length * palletStore.palletTypeByID.rows_width * palletStore.palletTypeByID.rows_height
 })
 const totalWeightPallet = computed(() => {
-  return Number(ERPStore.getBasePallet.weight) + (Math.round(Number(ERPStore.productTypeId.max_weight) * totalCountProductPallet.value))
+  return Number(palletStore.basePalletTypeById.weight) + (Math.round(Number(ERPStore.productTypeId.max_weight) * totalCountProductPallet.value))
 })
 const errorMessages = computed(() => {
   if (!packingStore.detailInfoPackingProduct?.error) return []
@@ -188,21 +154,4 @@ const handlerPrint = async () => {
   align-self: start;
 }
 
-.template-link-pallet-container {
-  display: grid;
-  grid-template-columns: minmax(auto, 400px);
-  grid-template-rows: minmax(auto, 1fr);
-}
-
-.template-link-pallet {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: 1fr;
-}
-
-.counter {
-  display: grid;
-  grid-template-columns: 3rem 5rem 3rem;
-  font-size: 1.2rem;
-}
 </style>

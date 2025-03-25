@@ -66,6 +66,7 @@ import {useERPStore} from "@/stores/HTTP/ERPStore.js";
 import {useWarehouseStore} from "@/stores/HTTP/WarehouseStore.js";
 import CustomTooltip from "@/components/UI/Tooltip/CustomTooltip.vue";
 import {useErrorCodeDictionary} from "@/composables/Dictionary/useErrorCodeDictionary.js";
+import {usePalletStore} from "@/stores/HTTP/PalletStore.js";
 
 defineProps({
   filterUnregProductByUser: Object
@@ -74,6 +75,7 @@ const warehouseStore = useWarehouseStore()
 const ERPStore = useERPStore()
 const webSocketStore = useWebSocketStore()
 const packingStore = usePackingStore()
+const palletStore = usePalletStore()
 
 const handleCreatePallet = async (item) => {
   if (!packingStore.selectedTSD) {
@@ -105,7 +107,8 @@ const toggleDetailUnregProduct = async (item) => {
       await ERPStore.GET_MIN_ITEMS_BY_ID_UNREG(item)
       await ERPStore.GET_PRODUCT_TYPE_BY_ID(item)
       if (ERPStore.getPalletType !== undefined) {
-        await ERPStore.GET_PALLET_TYPE_VIA_PRODUCT_TYPE(ERPStore.getPalletType)
+        await palletStore.GET_PALLET_TYPE_BY_ID(ERPStore.getPalletType)
+        await palletStore.GET_BASE_PALLET_TYPE_BY_ID(palletStore.palletTypeByID?.base_pallet)
       }
       await packingStore.openTableItemUnregProduct(item)
     }

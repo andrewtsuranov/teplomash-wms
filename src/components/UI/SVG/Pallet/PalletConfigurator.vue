@@ -190,8 +190,10 @@
 import {ref, computed, watchEffect} from 'vue'
 import {useERPStore} from "@/stores/HTTP/ERPStore.js"
 import PalletSVG from "@/components/UI/SVG/Pallet/PalletSVG.vue";
+import {usePalletStore} from "@/stores/HTTP/PalletStore.js";
 
 const ERPStore = useERPStore()
+const palletStore = usePalletStore()
 // Размеры поддона
 const palletHeight = ref(145) // Высота поддона
 const palletStandardWidth = ref(800) // Стандартная ширина поддона
@@ -218,7 +220,7 @@ const getPalletWidth = (index) => {
     return palletLength.value
   }
   // Для вида сбоку всегда возвращаем длину 1200
-  return ERPStore.getBasePallet.width === 1200 ? palletWideWidth.value : palletStandardWidth.value
+  return palletStore.basePalletTypeById.width === 1200 ? palletWideWidth.value : palletStandardWidth.value
 }
 const palletTransform = (index) => {
   const x = (Math.max(gridWidths.value[index], getPalletWidth(index)) - getPalletWidth(index)) / 2
@@ -269,16 +271,16 @@ const getStartPointY = computed(() => (index) => {
 })
 const getPalletType = (index) => {
   if (index === 0) return 'front'
-  return ERPStore.getBasePallet.width === 1200 ? 'side-1200' : 'side-800'
+  return palletStore.basePalletTypeById.width === 1200 ? 'side-1200' : 'side-800'
 }
 watchEffect(() => {
   // Обновляем значения при изменении в ERPStore
   boxLength.value = ERPStore.productTypeId.length
   boxWidth.value = ERPStore.productTypeId.width
   boxHeight.value = ERPStore.productTypeId.height
-  matrixLength.value = ERPStore.palletTypeId.rows_length
-  matrixWidth.value = ERPStore.palletTypeId.rows_width
-  matrixHeight.value = ERPStore.palletTypeId.rows_height
+  matrixLength.value = palletStore.palletTypeByID.rows_length
+  matrixWidth.value = palletStore.palletTypeByID.rows_width
+  matrixHeight.value = palletStore.palletTypeByID.rows_height
   // Пересчитываем общие размеры
   gridTotalLength.value = boxLength.value * matrixLength.value
   gridTotalWidth.value = boxWidth.value * matrixWidth.value
@@ -288,14 +290,14 @@ watchEffect(() => {
     {
       width: getMaxWidth(0),
       height: gridTotalHeight.value,
-      rowCount: ERPStore.palletTypeId.rows_height,
-      colCount: ERPStore.palletTypeId.rows_width
+      rowCount: palletStore.palletTypeByID.rows_height,
+      colCount: palletStore.palletTypeByID.rows_width
     },
     {
       width: getMaxWidth(1),
       height: gridTotalHeight.value,
-      rowCount: ERPStore.palletTypeId.rows_height,
-      colCount: ERPStore.palletTypeId.rows_length
+      rowCount: palletStore.palletTypeByID.rows_height,
+      colCount: palletStore.palletTypeByID.rows_length
     }
   ]
 })

@@ -17,15 +17,18 @@ export const usePalletStore = defineStore('palletStore', () => {
 //state
     const loading = ref(false)
     const errorStore = useErrorStore()
-    const palletType = ref(null)
-    const palletId = ref(null)
+    const palletItemTypeList = ref(null)
+    const palletTypeList = ref(null)
+    const palletTypeByID = ref(null)
+    const basePalletTypeList = ref(null)
+    const basePalletTypeById = ref(null)
 //getters
 //actions
     const GET_PALLET_TYPE_LIST = async () => {
         loading.value = true;
         errorStore.clearError();
         try {
-            palletType.value = await kyStd('pallet-types/').json()
+            palletTypeList.value = await kyStd('pallet-types/').json()
             return true
         } catch (e) {
             errorStore.setError(e)
@@ -35,11 +38,53 @@ export const usePalletStore = defineStore('palletStore', () => {
             loading.value = false
         }
     }
-    const GET_PALLET_BY_ID = async (id) => {
+    const GET_PALLET_TYPE_BY_ID = async (id) => {
         loading.value = true;
         errorStore.clearError();
         try {
-            palletType.value = await kyStd(`pallets/${id}`).json()
+            palletTypeByID.value = await kyStd(`pallet-types/${id}/`).json()
+            return true
+        } catch (e) {
+            errorStore.setError(e)
+            console.log(e)
+            throw e
+        } finally {
+            loading.value = false
+        }
+    }
+    const GET_BASE_PALLET_TYPE_LIST = async () => {
+        loading.value = true;
+        errorStore.clearError();
+        try {
+            basePalletTypeList.value = await kyStd('base-pallets/').json()
+            return true
+        } catch (e) {
+            errorStore.setError(e)
+            console.log(e)
+            throw e
+        } finally {
+            loading.value = false
+        }
+    }
+    const GET_BASE_PALLET_TYPE_BY_ID = async (id) => {
+        loading.value = true;
+        errorStore.clearError();
+        try {
+            basePalletTypeById.value = await kyStd(`base-pallets/${id}/`).json()
+            return true
+        } catch (e) {
+            errorStore.setError(e)
+            console.log(e)
+            throw e
+        } finally {
+            loading.value = false
+        }
+    }
+    const GET_PALLET_ITEM_TYPE_LIST = async () => {
+        loading.value = true;
+        errorStore.clearError();
+        try {
+            palletItemTypeList.value = await kyStd('item-types/').json()
             return true
         } catch (e) {
             errorStore.setError(e)
@@ -53,11 +98,17 @@ export const usePalletStore = defineStore('palletStore', () => {
 //state
         errorStore,
         loading,
-        palletType,
-        palletId,
+        palletTypeList,
+        palletTypeByID,
+        basePalletTypeList,
+        basePalletTypeById,
+        palletItemTypeList,
 //getters
 //actions
         GET_PALLET_TYPE_LIST,
-        GET_PALLET_BY_ID,
+        GET_PALLET_TYPE_BY_ID,
+        GET_BASE_PALLET_TYPE_LIST,
+        GET_BASE_PALLET_TYPE_BY_ID,
+        GET_PALLET_ITEM_TYPE_LIST,
     }
 })

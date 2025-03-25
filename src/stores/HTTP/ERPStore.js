@@ -18,7 +18,7 @@ export const useERPStore = defineStore('ERPStore', () => {
 //State
     const errorStore = useErrorStore()
     const loading = ref(false)
-    const palletTypeId = ref(null)
+    // const palletTypeId = ref(null)
     const minItemsByIdUnreg = ref(null)
     const productTypeId = ref(null)
 //Getters
@@ -28,9 +28,9 @@ export const useERPStore = defineStore('ERPStore', () => {
     const getPalletType = computed(() =>
         productTypeId.value?.pallet_types[0]
     )
-    const getBasePallet = computed(() =>
-        palletTypeId.value?.base_pallet
-    )
+    // const getBasePallet = computed(() =>
+    //     palletTypeId.value?.base_pallet
+    // )
 //Actions
     const GET_MIN_ITEMS_BY_ID_UNREG = async (item, unregistered = true) => {
         loading.value = true;
@@ -61,30 +61,30 @@ export const useERPStore = defineStore('ERPStore', () => {
             loading.value = false
         }
     }
-    const GET_PALLET_TYPE_VIA_PRODUCT_TYPE = async (id) => {
-        loading.value = true;
-        errorStore.clearError();
-        try {
-            palletTypeId.value = await kyStd(`pallet-types/${id}/`).json()
-            return true
-        } catch (e) {
-            errorStore.setError(e)
-            console.log(e)
-            throw e
-        } finally {
-            loading.value = false
-        }
-    }
+    // const GET_PALLET_TYPE_VIA_PRODUCT_TYPE = async (id) => {
+    //     loading.value = true;
+    //     errorStore.clearError();
+    //     try {
+    //         palletTypeId.value = await kyStd(`pallet-types/${id}/`).json()
+    //         return true
+    //     } catch (e) {
+    //         errorStore.setError(e)
+    //         console.log(e)
+    //         throw e
+    //     } finally {
+    //         loading.value = false
+    //     }
+    // }
     return {
         errorStore,
         loading,
         minItemsByIdUnreg,
         getBarcodes,
         productTypeId,
-        palletTypeId,
+        // palletTypeId,
         getPalletType,
-        getBasePallet,
-        GET_PALLET_TYPE_VIA_PRODUCT_TYPE,
+        // getBasePallet,
+        // GET_PALLET_TYPE_VIA_PRODUCT_TYPE,
         GET_MIN_ITEMS_BY_ID_UNREG,
         GET_PRODUCT_TYPE_BY_ID,
     }
