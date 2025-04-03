@@ -1,77 +1,41 @@
 <template>
   <div class="wms-packing-erp-data">
     <div class="erp-data">
-      <div class="erp-alert alert m-0" data-bs-theme="dark" role="alert">
-        <i class="bi bi-info-circle erp-alert-logo"></i>
-        <span
-            class="erp-alert-text">Данные обновляются в автоматическом режиме с периодичностью один раз в 30 минут!</span>
-      </div>
-
-      <div class="erp-settings-filter">
-        <div class="form-check">
-          <input id="flexRadioDefault1"
-                 v-model="selectedFilter"
-                 class="form-check-input"
-                 name="flexRadioDefault"
-                 type="radio"
-                 value="КЭВ-18П4021Е"
-          >
-          <label class="form-check-label"
-                 for="flexRadioDefault1"
-          >
-            КЭВ-18П4021Е (TEST Default)
-          </label>
+      <div class="erp-update">
+        <div class="erp-update-alert alert m-0">
+          <i class="bi bi-info-circle erp-update-alert-logo"></i>
+          <span class="erp-update-alert-text">
+            Данные обновляются в автоматическом режиме каждые 5 минут!
+          </span>
         </div>
-        <div class="form-check">
-          <input
-              id="flexRadioDefault2"
-              v-model="selectedFilter"
-              checked
-              class="form-check-input"
-              name="flexRadioDefault"
-              type="radio"
-              value="all"
-          >
-          <label
-              class="form-check-label"
-              for="flexRadioDefault2"
-          >
-            Показать все данные
-          </label>
-        </div>
+        <button class="btn btn-outline-info"
+                type="button"
+                @click="webSocketStore.GET_UNREGISTERED_ITEMS()"
+        >
+          Ручное обновление
+        </button>
       </div>
-      <table-group-unregistered-products :filterUnregProductByUser="filterUnregProductByUser"/>
+      <table-group-unregistered-products />
     </div>
     <svg-logo-erp class="erp-logo"/>
     <div class="erp-settings-group-btn">
       <button class="btn btn-outline-info"
               type="button"
-              @click="webSocketStore.GET_UNREGISTERED_ITEMS()"
+              @click="webSocketStore.LINK_PALLET"
       >
-        TEST (Обновить данные)
+        TEST (Связать тип паллеты)
       </button>
       <div class="qrcode">
         <label style="text-transform: uppercase">Задача: Собрать паллету</label>
         <div v-html="qrcode"></div>
       </div>
-      <!--      <button class="btn btn-outline-info"-->
-      <!--              type="button"-->
-      <!--              @click="webSocketStore.GET_TRANSACTION_DATA(400, true, true)"-->
-      <!--      >-->
-      <!--        TEST (Получить транзакцию)-->
-      <!--      </button>-->
-      <!--      <button class="btn btn-outline-info"-->
-      <!--              type="button"-->
-      <!--              @click="handleCheckPallet"-->
-      <!--      >-->
-      <!--        TEST (Проверить паллету)-->
-      <!--      </button>-->
-            <button class="btn btn-outline-info"
-                    type="button"
-                    @click="webSocketStore.LINK_PALLET"
-            >
-              TEST (Связать тип паллеты)
-            </button>
+
+      <!--            <button class="btn btn-outline-info"-->
+      <!--                    type="button"-->
+      <!--                    @click="webSocketStore.GET_TRANSACTION_DATA(3455, true, true)"-->
+      <!--            >-->
+      <!--              TEST (Получить транзакцию)-->
+      <!--            </button>-->
     </div>
   </div>
 </template>
@@ -79,51 +43,14 @@
 import TableGroupUnregisteredProducts from "@/components/Tables/ERP/TableGroupUnregisteredProducts.vue";
 import SvgLogoErp from "@/components/UI/SVG/svgLogoErp.vue";
 import {useWebSocketStore} from "@/stores/WebSockets/WebSocketStore.js";
-import {useERPStore} from "@/stores/HTTP/ERPStore.js";
-import {useUserStore} from "@/stores/HTTP/UserStore.js";
-import {usePackingStore} from "@/stores/HTTP/PackingStore.js";
 import {useWarehouseStore} from "@/stores/HTTP/WarehouseStore.js";
-import {ref, computed, onMounted} from "vue";
+import {ref, onMounted} from "vue";
 import QRCode from 'qrcode'
 
 const warehouseStore = useWarehouseStore()
-const ERPStore = useERPStore()
-const packingStore = usePackingStore()
-const userStore = useUserStore()
 const webSocketStore = useWebSocketStore()
-const selectedFilter = ref('all')
 const qrcode = ref(null)
-const filterUnregProductByUser = computed(() => {
-  if (!webSocketStore.getUnregisteredProducts) {
-    return []
-  }
-  if (selectedFilter.value === 'КЭВ-18П4021Е') {
-    return webSocketStore.getUnregisteredProducts.filter(item => {
-      return item.name === selectedFilter.value
-    })
-  } else {
-    return webSocketStore.getUnregisteredProducts
-  }
-})
-// const handleCheckPallet = async () => {
-//   const data = {
-//     "action": "check_pallet",
-//     "from_user": userStore.getUserId,
-//     "description": '1. Сканируйте зону нахождения паллеты; 2. Сканируйте QR-код паллеты; 3. Сканируйте любое изделие из паллеты;',
-//     "loader_id": packingStore.selectedTSD,
-//     "warehouse_id": 1,
-//     "data": {
-//       "to": [],
-//       "from": [],
-//       "barcodes": []
-//     }
-//   }
-//   try {
-//     await webSocketStore.TASK_CHECK_PALLET(data)
-//   } catch (e) {
-//     console.log(e)
-//   }
-// }
+
 const generateQR = async (data) => {
   const opts = {
     errorCorrectionLevel: 'H',
@@ -153,7 +80,6 @@ const taskScanData = () => {
   }
   return JSON.stringify(data)
 }
-
 onMounted(async () => {
   try {
     qrcode.value = await generateQR(taskScanData())
@@ -184,7 +110,13 @@ onMounted(async () => {
   row-gap: 1rem;
 }
 
-.erp-alert {
+.erp-update {
+  display: grid;
+  grid-template-columns: max-content max-content;
+  column-gap: 2rem;
+}
+
+.erp-update-alert {
   display: grid;
   grid-template-columns:min-content minmax(auto, 1fr);
   column-gap: .7rem;
@@ -192,8 +124,8 @@ onMounted(async () => {
   border-color: #605039e0;
 }
 
-.erp-alert-logo,
-.erp-alert-text {
+.erp-update-alert-logo,
+.erp-update-alert-text {
   color: #979797;
   font-size: 1.1rem;
 }

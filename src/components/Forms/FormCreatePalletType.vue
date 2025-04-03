@@ -1,253 +1,388 @@
 <template>
-  <div class="container mt-4">
-    <h2>Создать тип паллеты</h2>
-    <form @submit.prevent="submitForm">
-      <!-- Радиокнопки с динамическим списком -->
-      <div class="mb-3">
-        <div
-            v-for="type in palletStore.palletItemTypeList"
-            :key="type.id"
-            class="form-check"
-            v-show="type.value !== 'return'"
-        >
-          <input
-              class="form-check-input"
-              type="radio"
-              :id="`type-${type.id}`"
-              name="palletItemTypeId"
-              :value="type.id"
-              v-model="palletForm.palletItemTypeId"
-          >
-          <label
-              class="form-check-label"
-              :for="`type-${type.id}`"
-          >
-            {{ type.name }}
-          </label>
+  <div class="form-create-pallet-container">
+    <h5 style="text-transform: uppercase">Тип паллеты: {{ packingStore.detailInfoPackingProduct?.name }}</h5>
+    <hr>
+
+    <!-- Информационный блок об ошибках -->
+    <div v-if="hasError1 || hasError2" class="alert alert-info mb-3">
+      <i class="bi bi-info-circle me-2"></i>
+      <span v-if="hasError1 && hasError2">
+        Необходимо указать параметры паллеты и дополнительные параметры упаковки
+      </span>
+      <span v-else-if="hasError1">
+        Необходимо указать параметры паллеты
+      </span>
+      <span v-else-if="hasError2">
+        Необходимо указать дополнительные параметры упаковки типа продукции
+      </span>
+    </div>
+
+    <form novalidate @submit.prevent="validateAndSubmit">
+      <!-- Блок дополнительных параметров продукции при наличии ошибки кода 2 -->
+      <div v-if="hasError2" class="mb-4">
+        <h6 class="mb-3">Параметры упаковки продукции:</h6>
+        <div class="row g-3">
+          <div class="col-md-3 mb-3">
+            <label class="form-label" for="productLength">Длина (мм)</label>
+            <input
+                id="productLength"
+                v-model.number="palletForm.updateProductType.length"
+                class="form-control"
+                min="1"
+                required
+                type="number"
+            />
+            <div v-if="validationErrors.productLength" class="text-danger mt-1">
+              {{ validationErrors.productLength }}
+            </div>
+          </div>
+          <div class="col-md-3 mb-3">
+            <label class="form-label" for="productWidth">Ширина (мм)</label>
+            <input
+                id="productWidth"
+                v-model.number="palletForm.updateProductType.width"
+                class="form-control"
+                min="1"
+                required
+                type="number"
+            />
+            <div v-if="validationErrors.productWidth" class="text-danger mt-1">
+              {{ validationErrors.productWidth }}
+            </div>
+          </div>
+          <div class="col-md-3 mb-3">
+            <label class="form-label" for="productHeight">Высота (мм)</label>
+            <input
+                id="productHeight"
+                v-model.number="palletForm.updateProductType.height"
+                class="form-control"
+                min="1"
+                required
+                type="number"
+            />
+            <div v-if="validationErrors.productHeight" class="text-danger mt-1">
+              {{ validationErrors.productHeight }}
+            </div>
+          </div>
+          <div class="col-md-3 mb-3">
+            <label class="form-label" for="productWeight">Масса (кг)</label>
+            <input
+                id="productWeight"
+                v-model="palletForm.updateProductType.max_weight"
+                class="form-control"
+                pattern="\d+(\.\d{2})?"
+                placeholder="0.00"
+                required
+                type="text"
+            />
+            <div v-if="validationErrors.productWeight" class="text-danger mt-1">
+              {{ validationErrors.productWeight }}
+            </div>
+          </div>
         </div>
+        <hr>
       </div>
 
-      <!-- Динамический контент в зависимости от типа -->
-      <template v-if="selectedTypeValue === 'production'">
-        <!-- Текущая форма для продукции -->
+      <!-- Текущая форма для продукции - показываем только при наличии ошибки кода 1 -->
+      <div v-if="hasError1">
         <div class="mb-3">
-          <label for="palletName" class="form-label">Наименование типа паллеты</label>
+          <label class="form-label" for="palletName">Наименование типа паллеты:</label>
           <input
-              type="text"
-              class="form-control"
               id="palletName"
-              placeholder="Впишите наименование типа паллеты (например, Серия 600 Колонна 2м, ВО-6Т800А и т.д.)"
-              v-model="palletForm.name"
+              v-model="palletForm.data.name"
+              class="form-control"
+              placeholder="например, Серия 600 Колонна 2м или ВО-6Т800А"
               required
+              type="text"
           />
+          <div v-show="validationErrors.name" class="text-danger mt-1">
+            {{ validationErrors.name }}
+          </div>
         </div>
-
+        <hr>
         <div class="mb-3">
-          <label for="palletType" class="form-label">Тип поддона</label>
+          <label class="form-label" for="palletType">Тип поддона:</label>
           <select
-              class="form-select"
               id="palletType"
-              v-model="palletForm.type"
+              v-model="palletForm.data.base_pallet"
+              class="form-select"
               required
           >
-            <option value="" disabled selected>Выберите тип поддона</option>
-            <option value="no_pallet">Нет поддона</option>
+            <option disabled selected value="">Выберите тип поддона</option>
             <option v-for="type in palletStore.basePalletTypeList || []"
                     :key="type.id"
-                    :value="type.value"
-            >{{ type.name }}</option>
+                    :value="type.id"
+            >{{ type.name }}
+            </option>
           </select>
+          <div v-show="validationErrors.base_pallet" class="text-danger mt-1">
+            {{ validationErrors.base_pallet }}
+          </div>
         </div>
-
-        <div class="row" v-if="palletForm.type !== 'no_pallet' && palletForm.type !== ''">
-          <h5 class="mt-3 mb-3">Расположение коробок на паллете</h5>
+        <hr>
+        <div class="row">
+          <h6 class="mb-3">Количество коробок на паллете:</h6>
           <div class="col-md-4 mb-3">
-            <label for="boxesLength" class="form-label">По длине</label>
+            <label class="form-label" for="boxesLength">По длине (max)</label>
             <input
-                type="number"
-                class="form-control"
                 id="boxesLength"
-                v-model.number="palletForm.boxArrangement.length"
+                v-model.number="palletForm.data.rows_length"
+                class="form-control"
                 min="1"
                 required
+                type="number"
             />
+            <div v-if="validationErrors.rows_length" class="text-danger mt-1">
+              {{ validationErrors.rows_length }}
+            </div>
           </div>
           <div class="col-md-4 mb-3">
-            <label for="boxesWidth" class="form-label">По ширине</label>
+            <label class="form-label" for="boxesWidth">По ширине</label>
             <input
-                type="number"
-                class="form-control"
                 id="boxesWidth"
-                v-model.number="palletForm.boxArrangement.width"
+                v-model.number="palletForm.data.rows_width"
+                class="form-control"
                 min="1"
                 required
+                type="number"
             />
+            <div v-if="validationErrors.rows_width" class="text-danger mt-1">
+              {{ validationErrors.rows_width }}
+            </div>
           </div>
           <div class="col-md-4 mb-3">
-            <label for="boxesHeight" class="form-label">По высоте</label>
+            <label class="form-label" for="boxesHeight">По высоте</label>
             <input
-                type="number"
-                class="form-control"
                 id="boxesHeight"
-                v-model.number="palletForm.boxArrangement.height"
+                v-model.number="palletForm.data.rows_height"
+                class="form-control"
                 min="1"
                 required
+                type="number"
             />
+            <div v-if="validationErrors.rows_height" class="text-danger mt-1">
+              {{ validationErrors.rows_height }}
+            </div>
+          </div>
+          <div v-if="showTotalBoxes && hasError1">
+            <div class="alert alert-info mb-0">
+              Всего коробок на паллете: <strong>{{ totalBoxesOnPallet }}</strong>
+            </div>
           </div>
         </div>
-      </template>
-
-      <!-- Логика для товаров и комплектующих -->
-      <template v-else-if="selectedTypeValue === 'goods' || selectedTypeValue === 'components'">
+        <hr>
         <div class="mb-3">
-          <label for="palletName" class="form-label">Наименование</label>
-          <input
-              type="text"
+          <label class="form-label" for="palletDescription">Описание:</label>
+          <textarea
+              id="palletDescription"
+              v-model="palletForm.data.description"
               class="form-control"
-              id="palletName"
-              placeholder="Введите наименование"
-              v-model="palletForm.name"
-              required
-          />
+              placeholder="Введите описание типа паллеты"
+              rows="3"
+          ></textarea>
         </div>
-
-        <div class="mb-3">
-          <label for="maxPalletWidth" class="form-label">Максимальная ширина паллеты (см)</label>
-          <input
-              type="number"
-              class="form-control"
-              id="maxPalletWidth"
-              v-model.number="palletForm.maxWidth"
-              min="1"
-              required
-          />
-        </div>
-
-        <div class="mb-3">
-          <label for="packagesCount" class="form-label">Количество упаковок на паллете</label>
-          <input
-              type="number"
-              class="form-control"
-              id="packagesCount"
-              v-model.number="palletForm.packagesCount"
-              min="1"
-              required
-          />
-        </div>
-      </template>
-
-      <div class="mb-3" v-if="showTotalBoxes">
-        <div class="alert alert-info">
-          Всего коробок на паллете: <strong>{{ totalBoxesOnPallet }}</strong>
-        </div>
+        <hr>
       </div>
 
-      <button type="submit" class="btn btn-primary">Создать</button>
-    </form>
+      <!-- Показываем ошибки валидации в общем блоке -->
+      <div v-if="Object.keys(validationErrors).length > 0" class="alert alert-danger mb-3">
+        <i class="bi bi-exclamation-triangle me-2"></i>
+        Пожалуйста, исправьте ошибки в форме!
+      </div>
 
-    <div v-if="formSubmitted" class="mt-4">
-      <h3>Результат (JSON):</h3>
-      <pre class="bg-light p-3 rounded">{{ formOutput }}</pre>
-    </div>
+      <button :disabled="isLoading" class="btn btn-primary" type="submit">
+        <span v-if="isLoading" aria-hidden="true" class="spinner-border spinner-border-sm me-2" role="status"></span>
+        {{ isLoading ? 'Создание...' : 'Создать' }}
+      </button>
+    </form>
   </div>
 </template>
-
 <script setup>
-import { reactive, ref, computed, watch, onMounted } from 'vue';
-import { usePalletStore } from "@/stores/HTTP/PalletStore.js";
+import {reactive, ref, computed, watch, onMounted, nextTick} from 'vue';
+import {usePalletStore} from "@/stores/HTTP/PalletStore.js";
+import {usePackingStore} from "@/stores/HTTP/PackingStore.js";
+import {useWebSocketStore} from "@/stores/WebSockets/WebSocketStore.js";
 
+const webSocketStore = useWebSocketStore()
 const palletStore = usePalletStore();
+const packingStore = usePackingStore();
+const isLoading = ref(false);
+const validationErrors = reactive({});
+// Проверка наличия ошибок по кодам
+const hasError1 = computed(() => {
+  return packingStore.detailInfoPackingProduct?.error?.includes('1');
+});
 
+const hasError2 = computed(() => {
+  return packingStore.detailInfoPackingProduct?.error?.includes('2');
+});
 // Реактивное состояние формы с расширенной структурой
 const palletForm = reactive({
-  name: '',
-  type: '',
-  palletItemTypeId: '',
-  boxArrangement: {
+  id: packingStore.detailInfoPackingProduct.id,
+  data: {
+    name: '',
+    code: '',
+    product_type_id: packingStore.detailInfoPackingProduct.id,
+    description: '',
+    base_pallet: null,
+    rows_length: 1, // Значение по умолчанию
+    rows_width: 1,  // Значение по умолчанию
+    rows_height: 1, // Значение по умолчанию
+    orientation: "LWH",
+    default_abc_class: "C",
+    default_xyz_class: "Z",
+    is_active: true,
+  },
+  updateProductType: {
+    name: packingStore.detailInfoPackingProduct.name,
     length: null,
     width: null,
-    height: null
-  },
-  maxWidth: null,
-  packagesCount: null
-});
-
-const formSubmitted = ref(false);
-const formOutput = ref('');
-
-// Получаем выбранный тип для условного рендеринга
-const selectedTypeValue = computed(() => {
-  const selectedType = palletStore.palletItemTypeList.find(
-      type => type.id === palletForm.palletItemTypeId
-  );
-  return selectedType ? selectedType.value : null;
-});
-
-// Вычисляемые свойства
-const showTotalBoxes = computed(() => {
-  return selectedTypeValue.value === 'production' &&
-      palletForm.type !== 'no_pallet' &&
-      palletForm.type !== '' &&
-      palletForm.boxArrangement.length &&
-      palletForm.boxArrangement.width &&
-      palletForm.boxArrangement.height;
-});
-
-const totalBoxesOnPallet = computed(() => {
-  if (!showTotalBoxes.value) return 0;
-
-  return palletForm.boxArrangement.length *
-      palletForm.boxArrangement.width *
-      palletForm.boxArrangement.height;
-});
-
-// Очистка данных о расположении при выборе "нет поддона"
-watch(() => palletForm.type, (newType) => {
-  if (newType === 'no_pallet') {
-    palletForm.boxArrangement.length = null;
-    palletForm.boxArrangement.width = null;
-    palletForm.boxArrangement.height = null;
+    height: null,
+    max_weight: ''
   }
 });
-
-// Сброс полей при смене типа
-watch(() => selectedTypeValue.value, (newType) => {
-  // Очищаем все поля формы при смене типа
-  palletForm.name = '';
-  palletForm.type = '';
-  palletForm.boxArrangement = {
-    length: null,
-    width: null,
-    height: null
-  };
-  palletForm.maxWidth = null;
-  palletForm.packagesCount = null;
+// Добавляем наблюдатель для синхронизации name и code
+watch(() => palletForm.data.name, (newValue) => {
+  palletForm.data.code = newValue;
 });
+// Вычисляемые свойства
+const showTotalBoxes = computed(() => {
+  return palletForm.data.rows_length &&
+      palletForm.data.rows_width &&
+      palletForm.data.rows_height;
+});
+const totalBoxesOnPallet = computed(() => {
+  if (!showTotalBoxes.value) return 0;
+  return palletForm.data.rows_length *
+      palletForm.data.rows_width *
+      palletForm.data.rows_height;
+});
+// Валидация формы
+const validateForm = () => {
+  const errors = {};
+  // Очистка предыдущих ошибок
+  Object.keys(validationErrors).forEach(key => delete validationErrors[key]);
 
-// Обработка отправки формы
-const submitForm = () => {
-  // Формируем JSON с учетом разных сценариев
-  const outputData = JSON.stringify(
-      {
-        type: selectedTypeValue.value,
-        ...palletForm
-      },
-      null,
-      2
-  );
+  // Базовая валидация для ошибки 1
+  if (hasError1.value) {
+    if (!palletForm.data.name) {
+      errors.name = 'Необходимо указать наименование';
+    }
+    if (!palletForm.data.base_pallet) {
+      errors.base_pallet = 'Необходимо выбрать тип поддона';
+    }
+    if (!palletForm.data.rows_length || palletForm.data.rows_length < 1) {
+      errors.rows_length = 'Укажите корректное значение (≥1)';
+    }
+    if (!palletForm.data.rows_width || palletForm.data.rows_width < 1) {
+      errors.rows_width = 'Укажите корректное значение (≥1)';
+    }
+    if (!palletForm.data.rows_height || palletForm.data.rows_height < 1) {
+      errors.rows_height = 'Укажите корректное значение (≥1)';
+    }
+  }
 
-  formOutput.value = outputData;
-  formSubmitted.value = true;
+  // Дополнительная валидация для ошибки 2
+  if (hasError2.value) {
+    if (!palletForm.updateProductType.length || palletForm.updateProductType.length < 1) {
+      errors.productLength = 'Укажите корректное значение длины (≥1)';
+    }
+    if (!palletForm.updateProductType.width || palletForm.updateProductType.width < 1) {
+      errors.productWidth = 'Укажите корректное значение ширины (≥1)';
+    }
+    if (!palletForm.updateProductType.height || palletForm.updateProductType.height < 1) {
+      errors.productHeight = 'Укажите корректное значение высоты (≥1)';
+    }
+    if (!palletForm.updateProductType.max_weight) {
+      errors.productWeight = 'Укажите вес продукции';
+    }
+  }
 
-  console.log('Отправляем данные:', outputData);
+  // Копируем ошибки в реактивный объект
+  Object.assign(validationErrors, errors);
+  return Object.keys(errors).length === 0;
+};
+
+// Форматирование веса перед отправкой
+const formatWeight = () => {
+  if (!palletForm.updateProductType.max_weight.includes('.')) {
+    palletForm.updateProductType.max_weight += '.00';
+  } else if (palletForm.updateProductType.max_weight.split('.')[1].length === 1) {
+    palletForm.updateProductType.max_weight += '0';
+  }
+};
+
+// Обработка успешного создания
+const handleSuccess = async () => {
+  packingStore.closeTableItemUnregProduct();
+  await webSocketStore.GET_UNREGISTERED_ITEMS();
+};
+
+
+// Обработка отправки формы с валидацией
+const validateAndSubmit = async () => {
+  // Очищаем ошибки перед проверкой
+  Object.keys(validationErrors).forEach(key => delete validationErrors[key]);
+
+  // Запускаем валидацию
+  const isValid = validateForm();
+
+  // Дожидаемся обновления DOM
+  await nextTick();
+
+  if (!isValid) {
+    // Если есть ошибки, прокручиваем к первой ошибке
+    const firstErrorField = document.querySelector('.text-danger');
+    if (firstErrorField) {
+      firstErrorField.scrollIntoView({behavior: 'smooth', block: 'center'});
+    }
+    return false;
+  }
+
+  try {
+    isLoading.value = true;
+
+    // Сценарий 1: Только ошибка кода 2
+    if (hasError2.value && !hasError1.value) {
+      formatWeight();
+      await packingStore.UPDATE_PRODUCT_TYPE(palletForm.updateProductType, palletForm.id);
+      await handleSuccess();
+    }
+    // Сценарий 2: Только ошибка кода 1
+    else if (!hasError2.value && hasError1.value) {
+      const result = await packingStore.CREATE_PALLET_TYPE(palletForm.data);
+      if (result) {
+        await handleSuccess();
+      }
+    }
+    // Сценарий 3: Обе ошибки (коды 1 и 2)
+    else if (hasError2.value && hasError1.value) {
+      formatWeight();
+      await packingStore.UPDATE_PRODUCT_TYPE(palletForm.updateProductType, palletForm.id);
+      const result = await packingStore.CREATE_PALLET_TYPE(palletForm.data);
+      if (result) {
+        await handleSuccess();
+      }
+    }
+  } catch (e) {
+    console.error('Ошибка при обработке запроса:', e);
+  } finally {
+    isLoading.value = false;
+  }
 };
 
 onMounted(async () => {
   try {
     await palletStore.GET_BASE_PALLET_TYPE_LIST();
-    await palletStore.GET_PALLET_ITEM_TYPE_LIST();
   } catch (error) {
-    console.error('Error:', error);
+    console.error('Ошибка загрузки типов поддонов:', error);
   }
 });
 </script>
+<style scoped>
+.form-create-pallet-container {
+  border: 1px solid gray;
+  border-radius: 1rem;
+  padding: 1rem;
+}
+</style>

@@ -162,14 +162,7 @@ export const useWebSocketStore = defineStore('websocket', () => {
             error.value = 'Cannot send message: WebSocket is not connected'
         }
     }
-    const TASK_CHECK_PALLET = (payload) => {
-        if (isConnected.value && socket.value && socket.value.readyState === WebSocket.OPEN) {
-            socket.value.send(JSON.stringify(payload))
-        } else {
-            console.error('Cannot send message: WebSocket is not connected')
-            error.value = 'Cannot send message: WebSocket is not connected'
-        }
-    }
+
     const GET_UNREGISTERED_ITEMS = () => {
         const data = {
             "action": "get_product_types",
@@ -255,7 +248,6 @@ export const useWebSocketStore = defineStore('websocket', () => {
         CREATE_WAREHOUSE,
         CREATE_ITEMS_BULK,
         TASK_CREATE_PALLET,
-        TASK_CHECK_PALLET,
         GET_UNREGISTERED_ITEMS,
         GET_PRODUCT_TYPES,
         GET_WAREHOUSE,

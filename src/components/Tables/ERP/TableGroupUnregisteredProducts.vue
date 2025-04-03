@@ -17,9 +17,8 @@
         <th scope="col">Инфо</th>
       </tr>
       </thead>
-      <!-- Изменено условие: показываем данные, если они есть -->
-      <tbody v-if="filterUnregProductByUser">
-      <tr v-for="(item, index) in filterUnregProductByUser"
+      <tbody v-if="erpUnregItemsPAC">
+      <tr v-for="(item, index) in erpUnregItemsPAC"
           :key="index"
           style="cursor: pointer;"
           @click="toggleDetailUnregProduct(item)"
@@ -59,7 +58,7 @@
   </div>
 </template>
 <script setup>
-import {ref} from 'vue';
+import {computed, onMounted} from 'vue';
 import {useWebSocketStore} from "@/stores/WebSockets/WebSocketStore.js";
 import {usePackingStore} from "@/stores/HTTP/PackingStore.js";
 import {useERPStore} from "@/stores/HTTP/ERPStore.js";
@@ -68,15 +67,17 @@ import CustomTooltip from "@/components/UI/Tooltip/CustomTooltip.vue";
 import {useErrorCodeDictionary} from "@/composables/Dictionary/useErrorCodeDictionary.js";
 import {usePalletStore} from "@/stores/HTTP/PalletStore.js";
 
-defineProps({
-  filterUnregProductByUser: Object
-})
 const warehouseStore = useWarehouseStore()
 const ERPStore = useERPStore()
 const webSocketStore = useWebSocketStore()
 const packingStore = usePackingStore()
 const palletStore = usePalletStore()
-
+const erpUnregItemsPAC = computed(() => {
+  if (!webSocketStore.getUnregisteredProducts) {
+    return []
+  }
+  return webSocketStore.getUnregisteredProducts
+})
 const handleCreatePallet = async (item) => {
   if (!packingStore.selectedTSD) {
     alert('Выберите активный ТСД')
@@ -109,6 +110,8 @@ const toggleDetailUnregProduct = async (item) => {
       if (ERPStore.getPalletType !== undefined) {
         await palletStore.GET_PALLET_TYPE_BY_ID(ERPStore.getPalletType)
         await palletStore.GET_BASE_PALLET_TYPE_BY_ID(palletStore.palletTypeByID?.base_pallet)
+      } else {
+        await palletStore.GET_PALLET_ITEM_TYPE_LIST();
       }
       await packingStore.openTableItemUnregProduct(item)
     }
@@ -121,6 +124,15 @@ const handleErrorMessage = (errorMessage) => {
     return errorMessage.map(err => useErrorCodeDictionary[err])
   }
 }
+onMounted(async () => {
+  try {
+    if (webSocketStore.isConnected) {
+      await webSocketStore.GET_UNREGISTERED_ITEMS()
+    }
+  } catch (e) {
+    console.log(e)
+  }
+})
 </script>
 <style scoped>
 .in-table-container {

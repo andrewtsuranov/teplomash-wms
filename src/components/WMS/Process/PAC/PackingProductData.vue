@@ -4,18 +4,20 @@
     <label class="packing-product-data-title">
       Информация об упаковке продукции {{ packingStore.detailInfoPackingProduct?.name }}:
     </label>
-    <div v-if="packingStore.detailInfoPackingProduct?.error">
-      <div class="modal-grid-msg">
-        <div>
-          <label>Найдены следующие ошибки:</label>
-          <ul>
-            <li v-for="(err, index) in errorMessages" :key="index">
-              {{ err }}
-            </li>
-          </ul>
-        </div>
-      <FormCreatePalletType/>
+    <div v-if="packingStore.detailInfoPackingProduct?.error"
+         class="modal-grid-msg"
+    >
+      <div class="alert alert-warning"
+           role="alert"
+           data-bs-theme="dark"
+      >Ошибка:
+        <ol class="mb-0">
+          <li v-for="(err, index) in errorMessages" :key="index">
+            {{ err }}
+          </li>
+        </ol>
       </div>
+      <FormCreatePalletType class="packing-product-form"/>
     </div>
     <div v-else class="packing-product-data">
       <div class="packing-product-data-pallet">
@@ -36,7 +38,8 @@
           </ul>
           <label>Тип поддона:</label>
           <ul>
-            <li>{{ palletStore.basePalletTypeById?.code }} &mdash; 1200 x {{ palletStore.basePalletTypeById?.width }} x 145 (мм)
+            <li>{{ palletStore.basePalletTypeById?.code }} &mdash; 1200 x {{ palletStore.basePalletTypeById?.width }} x
+                145 (мм)
             </li>
           </ul>
           <label>Изделий в паллете:</label>
@@ -136,6 +139,11 @@ const handlerPrint = async () => {
   grid-template-rows: min-content min-content;
   overflow: auto;
   row-gap: 2rem;
+}
+.modal-grid-msg,
+.packing-product-form {
+  max-width: 500px;
+
 }
 
 .packing-product-data-pallet {
