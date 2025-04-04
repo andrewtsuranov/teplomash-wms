@@ -8,8 +8,8 @@
          class="modal-grid-msg"
     >
       <div class="alert alert-warning"
-           role="alert"
            data-bs-theme="dark"
+           role="alert"
       >Ошибка:
         <ol class="mb-0">
           <li v-for="(err, index) in errorMessages" :key="index">
@@ -64,7 +64,7 @@
       </div>
     </div>
   </div>
-  <ModalPrintSettings v-if="ERPStore.minItemsByIdUnreg"/>
+  <ModalPrintSettings :selected-item="ERPStore.minItemsByIdUnreg"/>
 </template>
 <script setup>
 import {usePackingStore} from "@/stores/HTTP/PackingStore.js";
@@ -95,21 +95,21 @@ const errorMessages = computed(() => {
   if (!packingStore.detailInfoPackingProduct?.error) return []
   return packingStore.detailInfoPackingProduct.error.map(err => useErrorCodeDictionary[err] || `Неизвестная ошибка (${err})`)
 })
-const handlerPrint = async () => {
+const handlerPrint = async (data) => {
   try {
     await printingStore.getZPLPrinters()
     await printingStore.getLabelTemplate()
-    if (warehouseStore.selectedZone.id) {
-      const printerInZone = printingStore.printersList.printers
-          .find(printer => printer.zone === warehouseStore.selectedZone.id);
-      if (printerInZone) {
-        await printingStore.setSelectedPrinter(printerInZone)
-      }
-    }
-    await printingStore.setSelectedLabelTemplate(
-        printingStore.labelTemplatesList
-            .find(label => label.code.toLowerCase() === 'code-128'
-            ))
+    // if (warehouseStore.selectedZone.id) {
+    //   const printerInZone = printingStore.printersList.printers
+    //       .find(printer => printer.zone === warehouseStore.selectedZone.id);
+    //   if (printerInZone) {
+    //     await printingStore.setSelectedPrinter(printerInZone)
+    //   }
+    // }
+    // await printingStore.setSelectedLabelTemplate(
+    //     printingStore.labelTemplatesList
+    //         .find(label => label.code.toLowerCase() === '300_этикетка_58*40_Продукция'
+    //         ))
   } catch (e) {
     console.log(e)
     throw e
@@ -140,6 +140,7 @@ const handlerPrint = async () => {
   overflow: auto;
   row-gap: 2rem;
 }
+
 .modal-grid-msg,
 .packing-product-form {
   max-width: 500px;
@@ -161,5 +162,4 @@ const handlerPrint = async () => {
 .grp-btn {
   align-self: start;
 }
-
 </style>

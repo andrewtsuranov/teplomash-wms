@@ -79,23 +79,12 @@ export const usePrintingStore = defineStore('printingStore', () => {
             loading.value = false
         }
     }
-    const PRINT_LABEL = async (barcode) => {
+    const PRINT_LABEL_300_BARCODE_58x40_PRODUCTS = async (payload) => {
         loading.value = true;
         errorStore.clearError();
-        const zplData = {
-            "template_code": selectedLabelTemplate.value.code,
-            "printer_id": selectedPrinter.value.id,
-            "data": barcode.map(item => ({
-                "product_name": ERPStore.productTypeId?.name,
-                "body": item,
-                // "qty": selectedQuantityLabel.value,
-            })),
-            "copies": 1,
-            "priority": 0
-        }
         try {
             printStatus.value = await kyPrint
-                .post('printers/print_label/', {json: zplData})
+                .post('printers/print_label/', {json: payload})
                 .json()
             return true
         } catch (err) {
@@ -105,10 +94,29 @@ export const usePrintingStore = defineStore('printingStore', () => {
             loading.value = false
         }
     }
+    const PRINT_LABEL_300_BARCODE_58x40_COMPONENTS = async (payload) => {
+        loading.value = true;
+        errorStore.clearError();
+        try {
+            const newSendPrinterData = {
+                ...payload,
+                "data": [payload.data]
+            };
+            printStatus.value = await kyPrint
+                .post('printers/print_label/', {json: newSendPrinterData})
+                .json()
+            return true
+        } catch (err) {
+            console.log(err)
+            throw err
+        } finally {
+            loading.value = false
+        }
+    }
+
     const setSelectedPrinter = (printer) => {
         selectedPrinter.value = printer;
     }
-
     const setSelectedLabelTemplate = (type) => {
         selectedLabelTemplate.value = type;
     }
@@ -135,7 +143,8 @@ export const usePrintingStore = defineStore('printingStore', () => {
 //actions
         getZPLPrinters,
         getLabelTemplate,
-        PRINT_LABEL,
+        PRINT_LABEL_300_BARCODE_58x40_PRODUCTS,
+        PRINT_LABEL_300_BARCODE_58x40_COMPONENTS,
         setSelectedPrinter,
         setSelectedLabelTemplate,
         increment,

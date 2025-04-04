@@ -1,13 +1,12 @@
 <template>
   <div>
     <h1>Here is gonna be Support page</h1>
-    <FormCreatePalletType/>
-    <FormCreateNewProductType/>
+    <FormSearchComponents/>
   </div>
 </template>
 <script setup>
-import FormCreatePalletType from "@/components/Forms/FormCreatePalletType.vue";
-import FormCreateNewProductType from "@/components/Forms/FormCreateNewProductType.vue";
+
+import FormSearchComponents from "@/components/Forms/FormSearchComponents.vue";
 </script>
 <style scoped>
 </style>

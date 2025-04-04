@@ -12,7 +12,7 @@
           <h1 id="modalPrintSettingsLabel"
               class="modal-title fs-5"
           >
-            Параметры печати этикетки {{ packingStore.detailInfoPackingProduct?.name }}
+            Параметры печати этикетки {{ ERPStore.getBarcodeFromComponent?.name }}
           </h1>
           <button aria-label="Close"
                   class="btn-close"
@@ -80,14 +80,14 @@
           <!--          <div v-else>Ожидает задание на печать</div>-->
           <div>
             <div>
-              <button class="btn btn-outline-info"
-                      data-bs-target="#modalPreviewPrintingBody"
-                      data-bs-toggle="modal"
-                      type="button"
-                      @click="handlePreviewPrint()"
-              >
-                Просмотр
-              </button>
+<!--              <button class="btn btn-outline-info"-->
+<!--                      data-bs-target="#modalPreviewPrintingBody"-->
+<!--                      data-bs-toggle="modal"-->
+<!--                      type="button"-->
+<!--                      @click="handlePreviewPrint()"-->
+<!--              >-->
+<!--                Просмотр-->
+<!--              </button>-->
             </div>
           </div>
         </div>
@@ -100,7 +100,7 @@
           </button>
           <button class="btn btn-outline-success"
                   type="button"
-                  @click="handlePrint(ERPStore.getBarcodes)"
+                  @click="handlePrint(selectedItem)"
           >
             Печать
           </button>
@@ -108,7 +108,7 @@
       </div>
     </div>
   </div>
-  <ModalPreviewPrintingBody/>
+<!--  <ModalPreviewPrintingBody/>-->
 </template>
 <script setup>
 import {usePrintingStore} from "@/stores/HTTP/PrintingStore.js";
@@ -118,13 +118,37 @@ import {useERPStore} from "@/stores/HTTP/ERPStore.js";
 
 import {useNumbersOnlyWithoutDot} from "@/composables/NumbersOnlyWithoutDot.js";
 import ModalPreviewPrintingBody from "@/components/Modals/ModalPreviewPrintingBody.vue";
+defineProps({
+  selectedItem: {
+    type: Object,
+    default: null,
+  },
+});
 const printingStore = usePrintingStore()
 const ERPStore = useERPStore()
 const warehouseStore = useWarehouseStore()
 const packingStore = usePackingStore()
-const handlePrint = async (barcode) => {
+const handlePrint = async (data) => {
   try {
-    await printingStore.PRINT_LABEL(barcode)
+    const sendPrinterData = {
+      "template_code": printingStore.selectedLabelTemplate.code,
+      "printer_id": printingStore.selectedPrinter.id,
+      "data": data,
+      "copies": 1,
+      "priority": 0
+    }
+    switch (printingStore.selectedLabelTemplate.name) {
+      case "300_этикетка_58*40_Комплектующая":
+        await printingStore.PRINT_LABEL_300_BARCODE_58x40_COMPONENTS(sendPrinterData);
+        break;
+      case "300_этикетка_58*40_Продукция":
+        await printingStore.PRINT_LABEL_300_BARCODE_58x40_PRODUCTS(sendPrinterData);
+        break;
+      default:
+        // Опционально: обработка случая, если ни один шаблон не подошел
+        console.log("Неизвестный шаблон этикетки");
+        break;
+    }
   } catch (error) {
     console.error('Ошибка при печати:', error);
   }

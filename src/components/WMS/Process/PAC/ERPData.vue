@@ -15,21 +15,20 @@
           Ручное обновление
         </button>
       </div>
-      <table-group-unregistered-products />
+      <table-group-unregistered-products/>
     </div>
     <svg-logo-erp class="erp-logo"/>
     <div class="erp-settings-group-btn">
-      <button class="btn btn-outline-info"
-              type="button"
-              @click="webSocketStore.LINK_PALLET"
-      >
-        TEST (Связать тип паллеты)
-      </button>
+      <!--      <button class="btn btn-outline-info"-->
+      <!--              type="button"-->
+      <!--              @click="webSocketStore.LINK_PALLET"-->
+      <!--      >-->
+      <!--        TEST (Связать тип паллеты)-->
+      <!--      </button>-->
       <div class="qrcode">
         <label style="text-transform: uppercase">Задача: Собрать паллету</label>
         <div v-html="qrcode"></div>
       </div>
-
       <!--            <button class="btn btn-outline-info"-->
       <!--                    type="button"-->
       <!--                    @click="webSocketStore.GET_TRANSACTION_DATA(3455, true, true)"-->
@@ -50,7 +49,6 @@ import QRCode from 'qrcode'
 const warehouseStore = useWarehouseStore()
 const webSocketStore = useWebSocketStore()
 const qrcode = ref(null)
-
 const generateQR = async (data) => {
   const opts = {
     errorCorrectionLevel: 'H',
