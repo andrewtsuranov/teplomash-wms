@@ -14,17 +14,20 @@ v-if="isVisible"
 class="tooltip-custom"
 :style="tooltipStyle"
       >
-        {{ text }}
+        {{ error }}
       </div>
     </Transition>
   </div>
 </template>
 <script setup>
-import { ref } from 'vue'
+import { ref, computed} from 'vue'
 
-const props = defineProps({
-  text: String,
-})
+defineProps({
+  error: {
+    type: [String, Array],
+    required: true,
+  },
+});
 
 // Состояние видимости подсказки
 const isVisible = ref(false)
@@ -66,7 +69,7 @@ const hideTooltip = () => {
   color: white;
   border-radius: 4px;
   font-size: 14px;
-  white-space: nowrap;
+  white-space: pre-line;
   pointer-events: none; /* Чтобы подсказка не перехватывала события */
 }
 

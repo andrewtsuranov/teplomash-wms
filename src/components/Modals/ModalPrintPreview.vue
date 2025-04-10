@@ -1,7 +1,7 @@
 <template>
-  <div id="modalPreviewPrintingBody"
+  <div id="modalPrintPreview"
        aria-hidden="true"
-       aria-labelledby="modalPreviewPrintingBodyLabel"
+       aria-labelledby="modalPrintPreviewLabel"
        class="modal fade"
        data-bs-theme="dark"
        tabindex="-1"
@@ -9,7 +9,7 @@
     <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
       <div class="modal-content">
         <div class="modal-header">
-          <h1 id="modalPreviewPrintingBodyLabel"
+          <h1 id="modalPrintPreviewLabel"
               class="modal-title fs-5"
           > Предварительный просмотр
           </h1>
@@ -21,21 +21,26 @@
           </button>
         </div>
         <div class="modal-body">
-          <div class="barcodes-container">
-            <div v-for="(barcode, index) in ERPStore.getBarcodes"
+          <div class="barcodes-container"
+                v-if="barcodeData.length"
+          >
+            <div v-for="(item, index) in barcodeData"
                  :key="index"
                  class="barcode-item">
-              <label>{{ packingStore.detailInfoPackingProduct?.name }}</label>
+              <label>{{ item.name }}</label>
               <svg :id="'barcode-' + index"></svg>
             </div>
           </div>
+          <div v-else class="no-data">
+            Нет данных для предварительного просмотра
+          </div>
         </div>
+
         <div class="modal-footer">
           <button class="btn btn-primary"
-                  data-bs-target="#modalPrintSettings"
-                  data-bs-toggle="modal"
-          >
-            Назад
+                  type="button"
+                  @click="goBackToPrintSettings"
+          >Назад
           </button>
         </div>
       </div>
@@ -45,17 +50,37 @@
 <script setup>
 import {usePackingStore} from "@/stores/HTTP/PackingStore.js";
 import {useERPStore} from "@/stores/HTTP/ERPStore.js";
-import {watch, nextTick, onMounted} from "vue";
+import {usePrintingStore} from "@/stores/HTTP/PrintingStore.js";
+import {ref, watch, nextTick, onMounted, computed} from "vue";
 import JsBarcode from 'jsbarcode'
+
 
 const ERPStore = useERPStore()
 const packingStore = usePackingStore()
+const printingStore = usePrintingStore()
+
+// Определяем тип шаблона
+const templateType = computed(() => {
+  return printingStore.selectedLabelTemplate?.code || 'default';
+});
+
+// Количество копий
+const previewCopies = computed(() => printingStore.quantityLabel || 1);
+
+
+// Данные для штрих-кодов
+const barcodeData = computed(() => {
+  if (!printingStore.dataToPreview) return [];
+  return printingStore.dataToPreview
+});
+
+// Генерация штрих-кодов
 const generateBarcodes = () => {
-  ERPStore.getBarcodes.forEach((barcode, index) => {
+  barcodeData.value.forEach((item, index) => {
     const element = document.getElementById(`barcode-${index}`)
     if (element) {
       try {
-        JsBarcode(element, barcode, {
+        JsBarcode(element, item.barcode, {
           format: 'CODE128',
           width: 3,
           height: 100,
@@ -65,7 +90,7 @@ const generateBarcodes = () => {
           lineColor: '#000000',
           fontSize: 30,
           font: 'Arial',
-          text: `Зав.№ ${barcode}`,
+          text: `Зав.№ ${item.barcode}`,
           textAlign: "center",
         })
       } catch (error) {
@@ -74,18 +99,29 @@ const generateBarcodes = () => {
     }
   })
 }
-onMounted(() => {
-  if (ERPStore.getBarcodes) {
-    generateBarcodes()
+
+// Обработчик кнопки "Назад"
+const goBackToPrintSettings = () => {
+  const previewModal = document.getElementById('modalPrintPreview');
+  const printModal = document.getElementById('modalPrint');
+
+  if (previewModal && printModal) {
+    const previewBsModal = bootstrap.Modal.getInstance(previewModal);
+    const printBsModal = bootstrap.Modal.getOrCreateInstance(printModal);
+    previewBsModal.hide();
+    setTimeout(() => printBsModal.show(), 300);
   }
-})
-watch(() => ERPStore.minItemsByIdUnreg, () => {
-      nextTick(() => {
-        generateBarcodes()
-      })
-    },
-    {deep: true}
-)
+};
+
+// Следим за изменением barcodeData и генерируем штрих-коды
+watch(barcodeData, (newValue) => {
+  if (newValue) {
+    nextTick(() => {
+      generateBarcodes();
+    });
+  }
+}, { immediate: true });
+
 </script>
 <style scoped>
 .barcodes-container {
@@ -112,5 +148,11 @@ label {
   padding: 0 1.2rem;
   font-family: "Arial Narrow";
   line-height: 1.2;
+}
+.no-data {
+  padding: 2rem;
+  color: #666;
+  font-size: 1.1rem;
+  font-style: italic;
 }
 </style>

@@ -1,11 +1,9 @@
 import {defineStore} from 'pinia'
-import {useRouter} from "vue-router";
 import {ref, computed} from "vue"
 import {requestUrls} from '@/stores/request-urls.js';
 import {useErrorStore} from "@/stores/Error/ErrorStore.js"
 import ky from "ky"
 
-const router = useRouter()
 const kyStd = ky.create({
     prefixUrl: requestUrls.auth,
     retry: 0,
@@ -83,8 +81,6 @@ export const useUserStore = defineStore('userStore', () => {
     const getTokenAccess = computed(() => user.value?.access);
     const getUserId = computed(() => user.value?.user?.id);
     const getUserEmail = computed(() => user.value?.user?.email);
-
-
 //actions
     const LOGIN = async (credentials) => {
         loading.value = true;
@@ -109,7 +105,7 @@ export const useUserStore = defineStore('userStore', () => {
                     errorStore.setError({
                         status: e.response.status,
                         email: credentials.email,
-                        message: `Email пользователя не подтверждён.` ,
+                        message: `Email пользователя не подтверждён.`,
                         type: 'email_confirmation'
                     })
                 }

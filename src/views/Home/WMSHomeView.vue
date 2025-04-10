@@ -5,11 +5,11 @@
         Приветствуем Вас, {{ userStore.getFullNameUser?.firstName }} {{ userStore.getFullNameUser?.middleName }}!
       </h3>
       <p>Тепломаш&reg; Warehouse Management System (WMS) — это информационная система, предназначенная для
-        автоматизации
-        управления складскими процессами и инфраструктурой склада в целом.
+         автоматизации
+         управления складскими процессами и инфраструктурой склада в целом.
       </p>
       <ul> Система состоит из аппаратной и
-        программной части:
+           программной части:
         <li>
           Под аппаратной подразумеваются терминалы сбора данных (ТСД), серверы для хранения информации и
           другое оборудование, применение которого необходимо для автоматизированной работы складского комплекса.
@@ -32,13 +32,12 @@
 <script setup>
 import {useRouter} from "vue-router";
 import {useUserStore} from "@/stores/HTTP/UserStore.js";
-
-const userStore = useUserStore()
-const router = useRouter()
 import {onMounted} from "vue";
 import {useWebSocketStore} from "@/stores/WebSockets/WebSocketStore.js";
 import {useErrorStore} from "@/stores/Error/ErrorStore.js";
 
+const userStore = useUserStore()
+const router = useRouter()
 const errorStore = useErrorStore()
 const webSocketStore = useWebSocketStore()
 onMounted(async () => {

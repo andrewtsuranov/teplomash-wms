@@ -11,7 +11,7 @@
       <thead>
       <tr>
         <th scope="col">№</th>
-        <th scope="col">Изделие</th>
+        <th scope="col">Готовая продукция</th>
         <th scope="col">Кол-во, шт</th>
         <th scope="col">Задача</th>
         <th scope="col">Инфо</th>
@@ -25,7 +25,7 @@
       >
         <th scope="row">{{ index + 1 }}</th>
         <td>
-          <CustomTooltip :text="handleErrorMessage(item.error)">
+          <CustomTooltip :error="handleErrorMessage(item.error)">
             <i v-if="item.error"
                class="bi bi-exclamation-circle-fill"
                style="color: #ffc107;"
@@ -120,10 +120,13 @@ const toggleDetailUnregProduct = async (item) => {
   }
 }
 const handleErrorMessage = (errorMessage) => {
-  if (errorMessage !== undefined) {
-    return errorMessage.map(err => useErrorCodeDictionary[err])
+  if (errorMessage !== undefined && Array.isArray(errorMessage)) {
+    return errorMessage
+        .map(err => useErrorCodeDictionary[err] || 'Неизвестная ошибка')
+        .join('\n');
   }
-}
+  return '';
+};
 onMounted(async () => {
   try {
     if (webSocketStore.isConnected) {
@@ -145,7 +148,7 @@ onMounted(async () => {
 table thead {
   position: sticky;
   top: 0;
-  z-index: 10;
+  z-index: 1;
   box-shadow: 0 1px 0 0 red;
 }
 

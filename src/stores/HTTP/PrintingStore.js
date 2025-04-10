@@ -6,6 +6,8 @@ import {useErrorStore} from "@/stores/Error/ErrorStore.js";
 import {useERPStore} from "@/stores/HTTP/ERPStore.js";
 import {useUserStore} from '@/stores/HTTP/UserStore.js'
 import {useWarehouseStore} from "@/stores/HTTP/WarehouseStore.js";
+import {usePackingStore} from "@/stores/HTTP/PackingStore.js";
+import {log} from "qrcode/lib/core/galois-field.js";
 
 const ERPStore = useERPStore()
 const warehouseStore = useWarehouseStore()
@@ -32,17 +34,10 @@ const kyPrint = kyStd.extend({
         ]
     }
 })
-//     ^XA                          // Начало этикетки
-//     ^FO50,50                     // Позиция QR-кода
-//     ^BQN,2,5                     // QR-код
-//     ^FDQA,http://site.com^FS     // Данные QR-кода
-//     ^FO50,200                    // Позиция текста под QR
-//     ^ADN                         // Выбор шрифта
-//     ^FD http://site.com^FS       // Текст
-//     ^XZ                          // Конец этикетки
 export const usePrintingStore = defineStore('printingStore', () => {
 //state
     const errorStore = useErrorStore()
+    const packingStore = usePackingStore()
     const loading = ref(false)
     const printersList = ref(null)
     const printStatus = ref(null)
@@ -50,10 +45,11 @@ export const usePrintingStore = defineStore('printingStore', () => {
     const selectedLabelTemplate = ref(null)
     const labelTemplatesList = ref(null)
     const quantityLabel = ref(1)
+    const dataToPrint = ref(null)
+    const dataToPreview = ref(null)
 //getters
-//         const totalLabelPrint = computed(() => selectedQuantityLabel.value);
 //actions
-    const getZPLPrinters = async () => {
+    const GET_ZPL_PRINTERS = async () => {
         loading.value = true;
         errorStore.clearError();
         try {
@@ -66,7 +62,7 @@ export const usePrintingStore = defineStore('printingStore', () => {
             loading.value = false
         }
     }
-    const getLabelTemplate = async () => {
+    const GET_LABEL_TEMPLATE = async () => {
         loading.value = true;
         errorStore.clearError();
         try {
@@ -83,6 +79,9 @@ export const usePrintingStore = defineStore('printingStore', () => {
         loading.value = true;
         errorStore.clearError();
         try {
+            payload.data.map(item => {
+                item ["name"] = packingStore.detailInfoPackingProduct.name
+            })
             printStatus.value = await kyPrint
                 .post('printers/print_label/', {json: payload})
                 .json()
@@ -98,12 +97,8 @@ export const usePrintingStore = defineStore('printingStore', () => {
         loading.value = true;
         errorStore.clearError();
         try {
-            const newSendPrinterData = {
-                ...payload,
-                "data": [payload.data]
-            };
             printStatus.value = await kyPrint
-                .post('printers/print_label/', {json: newSendPrinterData})
+                .post('printers/print_label/', {json: payload})
                 .json()
             return true
         } catch (err) {
@@ -113,20 +108,31 @@ export const usePrintingStore = defineStore('printingStore', () => {
             loading.value = false
         }
     }
-
     const setSelectedPrinter = (printer) => {
-        selectedPrinter.value = printer;
+        selectedPrinter.value = printer
     }
     const setSelectedLabelTemplate = (type) => {
-        selectedLabelTemplate.value = type;
+        selectedLabelTemplate.value = type
     }
     const increment = () => {
-        quantityLabel.value++;
+        quantityLabel.value++
     }
     const decrement = () => {
         if (quantityLabel.value > 1) {
-            quantityLabel.value--;
+            quantityLabel.value--
         }
+    }
+    const setDataToPrint = (data) => {
+        dataToPrint.value = data
+    }
+    const clearDataToPrint = () => {
+        dataToPrint.value = null
+    }
+    const setDataToPreview = (data) => {
+        dataToPreview.value = data
+    }
+    const clearDataToPreview = () => {
+        dataToPreview.value = null
     }
     return {
 //state
@@ -137,17 +143,22 @@ export const usePrintingStore = defineStore('printingStore', () => {
         loading,
         labelTemplatesList,
         quantityLabel,
-//getters
         selectedLabelTemplate,
-        // totalLabelPrint,
+        dataToPrint,
+        dataToPreview,
+//getters
 //actions
-        getZPLPrinters,
-        getLabelTemplate,
+        GET_ZPL_PRINTERS,
+        GET_LABEL_TEMPLATE,
         PRINT_LABEL_300_BARCODE_58x40_PRODUCTS,
         PRINT_LABEL_300_BARCODE_58x40_COMPONENTS,
         setSelectedPrinter,
         setSelectedLabelTemplate,
         increment,
         decrement,
+        setDataToPrint,
+        clearDataToPrint,
+        setDataToPreview,
+        clearDataToPreview,
     }
 })

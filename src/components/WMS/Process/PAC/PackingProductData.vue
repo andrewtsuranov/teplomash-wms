@@ -55,8 +55,6 @@
           </ul>
         </div>
         <button class="btn btn-outline-primary grp-btn"
-                data-bs-target="#modalPrintSettings"
-                data-bs-toggle="modal"
                 @click="handlerPrint"
         >
           Печать Barcode
@@ -64,7 +62,6 @@
       </div>
     </div>
   </div>
-  <ModalPrintSettings :selected-item="ERPStore.minItemsByIdUnreg"/>
 </template>
 <script setup>
 import {usePackingStore} from "@/stores/HTTP/PackingStore.js";
@@ -72,13 +69,14 @@ import {usePrintingStore} from "@/stores/HTTP/PrintingStore.js";
 import {useWarehouseStore} from "@/stores/HTTP/WarehouseStore.js";
 import {useERPStore} from "@/stores/HTTP/ERPStore.js";
 import PalletConfigurator from "@/components/UI/SVG/Pallet/PalletConfigurator.vue";
-import ModalPrintSettings from "@/components/Modals/ModalPrintSettings.vue";
 import TableItemUnregisteredProduct from "@/components/Tables/ERP/TableItemUnregisteredProduct.vue";
-import {computed} from "vue";
+import {computed, nextTick} from "vue";
 import {useErrorCodeDictionary} from "@/composables/Dictionary/useErrorCodeDictionary.js";
 import {useNumbersOnlyWithoutDot} from "@/composables/NumbersOnlyWithoutDot.js";
 import {usePalletStore} from "@/stores/HTTP/PalletStore.js";
 import FormCreatePalletType from "@/components/Forms/FormCreatePalletType.vue";
+import ModalPrint from "@/components/Modals/ModalPrint.vue";
+
 
 const ERPStore = useERPStore()
 const packingStore = usePackingStore()
@@ -95,10 +93,24 @@ const errorMessages = computed(() => {
   if (!packingStore.detailInfoPackingProduct?.error) return []
   return packingStore.detailInfoPackingProduct.error.map(err => useErrorCodeDictionary[err] || `Неизвестная ошибка (${err})`)
 })
-const handlerPrint = async (data) => {
+const handlerPrint = async () => {
   try {
-    await printingStore.getZPLPrinters()
-    await printingStore.getLabelTemplate()
+    await nextTick();
+    const modalElement = document.getElementById('modalPrint')
+    if (!modalElement) {
+      console.log('Модальное окно не найдено')
+      return
+    }
+    const modalInstance = new bootstrap.Modal(modalElement)
+    modalInstance.show()
+    if (ERPStore.minItemsByIdUnreg.length > 0) {
+      printingStore.clearDataToPrint()
+      printingStore.setDataToPrint(ERPStore.getNameAndBarcodeProductList)
+    }
+    await printingStore.GET_ZPL_PRINTERS()
+    await printingStore.GET_LABEL_TEMPLATE()
+
+
     // if (warehouseStore.selectedZone.id) {
     //   const printerInZone = printingStore.printersList.printers
     //       .find(printer => printer.zone === warehouseStore.selectedZone.id);

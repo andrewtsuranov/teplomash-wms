@@ -7,6 +7,7 @@
       <footer-view/>
     </footer>
   </div>
+
 </template>
 <script setup>
 import {RouterView} from 'vue-router'

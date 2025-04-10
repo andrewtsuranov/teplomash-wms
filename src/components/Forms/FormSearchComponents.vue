@@ -28,21 +28,26 @@
         </button>
       </div>
     </div>
+    <div>
+      <p>Найдено: {{ ERPStore.searchResultsComponents?.length || 0 }}</p>
+    </div>
     <!-- Таблица с результатами -->
     <div class="in-table-container table-responsive">
       <table class="table-content table table-dark align-middle table-hover">
         <colgroup>
           <col style="width: 1%">
-          <col style="width: 60%">
-          <col style="width: 20%">
+          <col style="width: 40%">
+          <col style="width: 10%">
           <col style="width: 19%">
+          <col style="width: 5%">
         </colgroup>
         <thead>
         <tr>
           <th scope="col">№</th>
-          <th scope="col">Тип изделия</th>
+          <th scope="col">Комплектующие</th>
           <th scope="col">ID</th>
           <th scope="col">Задача</th>
+          <th scope="col">Инфо</th>
         </tr>
         </thead>
         <tbody v-if="searchResults.length > 0">
@@ -59,12 +64,15 @@
             <button
                 v-if="item.item_type_group_code === 'К'"
                 class="btn btn-outline-success"
-                data-bs-target="#modalPrintSettings"
-                data-bs-toggle="modal"
                 @click.stop="handlePrintLabel(item)"
             >
               Печать этикетки
             </button>
+          </td>
+          <td>
+            <i :class="packingStore.detailInfoPackingProduct?.id === item.id ? 'bi-circle-fill text-primary' : 'bi-circle'"
+               class="bi toggle-icon"
+            ></i>
           </td>
         </tr>
         </tbody>
@@ -77,11 +85,10 @@
         </tbody>
       </table>
     </div>
-    <ModalPrintSettings :selected-item="ERPStore.getBarcodeFromComponent" />
   </div>
 </template>
 <script setup>
-import {ref, onMounted} from 'vue';
+import {ref, onMounted, nextTick} from 'vue';
 import {useDebounceFn} from '@vueuse/core';
 import {usePackingStore} from "@/stores/HTTP/PackingStore.js";
 import {useERPStore} from "@/stores/HTTP/ERPStore.js";
@@ -89,10 +96,8 @@ import {useWarehouseStore} from "@/stores/HTTP/WarehouseStore.js";
 import {usePalletStore} from "@/stores/HTTP/PalletStore.js";
 import {useErrorCodeDictionary} from "@/composables/Dictionary/useErrorCodeDictionary.js";
 import {usePrintingStore} from "@/stores/HTTP/PrintingStore.js";
-import ModalPrintSettings from "@/components/Modals/ModalPrintSettings.vue";
 
 const warehouseStore = useWarehouseStore();
-
 const printingStore = usePrintingStore()
 const ERPStore = useERPStore();
 const packingStore = usePackingStore();
@@ -116,9 +121,10 @@ const debouncedSearch = useDebounceFn(async () => {
       query: searchQuery.value,
       filter: selectedFilter.value,
       names_only: false,
-      limit: 50, // Ограничение количества результатов
+      order_by: 'name',
+      limit: 10
     });
-    searchResults.value = ERPStore.searchResultsComponents || [];
+    searchResults.value = ERPStore.searchResultsComponents;
   } catch (e) {
     console.error('Ошибка поиска:', e);
     searchResults.value = [];
@@ -129,10 +135,21 @@ const debouncedSearch = useDebounceFn(async () => {
 const handlePrintLabel = async (item) => {
   selectedItem.value = item
   try {
-    await ERPStore.GET_BARCODE_COMPONENT_BY_ID(item)
-
-    await printingStore.getZPLPrinters()
-    await printingStore.getLabelTemplate()
+    await nextTick()
+    const modalElement = document.getElementById('modalPrint');
+    if (!modalElement) {
+      console.error('Модальное окно не найдено');
+      return;
+    }
+    const modalInstance = new bootstrap.Modal(modalElement);
+    modalInstance.show();
+    await ERPStore.GET_BARCODE_COMPONENT_BY_ID(selectedItem.value)
+    await printingStore.GET_ZPL_PRINTERS()
+    await printingStore.GET_LABEL_TEMPLATE()
+    if (ERPStore.getBarcodeFromComponent) {
+      printingStore.clearDataToPrint()
+      printingStore.setDataToPrint([ERPStore.getBarcodeFromComponent])
+    }
     // if (warehouseStore.selectedZone.id) {
     //   const printerInZone = printingStore.printersList.printers
     //       .find(printer => printer.zone === warehouseStore.selectedZone.id);
@@ -144,8 +161,6 @@ const handlePrintLabel = async (item) => {
     //     printingStore.labelTemplatesList
     //         .find(label => label.code.toLowerCase() === '300_этикетка_58*40_Комплектующая'
     //         ))
-
-
   } catch (e) {
     console.log(e);
   }
@@ -179,10 +194,6 @@ onMounted(async () => {
 });
 </script>
 <style scoped>
-.search-container {
-  padding: 1rem;
-}
-
 .in-table-container {
   display: grid;
   grid-template-columns: minmax(auto, 1fr);
