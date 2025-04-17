@@ -22,28 +22,22 @@ export const useERPStore = defineStore('ERPStore', () => {
     const productTypeId = ref(null)
     const searchComponents = ref(null)
     const getBarcodeFromComponent = ref(null)
+    const activeTab = ref('products')
 //Getters
-    const getNameAndBarcodeProductList = computed(() => {
-        const result = [];
-        // Проверяем наличие данных
-        if (!minItemsByIdUnreg.value.length || !productTypeId.value?.name) {
-            return result; // Возвращаем пустой массив, если данных нет
-        }
-        // Проходим по массиву minItemsByIdUnreg и создаем объекты
-        minItemsByIdUnreg.value.forEach((item) => {
-            result.push({
-                barcode: item.barcode || 'N/A', // Учитываем случай, если barcode отсутствует
-                name: productTypeId.value.name, // Используем name из productTypeId
-            });
-        });
-        return result;
-    });
+    const getNameAndBarcodeProductList = computed(() =>
+        minItemsByIdUnreg.value?.map(item => ({
+            barcode: item.barcode || 'N/A',
+            name: item.name || productTypeId.value.name ||'N/A'
+        })) || []
+    );
     const getPalletType = computed(() =>
         productTypeId.value?.pallet_types[0]
     )
     const searchResultsComponents = computed(() =>
-    searchComponents.value?.results || []
+        searchComponents.value?.results || []
     )
+    const isProductsActive = computed(() => activeTab.value === 'products')
+    const isComponentsActive = computed(() => activeTab.value === 'components')
 //Actions
     const GET_MIN_ITEMS_BY_ID_UNREG = async (item, unregistered = true) => {
         loading.value = true;
@@ -84,7 +78,6 @@ export const useERPStore = defineStore('ERPStore', () => {
             if (data.order_by) searchParams.append('order_by', data.order_by);
             if (data.filter && data.filter !== 'all') searchParams.append('item_type_group', data.filter);
             if (data.limit) searchParams.append('limit', data.limit);
-
             searchComponents.value = await kyStd('list-product-types/', {searchParams: searchParams}).json()
             return true
         } catch (e) {
@@ -111,6 +104,9 @@ export const useERPStore = defineStore('ERPStore', () => {
             loading.value = false
         }
     }
+    const setActiveTabs = (tabId) => {
+        activeTab.value = tabId
+    }
     return {
         errorStore,
         loading,
@@ -121,9 +117,13 @@ export const useERPStore = defineStore('ERPStore', () => {
         searchComponents,
         searchResultsComponents,
         getBarcodeFromComponent,
+        activeTab,
+        isProductsActive,
+        isComponentsActive,
         GET_MIN_ITEMS_BY_ID_UNREG,
         GET_PRODUCT_TYPE_BY_ID,
         SEARCH_COMPONENTS_BY_NAME,
         GET_BARCODE_COMPONENT_BY_ID,
+        setActiveTabs,
     }
 })

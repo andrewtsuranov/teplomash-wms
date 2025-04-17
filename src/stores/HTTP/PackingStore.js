@@ -17,7 +17,6 @@ const kyStd = ky.create({
 export const usePackingStore = defineStore('packingStore', () => {
     const loading = ref(false)
     const errorStore = useErrorStore()
-    const selectedTSD = ref(JSON.parse(localStorage.getItem('selectedTsd')) || null)
     const detailInfoPackingProduct = ref(null);
     const packingId = ref(JSON.parse(localStorage.getItem('packingId')) || null)
     const dataYYYYMMDD = ref(new Date().toISOString().slice(0, 10));
@@ -77,10 +76,7 @@ export const usePackingStore = defineStore('packingStore', () => {
         }
     }
 
-    const setSelectedTSD = (tsdId) => {
-        selectedTSD.value = tsdId
-        localStorage.setItem('selectedTsd', JSON.stringify(tsdId))
-    }
+
     const openTableItemUnregProduct = (item) => {
         detailInfoPackingProduct.value = item;
         isShownTableItemUnregProduct.value = true;
@@ -89,10 +85,7 @@ export const usePackingStore = defineStore('packingStore', () => {
         detailInfoPackingProduct.value = null;
         isShownTableItemUnregProduct.value = false;
     }
-    const clearSelectedTSD = () => {
-        selectedTSD.value = null
-        localStorage.removeItem('selectedTsd')
-    }
+
     return {
 //state
         errorStore,
@@ -101,16 +94,13 @@ export const usePackingStore = defineStore('packingStore', () => {
         isShownTableItemUnregProduct,
         palletData,
         palletStatus,
-        selectedTSD,
         packingId,
         newPalletType,
         updateProductType,
 //getters
 //actions
-        setSelectedTSD,
         openTableItemUnregProduct,
         closeTableItemUnregProduct,
-        clearSelectedTSD,
         CREATE_PALLET_TYPE,
         UPDATE_PRODUCT_TYPE,
     }

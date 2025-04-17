@@ -2,11 +2,13 @@ import {computed, ref} from "vue";
 import {useUserStore} from '@/stores/HTTP/UserStore.js'
 import {useTransactionStore} from "@/stores/WebSockets/transactionStore.js";
 import {defineStore} from 'pinia'
+import {useTSDStore} from "@/stores/HTTP/TSDStore.js";
 
 export const useWebSocketStore = defineStore('websocket', () => {
 //Store
     const userStore = useUserStore()
     const transactionStore = useTransactionStore()
+    const TSDStore = useTSDStore()
 //State
     const isConnected = ref(false)
     const onlineDevices = ref([])
@@ -22,7 +24,7 @@ export const useWebSocketStore = defineStore('websocket', () => {
     const wsUnregisteredProducts = ref(JSON.parse(localStorage.getItem('wsUnregisteredProducts')) || null)
 //Getters
     const lastMessage = computed(() => message.value)
-    const connectionStatus = computed(() => isConnected.value ? 'В сети' : 'Не в сети')
+    const connectionStatus = computed(() => isConnected.value ? 'В сети' : 'Не подключено')
     const getUnregisteredProducts = computed(() => wsUnregisteredProducts.value)
 //Actions
     const initWebSocket = () => {
@@ -104,6 +106,7 @@ export const useWebSocketStore = defineStore('websocket', () => {
             // Обработка сообщения: получение активных пользователей
             if (data.type === 'loaders_list') {
                 onlineDevices.value = data.loaders
+                TSDStore.set_onlineTSDList(data.loaders)
             }
             //Обработка сообщения: перенос продукции из ERP в БД
             if (data.type === 'items_created' && data.status === 'success') {
@@ -121,7 +124,7 @@ export const useWebSocketStore = defineStore('websocket', () => {
                 error.value = data.message
             }
             if (data.type === 'transaction_update') {
-                transactionStore.addTransaction(data.transaction)
+                transactionStore.addCurrentTransaction(data.transaction)
             }
         } catch (e) {
             console.error('Error parsing WebSocket message:', e)
@@ -195,12 +198,12 @@ export const useWebSocketStore = defineStore('websocket', () => {
             warehouse_id: 1
         }));
     }
-    const GET_TRANSACTION_DATA = (id, min = true, max = false) => {
+    const GET_TRANSACTION_DATA = (id, min = false, isData = true) => {
         const data = {
             "action": "get_transaction_data",
             "id": id,
             "min": min,
-            "data": max
+            "data": isData
         }
         if (isConnected.value && socket.value && socket.value.readyState === WebSocket.OPEN) {
             socket.value.send(JSON.stringify(data))

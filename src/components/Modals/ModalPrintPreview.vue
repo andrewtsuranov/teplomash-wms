@@ -21,8 +21,8 @@
           </button>
         </div>
         <div class="modal-body">
-          <div class="barcodes-container"
-                v-if="barcodeData.length"
+          <div v-if="barcodeData.length"
+               class="barcodes-container"
           >
             <div v-for="(item, index) in barcodeData"
                  :key="index"
@@ -35,7 +35,6 @@
             Нет данных для предварительного просмотра
           </div>
         </div>
-
         <div class="modal-footer">
           <button class="btn btn-primary"
                   type="button"
@@ -54,30 +53,29 @@ import {usePrintingStore} from "@/stores/HTTP/PrintingStore.js";
 import {ref, watch, nextTick, onMounted, computed} from "vue";
 import JsBarcode from 'jsbarcode'
 
-
 const ERPStore = useERPStore()
 const packingStore = usePackingStore()
 const printingStore = usePrintingStore()
-
 // Определяем тип шаблона
 const templateType = computed(() => {
   return printingStore.selectedLabelTemplate?.code || 'default';
 });
-
 // Количество копий
 const previewCopies = computed(() => printingStore.quantityLabel || 1);
-
-
 // Данные для штрих-кодов
 const barcodeData = computed(() => {
   if (!printingStore.dataToPreview) return [];
   return printingStore.dataToPreview
 });
-
 // Генерация штрих-кодов
 const generateBarcodes = () => {
   barcodeData.value.forEach((item, index) => {
     const element = document.getElementById(`barcode-${index}`)
+    const textBarcode = ERPStore.isProductsActive
+        ? `Зав.№ ${item.barcode}`
+        : ERPStore.isComponentsActive
+            ? item.barcode || 'N/A'
+            : item.barcode || []
     if (element) {
       try {
         JsBarcode(element, item.barcode, {
@@ -90,7 +88,7 @@ const generateBarcodes = () => {
           lineColor: '#000000',
           fontSize: 30,
           font: 'Arial',
-          text: `Зав.№ ${item.barcode}`,
+          text: textBarcode,
           textAlign: "center",
         })
       } catch (error) {
@@ -99,12 +97,10 @@ const generateBarcodes = () => {
     }
   })
 }
-
 // Обработчик кнопки "Назад"
 const goBackToPrintSettings = () => {
   const previewModal = document.getElementById('modalPrintPreview');
   const printModal = document.getElementById('modalPrint');
-
   if (previewModal && printModal) {
     const previewBsModal = bootstrap.Modal.getInstance(previewModal);
     const printBsModal = bootstrap.Modal.getOrCreateInstance(printModal);
@@ -112,7 +108,6 @@ const goBackToPrintSettings = () => {
     setTimeout(() => printBsModal.show(), 300);
   }
 };
-
 // Следим за изменением barcodeData и генерируем штрих-коды
 watch(barcodeData, (newValue) => {
   if (newValue) {
@@ -120,8 +115,7 @@ watch(barcodeData, (newValue) => {
       generateBarcodes();
     });
   }
-}, { immediate: true });
-
+}, {immediate: true});
 </script>
 <style scoped>
 .barcodes-container {
@@ -149,6 +143,7 @@ label {
   font-family: "Arial Narrow";
   line-height: 1.2;
 }
+
 .no-data {
   padding: 2rem;
   color: #666;

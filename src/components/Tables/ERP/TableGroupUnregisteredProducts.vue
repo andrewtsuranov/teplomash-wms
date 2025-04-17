@@ -58,7 +58,7 @@
   </div>
 </template>
 <script setup>
-import {computed, onMounted} from 'vue';
+import {computed, onMounted, watch} from 'vue';
 import {useWebSocketStore} from "@/stores/WebSockets/WebSocketStore.js";
 import {usePackingStore} from "@/stores/HTTP/PackingStore.js";
 import {useERPStore} from "@/stores/HTTP/ERPStore.js";
@@ -100,6 +100,7 @@ const handleCreatePallet = async (item) => {
     console.log(e)
   }
 }
+
 const toggleDetailUnregProduct = async (item) => {
   try {
     if (packingStore.detailInfoPackingProduct?.id === item.id) {

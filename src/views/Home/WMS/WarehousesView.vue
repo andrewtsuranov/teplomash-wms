@@ -1,5 +1,5 @@
 <template>
-  <div class="wms-home-container">
+  <div v-if="$route.name === 'WMS'" class="wms-home-container">
     <div v-for="warehouse in warehouseStore?.allWarehouses"
          :key="warehouse.id"
          class="wms-input"
@@ -8,6 +8,7 @@
       <span v-if="warehouse">{{ warehouse?.name }}</span>
     </div>
   </div>
+  <RouterView/>
 </template>
 <script setup>
 import {onMounted, onUnmounted} from "vue";
@@ -37,7 +38,7 @@ const handlerClickWarehouse = async (id) => {
       await router.push({
         name: 'WMSProcess',
         params: {
-          alias: warehouseStore.warehouseAliasMap[id]
+          idWarehouse: warehouseStore.warehouseAliasMap[id]
         }
       })
     }
@@ -50,7 +51,6 @@ const handlerClickWarehouse = async (id) => {
     console.log(e)
   }
 }
-
 </script>
 <style scoped>
 .wms-home-container {

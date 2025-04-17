@@ -77,7 +77,6 @@ import {usePalletStore} from "@/stores/HTTP/PalletStore.js";
 import FormCreatePalletType from "@/components/Forms/FormCreatePalletType.vue";
 import ModalPrint from "@/components/Modals/ModalPrint.vue";
 
-
 const ERPStore = useERPStore()
 const packingStore = usePackingStore()
 const palletStore = usePalletStore()
@@ -109,19 +108,29 @@ const handlerPrint = async () => {
     }
     await printingStore.GET_ZPL_PRINTERS()
     await printingStore.GET_LABEL_TEMPLATE()
-
-
-    // if (warehouseStore.selectedZone.id) {
-    //   const printerInZone = printingStore.printersList.printers
-    //       .find(printer => printer.zone === warehouseStore.selectedZone.id);
-    //   if (printerInZone) {
-    //     await printingStore.setSelectedPrinter(printerInZone)
-    //   }
-    // }
-    // await printingStore.setSelectedLabelTemplate(
-    //     printingStore.labelTemplatesList
-    //         .find(label => label.code.toLowerCase() === '300_этикетка_58*40_Продукция'
-    //         ))
+    if (warehouseStore.selectedZone.id) {
+      const printerInZone = printingStore.printersList.printers
+          .find(printer => printer.zone === warehouseStore.selectedZone.id);
+      if (printerInZone) {
+        await printingStore.setSelectedPrinter(printerInZone)
+      }
+      if (ERPStore.isProductsActive) {
+        if (printingStore.selectedPrinter.name !== "BIXOLON_SPP-L410 WiFi") {
+            await printingStore.setSelectedLabelTemplate(
+                printingStore.labelTemplatesList.find(label =>
+                  label.code === '300_этикетка_58*40_Продукция'
+                ))
+        }
+      }
+      if (ERPStore.isComponentsActive) {
+        if (printingStore.selectedPrinter.name !== "BIXOLON_SPP-L410 WiFi") {
+          await printingStore.setSelectedLabelTemplate(
+              printingStore.labelTemplatesList.find(label =>
+                  label.code === '300_этикетка_58*40_Комплектующая'
+              ))
+        }
+      }
+    }
   } catch (e) {
     console.log(e)
     throw e

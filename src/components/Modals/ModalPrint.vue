@@ -36,28 +36,16 @@
               <option
                   v-for="(print, index) in printingStore.printersList?.printers"
                   :key="index"
+                  :disabled="print.name === 'BIXOLON_SPP-L410 WiFi'"
                   :value="print"
               >
                 {{ print.name }} ({{ print.ip_address }})
               </option>
             </select>
             <label for="templateSelect">Тип печати:</label>
-            <select
-                id="templateSelect"
-                v-model="printingStore.selectedLabelTemplate"
-                aria-label="Выберите шаблон этикетки"
-                class="form-select"
-                required
-            >
-              <option :value="null" disabled>Выберите шаблон этикетки...</option>
-              <option
-                  v-for="(label, index) in printingStore.labelTemplatesList"
-                  :key="index"
-                  :value="label"
-              >
-                {{ label.name }}
-              </option>
-            </select>
+            <div>
+              {{ printingStore.selectedLabelTemplate?.name || 'Шаблон не задан!' }}
+            </div>
             <label for="quantityInput">Кол-во копий:</label>
             <div class="counter">
               <button
@@ -115,15 +103,16 @@
 <script setup>
 import {useERPStore} from "@/stores/HTTP/ERPStore.js";
 import {usePrintingStore} from "@/stores/HTTP/PrintingStore.js";
-import {computed, onMounted, ref} from "vue";
+import {computed, watch, nextTick, ref} from "vue";
 import {useNumbersOnlyWithoutDot} from "@/composables/NumbersOnlyWithoutDot.js";
 import ModalPrintPreview from "@/components/Modals/ModalPrintPreview.vue";
 
 const ERPStore = useERPStore()
 const printingStore = usePrintingStore()
+const printOptions = ref()
 // Вычисляемое свойство для общего количества этикеток
 const totalLabels = computed(() => {
-  if (!printingStore.dataToPrint) return 0;
+  if (!printingStore.dataToPrint || !Number.isInteger(printingStore.quantityLabel)) return 0;
   // Если это массив, учитываем каждый элемент
   if (Array.isArray(printingStore.dataToPrint)) {
     return printingStore.dataToPrint.length * printingStore.quantityLabel;
@@ -131,10 +120,12 @@ const totalLabels = computed(() => {
   // Если это один объект
   return printingStore.quantityLabel;
 });
-
 // Обработчик печати
 const handlePrint = async () => {
-
+  if (!printingStore.selectedPrinter || !printingStore.selectedLabelTemplate || !printingStore.quantityLabel) {
+    alert('Заполните все поля для печати');
+    return;
+  }
   try {
     const sendPrinterData = {
       "template_code": printingStore.selectedLabelTemplate.code,
@@ -143,7 +134,7 @@ const handlePrint = async () => {
       "copies": printingStore.quantityLabel,
       "priority": 0
     };
-    switch (printingStore.selectedLabelTemplate?.name) {
+    switch (printingStore.selectedLabelTemplate.name) {
       case "300_этикетка_58*40_Комплектующая":
         await printingStore.PRINT_LABEL_300_BARCODE_58x40_COMPONENTS(sendPrinterData);
         break;
@@ -151,43 +142,32 @@ const handlePrint = async () => {
         await printingStore.PRINT_LABEL_300_BARCODE_58x40_PRODUCTS(sendPrinterData);
         break;
       default:
-        console.log("Неизвестный шаблон этикетки");
+        console.log("Неизвестный шаблон этикетки", printingStore.selectedLabelTemplate.code);
         break;
     }
   } catch (error) {
     console.error('Ошибка при печати:', error);
   }
 };
-
-// Обработчик предпросмотра печати
+// Обработчик предпросмотра
 const handlePreviewPrint = async () => {
   // Проверяем, существует ли выбранный шаблон
   if (!printingStore.selectedLabelTemplate) {
     alert("Необходимо выбрать шаблон этикетки");
     return;
   }
-  const getModalPrint = document.getElementById('modalPrintPreview');
-  const modal = new bootstrap.Modal(getModalPrint);
-  // Показываем модальное окно, так как шаблон уже проверен
+  await printingStore.clearDataToPreview();
+  await printingStore.setDataToPreview(
+      ERPStore.isComponentsActive
+          ? [ERPStore.getBarcodeFromComponent].filter(Boolean)
+          : ERPStore.isProductsActive
+              ? ERPStore.getNameAndBarcodeProductList || []
+              : []
+  )
+  const modalElement = document.getElementById('modalPrintPreview');
+  const modal = new bootstrap.Modal(modalElement);
   modal.show();
-  switch (printingStore.selectedLabelTemplate.name) {
-    case "300_этикетка_58*40_Комплектующая":
-      // Если нужны дополнительные данные для компонентов, загружаем их
-       await printingStore.clearDataToPreview()
-       await printingStore.setDataToPreview([ERPStore.getBarcodeFromComponent])
-      break;
-    case "300_этикетка_58*40_Продукция":
-      // Если нужны дополнительные данные для продукции, загружаем их
-     await printingStore.clearDataToPreview()
-     await printingStore.setDataToPreview(ERPStore.getNameAndBarcodeProductList)
-
-      break;
-    default:
-      console.log("Предпросмотр для выбранного шаблона не настроен");
-      break;
-  }
 };
-
 </script>
 <style scoped>
 .printer-settings-container {
@@ -217,5 +197,4 @@ const handlePreviewPrint = async () => {
   outline: none;
   background: none;
 }
-
 </style>

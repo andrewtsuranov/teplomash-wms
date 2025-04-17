@@ -1,5 +1,6 @@
 <template>
-  <div class="process-zone-container" v-if="zones">
+  <template v-if="$route.name === 'wmsPackingZone'">
+  <div v-if="zones" class="process-zone-container">
     <div v-for="item in zones"
          :key="item.code"
          class="process-zone"
@@ -7,13 +8,14 @@
     >
       <div class="process-zone-header">{{ item?.name.replace(/_/g, ' ') }}</div>
       <div class="process-zone-info">
-      <span>Общая площадь: {{ item?.total_area }} м2</span>
-      <span>Занято: {{ item?.occupied_area }} м2</span>
-      <span>Загруженность: {{ item?.capacity_percentage }} %</span>
+        <span>Общая площадь: {{ item?.total_area }} м2</span>
+        <span>Занято: {{ item?.occupied_area }} м2</span>
+        <span>Загруженность: {{ item?.capacity_percentage }} %</span>
       </div>
     </div>
-    <RouterView/>
   </div>
+  </template>
+  <RouterView/>
 </template>
 <script setup>
 import {useWarehouseStore} from "@/stores/HTTP/WarehouseStore.js";
@@ -58,11 +60,13 @@ const handleZoneClick = (zone) => {
   cursor: pointer;
 
 }
+
 .process-zone-header {
   text-align: center;
   text-transform: uppercase;
   font-size: 2rem;
 }
+
 .process-zone-info {
   display: grid;
   grid-auto-rows: 1fr;

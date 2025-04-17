@@ -1,15 +1,15 @@
 <template>
-  <div class="home-view">
+  <div v-if="$route.name === 'Home'" class="home-view">
     <div class="welcome-text">
       <h3>
         Приветствуем Вас, {{ userStore.getFullNameUser?.firstName }} {{ userStore.getFullNameUser?.middleName }}!
       </h3>
-      <p>Тепломаш&reg; Warehouse Management System (WMS) — это информационная система, предназначенная для
-         автоматизации
-         управления складскими процессами и инфраструктурой склада в целом.
+      <p>
+        Тепломаш® Warehouse Management System (WMS) — это информационная система, предназначенная для
+        автоматизации управления складскими процессами и инфраструктурой склада в целом.
       </p>
-      <ul> Система состоит из аппаратной и
-           программной части:
+      <ul>
+        Система состоит из аппаратной и программной части:
         <li>
           Под аппаратной подразумеваются терминалы сбора данных (ТСД), серверы для хранения информации и
           другое оборудование, применение которого необходимо для автоматизированной работы складского комплекса.
@@ -20,14 +20,13 @@
         </li>
       </ul>
     </div>
-    <div class="welcome-image"
-         @click="router.push({name: 'WMS'})"
-    >
-      <span class="welcome-btn" style="font-size: 5rem; text-transform: uppercase"
-      >Начать работу!
-      </span>
+    <div class="welcome-image" @click="router.push({ name: 'WMS' })">
+        <span class="welcome-btn" style="font-size: 5rem; text-transform: uppercase">
+          Начать работу!
+        </span>
     </div>
   </div>
+  <RouterView/>
 </template>
 <script setup>
 import {useRouter} from "vue-router";

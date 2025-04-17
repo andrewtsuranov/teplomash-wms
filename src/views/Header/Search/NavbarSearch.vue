@@ -1,10 +1,30 @@
 <template>
-  <div class="search-container">
-    <BFormInput class="me-2" placeholder="Поиск Тепломаш..."/>
-    <BButton type="submit" variant="outline-primary">Поиск</BButton>
-  </div>
+  <form class="search-container"
+        data-bs-theme="dark"
+        role="search"
+        @submit.prevent="handleTotalSearchByTeplomash"
+  >
+    <input aria-label="Search"
+           class="form-control me-2"
+           placeholder="Поиск Тепломаш..."
+           type="search"
+           v-model="totalSearchQueries"
+    >
+    <button class="btn btn-outline-primary"
+            type="submit"
+    >
+      Поиск
+    </button
+    >
+  </form>
 </template>
 <script setup>
+import {ref} from "vue";
+
+const totalSearchQueries = ref('')
+const handleTotalSearchByTeplomash = () => {
+  console.log(`Ваш глобальный запрос по Тепломаш: ${totalSearchQueries.value}`)
+}
 </script>
 <style scoped>
 .search-container {

@@ -4,6 +4,7 @@ import {requestUrls} from '@/stores/request-urls.js';
 import {useErrorStore} from "@/stores/Error/ErrorStore.js"
 import ky from "ky"
 
+
 const kyStd = ky.create({
     prefixUrl: requestUrls.auth,
     retry: 0,
@@ -65,6 +66,7 @@ export const useUserStore = defineStore('userStore', () => {
     const tempCredentials = ref(null)
     const fullListUsers = ref(JSON.parse(localStorage.getItem('fullListUsers')) || null)
 //getters
+
     const isAuthenticated = computed(() => !!user.value)
     const getFullNameUser = computed(() => {
         if (!user.value) return null;

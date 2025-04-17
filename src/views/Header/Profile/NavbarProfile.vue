@@ -4,27 +4,25 @@
       <div class="avatar-mobile" data-bs-toggle="dropdown">
         <span>Профиль: {{ userStore.getFullNameUser?.lastName }} {{ userStore.getFullNameUser?.initialsDot }}</span>
       </div>
-      <BAvatar :text=userStore.getFullNameUser?.initials
-               aria-expanded="false"
-               bg-variant="secondary"
-               class="btn btn-secondary avatar-desktop"
-               data-bs-toggle="dropdown"
-               size="2.7rem"
-               text-variant=""
-      />
+      <div aria-expanded="false"
+           class="avatar-desktop rounded-circle d-flex align-items-center justify-content-center"
+           data-bs-toggle="dropdown"
+           style="width: 40px; height: 40px;"
+      >
+        {{ userStore.getFullNameUser?.initials }}
+      </div>
       <div class="dropdown-menu dropdown-menu-dark p-0" style="background-color: #2e2e2e">
         <div class="profile-dropdown">
           <div class="profile-name">
-            <BAvatar :text=userStore.getFullNameUser?.initials
-                     aria-expanded="false"
-                     bg-variant="secondary"
-                     class="btn btn-secondary avatar-dropdown"
-                     data-bs-toggle="dropdown"
-                     size="2.7rem"
-                     text-variant=""
-            />
+            <div aria-expanded="false"
+                 class="avatar-dropdown rounded-circle d-flex align-items-center justify-content-center"
+                 data-bs-toggle="dropdown"
+                 style="width: 40px; height: 40px;"
+            >
+              {{ userStore.getFullNameUser?.initials }}
+            </div>
             <div>{{ userStore.getFullNameUser?.lastName }} {{ userStore.getFullNameUser?.firstName }}
-              {{ userStore.getFullNameUser?.middleName }}
+                 {{ userStore.getFullNameUser?.middleName }}
             </div>
             <div>({{ userStore?.roleUser }})</div>
           </div>
@@ -42,7 +40,6 @@
 <script setup>
 import {useUserStore} from "@/stores/HTTP/UserStore.js";
 import {useRouter} from 'vue-router'
-import {BAvatar} from "bootstrap-vue-next";
 import {useErrorStore} from "@/stores/Error/ErrorStore.js";
 
 const errorStore = useErrorStore()
@@ -87,14 +84,19 @@ const logout = async () => {
 }
 
 .avatar-dropdown {
+  border: 1px solid #A4A4A4;
   grid-row: 1/3;
 }
 
 .avatar-desktop {
   display: block;
-  background: none !important;
   border: 1px solid blanchedalmond;
-  color: blanchedalmond !important;
+  cursor: pointer;
+}
+
+.avatar-desktop:hover {
+  background-color: #4a383882;
+
 }
 
 .avatar-mobile {

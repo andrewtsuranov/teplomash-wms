@@ -2,7 +2,8 @@
   <div class="storage-id-container">
     <div class="storage-id-title">
       <div>Склад {{ warehouseStore.warehouseData?.number }}: {{ warehouseStore.warehouseData?.name }},
-        {{ warehouseStore.warehouseData?.address }} [ Ёмкость: {{ warehouseStore.warehouseData?.max_capacity }} ячеек ]
+           {{ warehouseStore.warehouseData?.address }} [ Ёмкость: {{ warehouseStore.warehouseData?.max_capacity }}
+           ячеек ]
       </div>
     </div>
     <div v-if="warehouseStore.loading"

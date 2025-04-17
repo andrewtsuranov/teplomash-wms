@@ -6,24 +6,22 @@
         <li class="nav-item" role="presentation">
           <button id="products-tab"
                   aria-controls="products"
-                  aria-selected="true"
-                  class="nav-link active"
-                  data-bs-target="#products"
-                  data-bs-toggle="tab"
-                  role="tab"
-                  type="button">
+                  :aria-selected="ERPStore.isProductsActive"
+                  :class="['nav-link', ERPStore.isProductsActive ? 'active' : '']"
+                  type="button"
+                  @click="ERPStore.setActiveTabs('products')"
+          >
             Продукция
           </button>
         </li>
         <li class="nav-item" role="presentation">
           <button id="components-tab"
                   aria-controls="components"
-                  aria-selected="false"
-                  class="nav-link"
-                  data-bs-target="#components"
-                  data-bs-toggle="tab"
-                  role="tab"
-                  type="button">
+                  :aria-selected="ERPStore.isComponentsActive"
+                  :class="['nav-link', ERPStore.isComponentsActive ? 'active' : '']"
+                  type="button"
+                  @click="ERPStore.setActiveTabs('components')"
+          >
             Комплектующие
           </button>
         </li>
@@ -36,7 +34,7 @@
         <div id="erpTabContent" class="tab-content">
           <div id="products"
                aria-labelledby="products-tab"
-               class="tab-pane fade show active"
+               :class="['tab-pane fade', ERPStore.isProductsActive ? 'show active' : '']"
                role="tabpanel"
                tabindex="0">
             <div class="erp-product-data">
@@ -61,7 +59,7 @@
           </div>
           <div id="components"
                aria-labelledby="components-tab"
-               class="tab-pane fade"
+               :class="['tab-pane fade', ERPStore.isComponentsActive ? 'show active' : '']"
                role="tabpanel"
                tabindex="0">
             <FormSearchComponents/>
@@ -79,17 +77,31 @@
   </div>
 </template>
 <script setup>
-import TableGroupUnregisteredProducts from "@/components/Tables/ERP/TableGroupUnregisteredProducts.vue";
-import SvgLogoErp from "@/components/UI/SVG/svgLogoErp.vue";
 import {useWebSocketStore} from "@/stores/WebSockets/WebSocketStore.js";
 import {useWarehouseStore} from "@/stores/HTTP/WarehouseStore.js";
-import {ref, onMounted} from "vue";
+import {useERPStore} from "@/stores/HTTP/ERPStore.js";
+import {ref, onMounted, watch} from "vue";
+import TableGroupUnregisteredProducts from "@/components/Tables/ERP/TableGroupUnregisteredProducts.vue";
+import SvgLogoErp from "@/components/UI/SVG/svgLogoErp.vue";
 import QRCode from 'qrcode'
 import FormSearchComponents from "@/components/Forms/FormSearchComponents.vue";
+import {usePackingStore} from "@/stores/HTTP/PackingStore.js";
 
 const warehouseStore = useWarehouseStore()
 const webSocketStore = useWebSocketStore()
+const ERPStore = useERPStore()
 const qrcode = ref(null)
+const packingStore = usePackingStore()
+
+
+watch(() => ERPStore.isProductsActive, (newValue) => {
+  // Действия для вкладки продукции
+  if (!newValue) {
+    packingStore.closeTableItemUnregProduct()
+  }
+},
+{ immediate: true })
+
 const generateQR = async (data) => {
   const opts = {
     errorCorrectionLevel: 'H',
@@ -122,10 +134,22 @@ const taskScanData = () => {
 onMounted(async () => {
   try {
     qrcode.value = await generateQR(taskScanData())
+    const savedTab = localStorage.getItem('wms-erp-active-tab');
+    if (savedTab && ['products', 'components'].includes(savedTab)) {
+      ERPStore.setActiveTabs(savedTab);
+    }
+
+
   } catch (e) {
     console.log(e)
   }
+
 })
+
+// При необходимости сохраняем текущую вкладку в localStorage при изменении
+watch(() => ERPStore.activeTab, (newTab) => {
+  localStorage.setItem('wms-erp-active-tab', newTab);
+});
 </script>
 <style scoped>
 /* Общий контейнер для страницы */

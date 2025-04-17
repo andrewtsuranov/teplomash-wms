@@ -11,7 +11,7 @@ export const useTransactionStore = defineStore('transaction', () => {
 //Getters
     const last10Transactions = computed(() => allTransactionsList100.value.slice(0, 10))
     const getStageProgress = computed(() => last10Transactions.value.map(progress => progress.stage_progress))
-    // Новый getter для получения сгруппированных по ID транзакций
+    // получения сгруппированных по ID транзакций
     const getLatestTransactionsByDevice = computed(() => {
         return (deviceId) => {
             if (!deviceId || !allTransactionsList100.value.length) return []
@@ -33,7 +33,7 @@ export const useTransactionStore = defineStore('transaction', () => {
         }
     })
 //Actions
-    const addTransaction = (transaction) => {
+    const addCurrentTransaction = (transaction) => {
         // Проверяем, существует ли транзакция с таким ID уже
         const existingIndex = allTransactionsList100.value.findIndex(
             t => t.id === transaction.id
@@ -66,14 +66,14 @@ export const useTransactionStore = defineStore('transaction', () => {
             }
         }
     }
-    const clearOldTransactions = () => {
-        // Очистка старых транзакций после 24 часов
-        const cutoffTime = Date.now() - (24 * 60 * 60 * 1000)
-        allTransactionsList100.value = allTransactionsList100.value.filter(
-            transaction => transaction.timestamp > cutoffTime
-        )
-        localStorage.setItem('transactions', JSON.stringify(allTransactionsList100.value))
-    }
+    // const clearOldTransactions = () => {
+    //     // Очистка старых транзакций после 24 часов
+    //     const cutoffTime = Date.now() - (24 * 60 * 60 * 1000)
+    //     allTransactionsList100.value = allTransactionsList100.value.filter(
+    //         transaction => transaction.timestamp > cutoffTime
+    //     )
+    //     localStorage.setItem('transactions', JSON.stringify(allTransactionsList100.value))
+    // }
     // Method to handle WebSocket updates
     const updateTransactionStatus = (transactionId, newStatus) => {
         const transactionIndex = allTransactionsList100.value.findIndex(t => t.id === transactionId)
@@ -89,8 +89,8 @@ export const useTransactionStore = defineStore('transaction', () => {
         last10Transactions,
         getStageProgress,
         getLatestTransactionsByDevice,
-        addTransaction,
+        addCurrentTransaction,
         updateTransactionStatus,
-        clearOldTransactions
+        // clearOldTransactions
     }
 })

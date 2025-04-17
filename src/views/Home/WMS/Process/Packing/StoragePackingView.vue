@@ -1,5 +1,5 @@
 <template>
-  <div class="wms-packing-container">
+  <div class="wms-packing-container" >
     <h2 v-if="warehouseStore.selectedZone">{{ warehouseStore.selectedZone.name.replace(/_/g, ' ').toUpperCase() }}</h2>
     <ERPData/>
     <PackingProductData/>

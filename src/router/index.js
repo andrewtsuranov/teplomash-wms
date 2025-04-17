@@ -32,7 +32,7 @@ const router = createRouter({
             component: () => import('@/layouts/AdminLayout.vue'),
             meta: {
                 adminOnly: true,
-                breadcrumb: 'Профиль пользователя'
+                breadcrumb: 'Профиль пользователя',
             },
         },
         {
@@ -40,155 +40,188 @@ const router = createRouter({
             component: () => import('@/layouts/HomeLayout.vue'),
             meta: {
                 requiresAuth: true,
-                breadcrumb: 'Главная'
             },
             children: [
                 {
                     path: '',
                     name: 'Home',
                     component: () => import('@/views/Home/WMSHomeView.vue'),
-                },
-                {
-                    path: 'warehouses',
-                    name: 'WMS',
-                    component: () => import('@/views/Home/WMS/WarehousesView.vue'),
-                    meta: {breadcrumb: 'Склады'},
-                },
-                {
-                    path: 'warehouse/:alias',
-                    name: 'WMSProcess',
-                    component: () => import('@/views/Home/WMS/Process/WarehouseProcess.vue'),
-                    meta: {breadcrumb: 'Процессы'},
+                    meta: {
+                        breadcrumb: {
+                            text: 'Home',
+                            icon: 'bi-house-door-fill',
+                            textOnly: false,
+                            iconSize: 'lg', // sm, md, lg, xl, 2xl
+                            iconClass: 'text-secondary',
+                            root: true
+                        }
+                    },
                     children: [
                         {
-                            path: 'packing',
-                            name: 'wmsPackingZone',
-                            component: () => import('@/views/Home/WMS/Process/ProcessZones.vue'),
-                            props: {process: 'Упаковка', processRouteName: 'wmsPacking'},
-                            meta: {breadcrumb: 'Упаковка'},
-                        },
-                        {
-                            path: 'receiving',
-                            name: 'wmsReceivingZone',
-                            component: () => import('@/views/Home/WMS/Process/ProcessZones.vue'),
-                            props: {process: 'Приёмка', processRouteName: 'wmsReceiving'},
-                            meta: {breadcrumb: 'Приёмка'}
-                        },
-                        {
-                            path: 'storage',
-                            name: 'wmsStorageZone',
-                            component: () => import('@/views/Home/WMS/Process/ProcessZones.vue'),
-                            props: {process: 'Хранение', processRouteName: 'wmsStorage'},
-                            meta: {breadcrumb: 'Хранение'}
-                        },
-                        {
-                            path: 'picking',
-                            name: 'wmsPickingZone',
-                            component: () => import('@/views/Home/WMS/Process/ProcessZones.vue'),
-                            props: {process: 'Ассортимент', processRouteName: 'wmsPicking'},
-                            meta: {breadcrumb: 'Ассортимент'}
-                        },
-                        {
-                            path: 'shipping',
-                            name: 'wmsShippingZone',
-                            component: () => import('@/views/Home/WMS/Process/ProcessZones.vue'),
-                            props: {process: 'Отгрузка', processRouteName: 'wmsShipping'},
-                            meta: {breadcrumb: 'Отгрузка'}
-                        },
-                        {
-                            path: 'returns',
-                            name: 'wmsDefectZone',
-                            component: () => import('@/views/Home/WMS/Process/ProcessZones.vue'),
-                            props: {process: 'Брак', processRouteName: 'wmsDefect'},
-                            meta: {breadcrumb: 'Брак'}
-                        },
-                        {
-                            path: 'packing/:code',
-                            name: 'wmsPacking',
-                            component: () => import('@/views/Home/WMS/Process/Packing/StoragePackingView.vue'),
-                            props: true,
-                            meta: {breadcrumb: 'Упаковка'},
+                            path: 'warehouses',
+                            name: 'WMS',
+                            component: () => import('@/views/Home/WMS/WarehousesView.vue'),
+                            meta: {
+                                breadcrumb: {
+                                    text: 'Склады',
+                                    textOnly: true,
+                                }
+                            },
                             children: [
                                 {
-                                    path: 'tsd-pac',
-                                    name: 'TTM-packing',
-                                    components: {
-                                        default: () => import('@/components/TeplomashTaskManager/Terminal/TTMTerminal.vue'),
+                                    path: ':idWarehouse',
+                                    name: 'WMSProcess',
+                                    component: () => import('@/views/Home/WMS/Process/WarehouseProcess.vue'),
+                                    meta: {
+                                        breadcrumb: {
+                                            text: 'Процессы',
+                                            textOnly: true,
+                                        }
                                     },
-                                    meta: {breadcrumb: 'ТСД'},
-                                    props: true
+                                    children: [
+                                        {
+                                            path: 'packing',
+                                            name: 'wmsPackingZone',
+                                            component: () => import('@/views/Home/WMS/Process/ProcessZones.vue'),
+                                            props: {process: 'Упаковка', processRouteName: 'wmsPacking'},
+                                            meta: {
+                                                breadcrumb: {
+                                                    text: 'Упаковка',
+                                                    textOnly: true,
+                                                }
+                                            },
+                                            children: [
+                                                {
+                                                    path: ':code',
+                                                    name: 'wmsPacking',
+                                                    component: () => import('@/views/Home/WMS/Process/Packing/StoragePackingView.vue'),
+                                                    props: true,
+                                                    meta: {
+                                                        breadcrumb: {
+                                                            text: 'Зона',
+                                                            textOnly: true,
+                                                        }
+                                                    },
+                                                    children: [
+                                                        {
+                                                            path: 'tsd-pac',
+                                                            name: 'TTM-packing',
+                                                            components: {
+                                                                default: () => import('@/components/TeplomashTaskManager/Terminal/TTMTerminal.vue'),
+                                                            },
+                                                            meta: {
+                                                                breadcrumb: {
+                                                                    text: 'ТСД',
+                                                                    textOnly: true,
+                                                                }
+                                                            },
+                                                            props: true
+                                                        },
+                                                    ]
+                                                },
+                                            ]
+                                        },
+                                        {
+                                            path: 'receiving',
+                                            name: 'wmsReceivingZone',
+                                            component: () => import('@/views/Home/WMS/Process/ProcessZones.vue'),
+                                            props: {process: 'Приёмка', processRouteName: 'wmsReceiving'},
+                                            meta: {
+                                                breadcrumb: {
+                                                    text: 'Приёмка',
+                                                    textOnly: true,
+                                                }
+                                            },
+                                        },
+                                        {
+                                            path: 'storage',
+                                            name: 'wmsStorageZone',
+                                            component: () => import('@/views/Home/WMS/Process/ProcessZones.vue'),
+                                            props: {process: 'Хранение', processRouteName: 'wmsStorage'},
+                                            meta: {
+                                                breadcrumb: {
+                                                    text: 'Хранение',
+                                                    textOnly: true,
+                                                }
+                                            },
+                                        },
+                                        {
+                                            path: 'shipping',
+                                            name: 'wmsShippingZone',
+                                            component: () => import('@/views/Home/WMS/Process/ProcessZones.vue'),
+                                            props: {process: 'Отгрузка', processRouteName: 'wmsShipping'},
+                                            meta: {
+                                                breadcrumb: {
+                                                    text: 'Отгрузка',
+                                                    textOnly: true,
+                                                }
+                                            },
+                                        },
+
+                                        {
+                                            path: 'receiving/:code',
+                                            name: 'wmsReceiving',
+                                            component: () => import('@/views/Home/WMS/Process/Receiving/StorageReceivingView.vue'),
+                                            children: [
+                                                {
+                                                    path: 'rec-tsd',
+                                                    name: 'TTM',
+                                                    components: {
+                                                        default: () => import('@/components/TeplomashTaskManager/Terminal/TTMTerminal.vue'),
+                                                    },
+                                                },
+                                            ]
+                                        },
+                                        {
+                                            path: 'storage/:code',
+                                            name: 'wmsStorage',
+                                            component: () => import('@/views/Home/WMS/Process/Storage/StorageView.vue'),
+                                        },
+                                        {
+                                            path: 'shipping/:code',
+                                            name: 'wmsShipping',
+                                            component: () => import('@/views/Home/WMS/Process/Shipping/Data/StorageShippingView.vue'),
+                                        },
+                                        {
+                                            path: 'inventory',
+                                            name: 'wmsInventory',
+                                            component: () => import('@/views/Home/WMS/Process/Inventory/StorageInventoryView.vue'),
+                                            meta: {breadcrumb: 'Инвентаризация'}
+                                        },
+                                        {
+                                            path: 'reporting',
+                                            name: 'wmsReporting',
+                                            component: () => import('@/views/Home/WMS/Process/Reporting/StorageReportingView.vue'),
+                                            meta: {breadcrumb: 'Аналитика'}
+                                        },
+                                    ]
                                 },
                             ]
                         },
                         {
-                            path: 'receiving/:code',
-                            name: 'wmsReceiving',
-                            component: () => import('@/views/Home/WMS/Process/Receiving/StorageReceivingView.vue'),
-                            children: [
-                                {
-                                    path: 'rec-tsd',
-                                    name: 'TTM',
-                                    components: {
-                                        default: () => import('@/components/TeplomashTaskManager/Terminal/TTMTerminal.vue'),
-                                    },
-                                },
-                            ]
+                            path: 'profile',
+                            name: 'Profile',
+                            component: () => import('@/views/Home/Profile/ProfileView.vue'),
+                            meta: {
+                                isPersonalPage: true,
+                                breadcrumb: 'Профиль'
+                            },
                         },
                         {
-                            path: 'storage/:code',
-                            name: 'wmsStorage',
-                            component: () => import('@/views/Home/WMS/Process/Storage/StorageView.vue'),
+                            path: 'info',
+                            name: 'Info',
+                            component: () => import('@/views/Home/About/AboutView.vue'),
+                            meta: {breadcrumb: 'О нас'},
                         },
                         {
-                            path: 'picking/:code',
-                            name: 'wmsPicking',
-                            component: () => import('@/views/Home/WMS/Process/Picking/StoragePickingView.vue'),
-                        },
-                        {
-                            path: 'shipping/:code',
-                            name: 'wmsShipping',
-                            component: () => import('@/views/Home/WMS/Process/Shipping/Data/StorageShippingView.vue'),
-                        },
-                        {
-                            path: 'defect/:code',
-                            name: 'wmsDefect',
-                            component: () => import('@/views/Home/WMS/Process/Defect/StorageDefectView.vue'),
-                        },
-                        {
-                            path: 'inventory',
-                            name: 'wmsInventory',
-                            component: () => import('@/views/Home/WMS/Process/Inventory/StorageInventoryView.vue'),
-                            meta: {breadcrumb: 'Инвентаризация'}
-                        },
-                        {
-                            path: 'reporting',
-                            name: 'wmsReporting',
-                            component: () => import('@/views/Home/WMS/Process/Reporting/StorageReportingView.vue'),
-                            meta: {breadcrumb: 'Аналитика'}
+                            path: 'support',
+                            name: 'Support',
+                            component: () => import('@/views/Home/Support/SupportView.vue'),
+                            meta: {breadcrumb: 'Поддержка'},
                         },
                     ]
                 },
-                {
-                    path: 'profile',
-                    name: 'Profile',
-                    component: () => import('@/views/Home/Profile/ProfileView.vue'),
-                    meta: {
-                        isPersonalPage: true
-                    },
-                },
-                {
-                    path: 'info',
-                    name: 'Info',
-                    component: () => import('@/views/Home/About/AboutView.vue'),
-                    meta: {breadcrumb: 'О нас'},
-                },
-                {
-                    path: 'support',
-                    name: 'Support',
-                    component: () => import('@/views/Home/Support/SupportView.vue'),
-                    meta: {breadcrumb: 'Поддержка'},
-                },
-            ],
+            ]
         },
         {
             path: '/login/:pathMatch(.*)*',

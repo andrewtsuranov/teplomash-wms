@@ -1,6 +1,4 @@
 <template>
-  <div class="search-container">
-    <!-- Форма поиска -->
     <div class="search-form mb-3">
       <div class="input-group">
         <input
@@ -85,7 +83,6 @@
         </tbody>
       </table>
     </div>
-  </div>
 </template>
 <script setup>
 import {ref, onMounted, nextTick} from 'vue';
@@ -150,36 +147,28 @@ const handlePrintLabel = async (item) => {
       printingStore.clearDataToPrint()
       printingStore.setDataToPrint([ERPStore.getBarcodeFromComponent])
     }
-    // if (warehouseStore.selectedZone.id) {
-    //   const printerInZone = printingStore.printersList.printers
-    //       .find(printer => printer.zone === warehouseStore.selectedZone.id);
-    //   if (printerInZone) {
-    //     await printingStore.setSelectedPrinter(printerInZone)
-    //   }
-    // }
-    // await printingStore.setSelectedLabelTemplate(
-    //     printingStore.labelTemplatesList
-    //         .find(label => label.code.toLowerCase() === '300_этикетка_58*40_Комплектующая'
-    //         ))
+    if (warehouseStore.selectedZone.id) {
+      const printerInZone = printingStore.printersList.printers
+          .find(printer => printer.zone === warehouseStore.selectedZone.id);
+      if (printerInZone) {
+        await printingStore.setSelectedPrinter(printerInZone)
+      }
+    }
+    if (ERPStore.isComponentsActive) {
+      if (printingStore.selectedPrinter.name !== "BIXOLON_SPP-L410 WiFi") {
+        await printingStore.setSelectedLabelTemplate(
+            printingStore.labelTemplatesList.find(label =>
+                label.code === '300_этикетка_58*40_Комплектующая'
+            ))
+      }
+    }
   } catch (e) {
     console.log(e);
   }
 };
 const toggleDetailUnregProduct = async (item) => {
   try {
-    if (packingStore.detailInfoPackingProduct?.id === item.id) {
-      packingStore.closeTableItemUnregProduct();
-    } else {
-      await ERPStore.GET_MIN_ITEMS_BY_ID_UNREG(item);
       await ERPStore.GET_PRODUCT_TYPE_BY_ID(item);
-      if (ERPStore.getPalletType !== undefined) {
-        await palletStore.GET_PALLET_TYPE_BY_ID(ERPStore.getPalletType);
-        await palletStore.GET_BASE_PALLET_TYPE_BY_ID(palletStore.palletTypeByID?.base_pallet);
-      } else {
-        await palletStore.GET_PALLET_ITEM_TYPE_LIST();
-      }
-      await packingStore.openTableItemUnregProduct(item);
-    }
   } catch (e) {
     console.log(e);
   }
