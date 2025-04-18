@@ -1,5 +1,4 @@
 import { createProcessZoneRoute } from "@/router/utils/routeGenerators";
-
 // Специализированные маршруты
 // const specialRoutes = [
 //   {
@@ -15,31 +14,29 @@ import { createProcessZoneRoute } from "@/router/utils/routeGenerators";
 //     meta: { breadcrumb: 'Аналитика' }
 //   }
 // ]
-
 // Маршруты для процессов по шаблону
 const processRoutes = [
   createProcessZoneRoute(
     "Упаковка",
     "Packing",
-    "/src/views/Home/WMS/Process/PAC/StoragePackingView.vue",
+    "/src/views/Home/WMS/Process/PAC/StoragePackingView.vue"
   ),
   createProcessZoneRoute(
     "Приёмка",
     "Receiving",
-    "/src/views/Home/WMS/Process/REC/StorageReceivingView.vue",
+    "/src/views/Home/WMS/Process/REC/StorageReceivingView.vue"
   ),
   createProcessZoneRoute(
     "Хранение",
     "Storage",
-    "/src/views/Home/WMS/Process/STR/StorageView.vue",
+    "/src/views/Home/WMS/Process/STR/StorageView.vue"
   ),
   createProcessZoneRoute(
     "Отгрузка",
     "Shipping",
-    "/src/views/Home/WMS/Process/SHP/StorageShippingView.vue",
-  ),
+    "/src/views/Home/WMS/Process/SHP/StorageShippingView.vue"
+  )
 ];
-
 export default {
   path: "warehouses",
   name: "WMS",
@@ -47,8 +44,8 @@ export default {
   meta: {
     breadcrumb: {
       text: "Склады",
-      textOnly: true,
-    },
+      textOnly: true
+    }
   },
   children: [
     {
@@ -58,30 +55,12 @@ export default {
       meta: {
         breadcrumb: {
           text: "Процессы",
-          textOnly: true,
-        },
+          textOnly: true
+        }
       },
       children: [
-        ...processRoutes,
-        // Дополнительные подмаршруты для TSD и т.д.
-        // {
-        //     path: 'packing/:code/tsd-pac',
-        //     name: 'TTM-packing',
-        //     component: () => import('@/components/TeplomashTaskManager/Terminal/TTMTerminal.vue'),
-        //     meta: {
-        //         breadcrumb: {
-        //             text: 'ТСД',
-        //             textOnly: true,
-        //         }
-        //     },
-        //     props: true
-        // },
-        // {
-        //     path: ':code',
-        //     name: 'TTM',
-        //     component: () => import('@/components/TeplomashTaskManager/Terminal/TTMTerminal.vue'),
-        // }
-      ],
-    },
-  ],
+        ...processRoutes
+      ]
+    }
+  ]
 };

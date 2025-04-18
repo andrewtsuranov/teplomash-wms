@@ -28,10 +28,10 @@ export const createProcessZoneRoute = (
           children: [
             {
               path: "tsd/",
-              name: "TTM-Terminal",
+              name: "TTM-TTMTerminal",
               component: () =>
                 import(
-                  "@/components/TeplomashTaskManager/Terminal/TTMTerminal.vue"
+                  "@/components/TeplomashTaskManager/TTMTerminal/TTMTerminal.vue"
                 ),
               meta: {
                 breadcrumb: {

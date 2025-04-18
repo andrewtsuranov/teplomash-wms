@@ -7,15 +7,17 @@ import notFoundRoute from "@/router/notFound.routes.js";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
-  routes: [authRoutes, adminRoutes, homeRoutes, notFoundRoute],
-  linkExactActiveClass: "teplomash-active-exact-link",
+  routes: [
+    authRoutes,
+    adminRoutes,
+    homeRoutes,
+    notFoundRoute
+  ],
+  linkExactActiveClass: "teplomash-active-exact-link"
 });
-
 // Настраиваем гварды авторизации
 setupGuards(router);
-
 router.onError((error) => {
   console.error("Ошибка роутинга:", error);
 });
-
 export default router;

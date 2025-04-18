@@ -154,7 +154,7 @@ onMounted(async () => {
     qrcode.value = await generateQR(taskScanData());
     const savedTab = localStorage.getItem("wms-erp-active-tab");
     if (savedTab && ["products", "components"].includes(savedTab)) {
-      ERPStore.setActiveTabs(savedTab);
+      await ERPStore.setActiveTabs(savedTab);
     }
   } catch (e) {
     console.log(e);

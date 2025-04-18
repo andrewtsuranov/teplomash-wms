@@ -98,7 +98,7 @@ export default {
 //                                                     path: 'tsd-pac',
 //                                                     name: 'TTM-packing',
 //                                                     components: {
-//                                                         default: () => import('@/components/TeplomashTaskManager/Terminal/TTMTerminal.vue'),
+//                                                         default: () => import('@/components/TeplomashTaskManager/TTMTerminal/TTMTerminal.vue'),
 //                                                     },
 //                                                     meta: {
 //                                                         breadcrumb: {
@@ -158,7 +158,7 @@ export default {
 //                                             path: 'rec-tsd',
 //                                             name: 'TTM',
 //                                             components: {
-//                                                 default: () => import('@/components/TeplomashTaskManager/Terminal/TTMTerminal.vue'),
+//                                                 default: () => import('@/components/TeplomashTaskManager/TTMTerminal/TTMTerminal.vue'),
 //                                             },
 //                                         },
 //                                     ]

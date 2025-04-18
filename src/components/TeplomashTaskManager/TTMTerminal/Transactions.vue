@@ -1,9 +1,7 @@
 <template>
-  <div class="transaction-container">
+  <div  class="transaction-container">
     <div
-      v-for="item in transactionStore.getLatestTransactionsByDevice(
-        TSDStore.selectedTSD.id,
-      )"
+      v-for="item in transactionStore.getLatestTransactionsByDevice(TSDStore.selectedTSD.id)"
       :key="item.id"
       class="transaction-view"
     >
@@ -13,9 +11,9 @@
         <span>Задача:</span>
         <div>{{ item.stage_progress.task_name }}</div>
         <span v-if="item.status !== 'COMPLETED'">Текущий этап:</span>
-        <div class="transaction-stage-name" v-if="item.status !== 'COMPLETED'">
-          {{ item.stage_progress.stage_name }}
-        </div>
+        <div v-if="item.status !== 'COMPLETED'"
+             class="transaction-stage-name"
+        >{{ item.stage_progress.stage_name }}</div>
         <span>Инициатор:</span>
         <div>{{ findInitialUsername(item.created_by_id) }}</div>
         <span>Номер ТСД:</span>
@@ -63,7 +61,7 @@ const findInitialUsername = (userId) => {
   if (!initialUsersCache.value.has(userId)) {
     // Ищем пользователя в userStore.fullListUsers
     const initialUser = userStore.fullListUsers?.find(
-      (user) => user.id === userId,
+      (user) => user.id === userId
     );
     if (initialUser) {
       // Сохраняем username в кэш с ключом userId
@@ -95,7 +93,7 @@ const findPlacement = (warehouseId) => {
   if (!initialPlacementCache.value.has(warehouseId)) {
     // Ищем склад в warehouseStore.allWarehouses
     const initialPlacement = warehouseStore.allWarehouses?.find(
-      (warehouse) => warehouse.id === warehouseId,
+      (warehouse) => warehouse.id === warehouseId
     );
     if (initialPlacement) {
       // Сохраняем name в кэш с ключом warehouseId
