@@ -11,35 +11,47 @@
 <template>
   <div class="warehouse-map">
     <svg :width="svgWidth" :height="svgHeight" @click="handleCellClick">
-      <g v-for="row in rows" :key="row" :transform="`translate(0, ${(row - 1) * (floorHeight + rowGap)})`">
+      <g
+        v-for="row in rows"
+        :key="row"
+        :transform="`translate(0, ${(row - 1) * (floorHeight + rowGap)})`"
+      >
         <text
-            :x="-50"
-            :y="floorHeight / 2"
-            text-anchor="end"
-            dominant-baseline="middle"
-            font-size="14"
-            font-weight="bold"
+          :x="-50"
+          :y="floorHeight / 2"
+          text-anchor="end"
+          dominant-baseline="middle"
+          font-size="14"
+          font-weight="bold"
         >
           Ряд {{ row }}
         </text>
-        <g v-for="floor in floors" :key="floor" :transform="`translate(0, ${(floor - 1) * (cellHeight + gap)})`">
-          <g v-for="cell in cells" :key="cell" :transform="`translate(${(cell - 1) * (cellWidth + gap)}, 0)`">
+        <g
+          v-for="floor in floors"
+          :key="floor"
+          :transform="`translate(0, ${(floor - 1) * (cellHeight + gap)})`"
+        >
+          <g
+            v-for="cell in cells"
+            :key="cell"
+            :transform="`translate(${(cell - 1) * (cellWidth + gap)}, 0)`"
+          >
             <rect
-                :x="0"
-                :y="0"
-                :width="cellWidth"
-                :height="cellHeight"
-                :class="{ occupied: isOccupied(row, cell, floor) }"
-                :data-row="row"
-                :data-cell="cell"
-                :data-floor="floor"
+              :x="0"
+              :y="0"
+              :width="cellWidth"
+              :height="cellHeight"
+              :class="{ occupied: isOccupied(row, cell, floor) }"
+              :data-row="row"
+              :data-cell="cell"
+              :data-floor="floor"
             />
             <text
-                :x="cellWidth / 2"
-                :y="cellHeight / 2"
-                text-anchor="middle"
-                dominant-baseline="middle"
-                font-size="10"
+              :x="cellWidth / 2"
+              :y="cellHeight / 2"
+              text-anchor="middle"
+              dominant-baseline="middle"
+              font-size="10"
             >
               {{ `${cell}-${floor}` }}
             </text>
@@ -48,14 +60,18 @@
       </g>
     </svg>
     <div v-if="selectedCell" class="cell-info">
-      <h3>Ячейка: {{ selectedCell.row }}-{{ selectedCell.cell }}-{{ selectedCell.floor }}</h3>
-      <p>Содержимое: {{ selectedCell.content || 'Пусто' }}</p>
+      <h3>
+        Ячейка: {{ selectedCell.row }}-{{ selectedCell.cell }}-{{
+          selectedCell.floor
+        }}
+      </h3>
+      <p>Содержимое: {{ selectedCell.content || "Пусто" }}</p>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref } from "vue";
 
 // Константы для размеров SVG
 const cellWidth = 50; // Ширина ячейки
@@ -71,9 +87,9 @@ const svgHeight = rows * (floorHeight + rowGap); // Общая высота SVG 
 
 // Пример данных о содержимом ячеек
 const warehouseData = ref({
-  '1-1-1': { content: 'Коробка с деталями' },
-  '2-5-3': { content: 'Паллета с товаром' },
-  '32-11-7': { content: 'Ящик с инструментами' },
+  "1-1-1": { content: "Коробка с деталями" },
+  "2-5-3": { content: "Паллета с товаром" },
+  "32-11-7": { content: "Ящик с инструментами" },
 });
 
 // Выбранная ячейка
@@ -88,7 +104,7 @@ const isOccupied = (row, cell, floor) => {
 // Обработка клика по ячейке
 const handleCellClick = (event) => {
   const target = event.target;
-  if (target.tagName === 'rect') {
+  if (target.tagName === "rect") {
     const row = target.dataset.row;
     const cell = target.dataset.cell;
     const floor = target.dataset.floor;

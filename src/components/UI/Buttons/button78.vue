@@ -1,25 +1,23 @@
 <template>
-  <button class="button-62"
-          role="button"
-          :disabled="props.disabled"
-  >
+  <button class="button-62" role="button" :disabled="props.disabled">
     <slot></slot>
   </button>
 </template>
 <script setup>
 const props = defineProps({
   disabled: Boolean,
-})
+});
 </script>
 <style scoped>
 .button-62 {
-  background: linear-gradient(to bottom right, #EF4765, #FF9A5A);
+  background: linear-gradient(to bottom right, #ef4765, #ff9a5a);
   border: 0;
   border-radius: 12px;
-  color: #FFFFFF;
+  color: #ffffff;
   cursor: pointer;
   display: inline-block;
-  font-family: -apple-system, system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-family:
+    -apple-system, system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   font-size: 16px;
   font-weight: 500;
   line-height: 2.5;
@@ -27,7 +25,7 @@ const props = defineProps({
   padding: 0 1rem;
   text-align: center;
   text-decoration: none;
-  transition: box-shadow .2s ease-in-out;
+  transition: box-shadow 0.2s ease-in-out;
   user-select: none;
   -webkit-user-select: none;
   touch-action: manipulation;
@@ -35,10 +33,16 @@ const props = defineProps({
 }
 
 .button-62:not([disabled]):focus {
-  box-shadow: 0 0 .25rem rgba(0, 0, 0, 0.5), -.125rem -.125rem 1rem rgba(239, 71, 101, 0.5), .125rem .125rem 1rem rgba(255, 154, 90, 0.5);
+  box-shadow:
+    0 0 0.25rem rgba(0, 0, 0, 0.5),
+    -0.125rem -0.125rem 1rem rgba(239, 71, 101, 0.5),
+    0.125rem 0.125rem 1rem rgba(255, 154, 90, 0.5);
 }
 
 .button-62:not([disabled]):hover {
-  box-shadow: 0 0 .25rem rgba(0, 0, 0, 0.5), -.125rem -.125rem 1rem rgba(239, 71, 101, 0.5), .125rem .125rem 1rem rgba(255, 154, 90, 0.5);
+  box-shadow:
+    0 0 0.25rem rgba(0, 0, 0, 0.5),
+    -0.125rem -0.125rem 1rem rgba(239, 71, 101, 0.5),
+    0.125rem 0.125rem 1rem rgba(255, 154, 90, 0.5);
 }
 </style>

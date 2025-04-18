@@ -1,16 +1,15 @@
 <template>
   <div class="app-container">
     <main class="app-main">
-      <router-view/>
+      <router-view />
     </main>
     <footer>
-      <footer-view/>
+      <footer-view />
     </footer>
   </div>
-
 </template>
 <script setup>
-import {RouterView} from 'vue-router'
+import { RouterView } from "vue-router";
 import FooterView from "@/views/Footer/FooterView.vue";
 </script>
 <style>
@@ -32,22 +31,24 @@ import FooterView from "@/views/Footer/FooterView.vue";
 .app-container {
   display: grid;
   min-height: 100vh;
-  grid: "main"
-        "footer";
+  grid:
+    "main"
+    "footer";
   overflow: hidden;
   /*grid-template-columns: minmax(auto, 1440px);*/
   grid-template-rows: 1fr auto;
   background: linear-gradient(
-      160deg,
-      rgb(140, 32, 41) 0%,
-      black 50%,
-      black 50%,
-      rgb(45, 66, 120) 100%
+    160deg,
+    rgb(140, 32, 41) 0%,
+    black 50%,
+    black 50%,
+    rgb(45, 66, 120) 100%
   );
   background-size: 200% 200%;
   animation: gradientShift 15s ease infinite;
-  transition: color 0.5s,
-  background-color 0.5s;
+  transition:
+    color 0.5s,
+    background-color 0.5s;
 }
 
 .app-main {

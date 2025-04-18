@@ -1,12 +1,13 @@
 <template>
   <nav class="menu-container">
-    <router-link :to="{name: 'Home'}"><span>Управление складом</span></router-link>
+    <router-link :to="{ name: 'Home' }"
+      ><span>Управление складом</span></router-link
+    >
     <router-link to="/info"><span>Справка</span></router-link>
     <router-link to="/support"><span>Поддержка</span></router-link>
   </nav>
 </template>
-<script setup>
-</script>
+<script setup></script>
 <style scoped>
 .menu-container {
   display: grid;

@@ -7,22 +7,21 @@
     </div>
     <div class="rack-grid">
       <div v-for="level in 7" :key="level" class="level">
-        <div
-            v-for="cell in 11"
-            :key="cell"
-            class="cell"
-        >
+        <div v-for="cell in 11" :key="cell" class="cell">
           <div
-              v-for="pallet in 4"
-              :key="pallet"
-              class="pallet"
-              :class="{
-              'occupied': isPalletOccupied(level-1, cell-1, pallet-1),
-              'selected': isSelectedPallet(level-1, cell-1, pallet-1)
+            v-for="pallet in 4"
+            :key="pallet"
+            class="pallet"
+            :class="{
+              occupied: isPalletOccupied(level - 1, cell - 1, pallet - 1),
+              selected: isSelectedPallet(level - 1, cell - 1, pallet - 1),
             }"
-              @click="handlePalletClick(level-1, cell-1, pallet-1)"
+            @click="handlePalletClick(level - 1, cell - 1, pallet - 1)"
           >
-            <div class="pallet-content" v-if="getPalletContent(level-1, cell-1, pallet-1)">
+            <div
+              class="pallet-content"
+              v-if="getPalletContent(level - 1, cell - 1, pallet - 1)"
+            >
               {{ getPalletContent(level - 1, cell - 1, pallet - 1).productId }}
             </div>
           </div>
@@ -32,71 +31,83 @@
     <div class="rack-info">
       <div class="alert alert-info">
         Стеллаж #{{ storageStore.selectedRack }}
-        <br>
+        <br />
         Занято паллетомест: {{ occupiedPalletsCount }}
-        <br>
+        <br />
         Свободно паллетомест: {{ freePalletsCount }}
       </div>
     </div>
     <Transition name="fade">
-      <PalletDetails v-if="storageStore.selectedPallet"/>
+      <PalletDetails v-if="storageStore.selectedPallet" />
     </Transition>
   </div>
 </template>
 <script setup>
-import {useStorageStore} from "@/stores/HTTP/StorageStore.js";
-import {computed, onMounted, watch} from 'vue'
-import PalletDetails from './map/PalletDetails.vue'
+import { useStorageStore } from "@/stores/HTTP/StorageStore.js";
+import { computed, onMounted, watch } from "vue";
+import PalletDetails from "./map/PalletDetails.vue";
 
-const storageStore = useStorageStore()
+const storageStore = useStorageStore();
 const selectedRack = computed(() => {
-  return storageStore.racks.find(rack => rack.id === storageStore.selectedRack)
-})
+  return storageStore.racks.find(
+    (rack) => rack.id === storageStore.selectedRack,
+  );
+});
 const occupiedPalletsCount = computed(() => {
-  if (!selectedRack.value) return 0
+  if (!selectedRack.value) return 0;
   return selectedRack.value.cells.reduce((acc, cell) => {
-    return acc + cell.levels.reduce((levelAcc, level) => {
-      return levelAcc + level.pallets.filter(p => p.occupied).length
-    }, 0)
-  }, 0)
-})
+    return (
+      acc +
+      cell.levels.reduce((levelAcc, level) => {
+        return levelAcc + level.pallets.filter((p) => p.occupied).length;
+      }, 0)
+    );
+  }, 0);
+});
 const freePalletsCount = computed(() => {
-  return 11 * 7 * 4 - occupiedPalletsCount.value
-})
+  return 11 * 7 * 4 - occupiedPalletsCount.value;
+});
 const isPalletOccupied = (level, cell, pallet) => {
-  return selectedRack.value?.cells[cell]?.levels[level]?.pallets[pallet]?.occupied
-}
+  return selectedRack.value?.cells[cell]?.levels[level]?.pallets[pallet]
+    ?.occupied;
+};
 const isSelectedPallet = (level, cell, pallet) => {
-  const selectedPallet = storageStore.selectedPallet
-  if (!selectedPallet) return false
-  return selectedPallet.level === level &&
-      selectedPallet.cell === cell &&
-      selectedPallet.pallet === pallet
-}
+  const selectedPallet = storageStore.selectedPallet;
+  if (!selectedPallet) return false;
+  return (
+    selectedPallet.level === level &&
+    selectedPallet.cell === cell &&
+    selectedPallet.pallet === pallet
+  );
+};
 const getPalletContent = (level, cell, pallet) => {
-  return selectedRack.value?.cells[cell]?.levels[level]?.pallets[pallet]?.content
-}
+  return selectedRack.value?.cells[cell]?.levels[level]?.pallets[pallet]
+    ?.content;
+};
 const handlePalletClick = (level, cell, pallet) => {
   const palletInfo = {
     rackId: storageStore.selectedRack,
     level,
     cell,
     pallet,
-    content: getPalletContent(level, cell, pallet)
-  }
-  storageStore.selectPallet(palletInfo)
-}
+    content: getPalletContent(level, cell, pallet),
+  };
+  storageStore.selectPallet(palletInfo);
+};
 // Загружаем данные при монтировании и при изменении выбранного стеллажа
-watch(() => storageStore.selectedRack, async (newRackId) => {
-  if (newRackId) {
-    await storageStore.fetchRackData(newRackId)
-  }
-})
+watch(
+  () => storageStore.selectedRack,
+  async (newRackId) => {
+    if (newRackId) {
+      await storageStore.fetchRackData(newRackId);
+    }
+  },
+);
 onMounted(async () => {
   if (storageStore.selectedRack) {
-    await storageStore.fetchRackData(storageStore.selectedRack)
+    await storageStore.fetchRackData(storageStore.selectedRack);
   }
-})
+});
 </script>
 <style scoped>
 .rack-profile {

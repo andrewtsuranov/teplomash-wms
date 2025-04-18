@@ -2,19 +2,17 @@
   <div class="not-found-container">
     <div class="not-found">
       <h1>Ошибка 404! Страница не найдена!</h1>
-      <my-button
-          class="not-found-btn"
-          @click="router.push('/')"
-      >Вернуться домой
+      <my-button class="not-found-btn" @click="router.push('/')"
+        >Вернуться домой
       </my-button>
     </div>
   </div>
 </template>
 <script setup>
-import MyButton from '@/components/UI/Buttons/MyButton.vue'
-import {useRouter} from "vue-router";
+import MyButton from "@/components/UI/Buttons/MyButton.vue";
+import { useRouter } from "vue-router";
 
-const router = useRouter()
+const router = useRouter();
 </script>
 <style scoped>
 .not-found-container {

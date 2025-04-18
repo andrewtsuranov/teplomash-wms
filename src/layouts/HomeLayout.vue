@@ -1,22 +1,22 @@
 <template>
   <div class="home-layout-container">
     <header class="home-layout-header">
-      <header-view/>
+      <header-view />
     </header>
     <div v-if="userStore.loading">Loading...</div>
     <div v-else></div>
     <main class="home-layout-main">
-      <Breadcrumbs/>
+      <Breadcrumbs />
       <router-view></router-view>
     </main>
   </div>
 </template>
 <script setup>
 import HeaderView from "@/views/Header/NavbarView.vue";
-import {useUserStore} from "@/stores/HTTP/UserStore.js";
+import { useUserStore } from "@/stores/HTTP/UserStore.js";
 import Breadcrumbs from "@/components/Breadcrumbs/Breadcrumbs.vue";
 
-const userStore = useUserStore()
+const userStore = useUserStore();
 </script>
 <style scoped>
 .home-layout-container {
@@ -43,7 +43,7 @@ const userStore = useUserStore()
   grid-template-columns: 1fr;
   grid-template-rows: min-content 1fr;
   padding: 2rem 0;
-  background-color: #514D4C5E;
+  background-color: #514d4c5e;
 }
 
 @media (max-width: 1140px) {

@@ -1,45 +1,42 @@
 <template>
-    <div class="search-form mb-3">
-      <div class="input-group">
-        <input
-            v-model="searchQuery"
-            class="form-control"
-            placeholder="Поиск по номенклатуре..."
-            type="text"
-            @input="debouncedSearch"
-        >
-        <select
-            v-model="selectedFilter"
-            class="form-select"
-            style="max-width: 200px"
-            @change="debouncedSearch"
-        >
-          <option value="all">Все поля</option>
-          <option value="1">Комплектующая</option>
-          <option value="2">Продукция</option>
-        </select>
-        <button
-            class="btn btn-outline-primary"
-            @click="debouncedSearch"
-        >
-          Найти
-        </button>
-      </div>
+  <div class="search-form mb-3">
+    <div class="input-group">
+      <input
+        v-model="searchQuery"
+        class="form-control"
+        placeholder="Поиск по номенклатуре..."
+        type="text"
+        @input="debouncedSearch"
+      />
+      <select
+        v-model="selectedFilter"
+        class="form-select"
+        style="max-width: 200px"
+        @change="debouncedSearch"
+      >
+        <option value="all">Все поля</option>
+        <option value="1">Комплектующая</option>
+        <option value="2">Продукция</option>
+      </select>
+      <button class="btn btn-outline-primary" @click="debouncedSearch">
+        Найти
+      </button>
     </div>
-    <div>
-      <p>Найдено: {{ ERPStore.searchResultsComponents?.length || 0 }}</p>
-    </div>
-    <!-- Таблица с результатами -->
-    <div class="in-table-container table-responsive">
-      <table class="table-content table table-dark align-middle table-hover">
-        <colgroup>
-          <col style="width: 1%">
-          <col style="width: 40%">
-          <col style="width: 10%">
-          <col style="width: 19%">
-          <col style="width: 5%">
-        </colgroup>
-        <thead>
+  </div>
+  <div>
+    <p>Найдено: {{ ERPStore.searchResultsComponents?.length || 0 }}</p>
+  </div>
+  <!-- Таблица с результатами -->
+  <div class="in-table-container table-responsive">
+    <table class="table-content table table-dark align-middle table-hover">
+      <colgroup>
+        <col style="width: 1%" />
+        <col style="width: 40%" />
+        <col style="width: 10%" />
+        <col style="width: 19%" />
+        <col style="width: 5%" />
+      </colgroup>
+      <thead>
         <tr>
           <th scope="col">№</th>
           <th scope="col">Комплектующие</th>
@@ -47,63 +44,68 @@
           <th scope="col">Задача</th>
           <th scope="col">Инфо</th>
         </tr>
-        </thead>
-        <tbody v-if="searchResults.length > 0">
+      </thead>
+      <tbody v-if="searchResults.length > 0">
         <tr
-            v-for="(item, index) in searchResults"
-            :key="item.id"
-            style="cursor: pointer;"
-            @click="toggleDetailUnregProduct(item)"
+          v-for="(item, index) in searchResults"
+          :key="item.id"
+          style="cursor: pointer"
+          @click="toggleDetailUnregProduct(item)"
         >
           <th scope="row">{{ index + 1 }}</th>
           <td>{{ item.name }}</td>
           <td>{{ item.id }}</td>
           <td>
             <button
-                v-if="item.item_type_group_code === 'К'"
-                class="btn btn-outline-success"
-                @click.stop="handlePrintLabel(item)"
+              v-if="item.item_type_group_code === 'К'"
+              class="btn btn-outline-success"
+              @click.stop="handlePrintLabel(item)"
             >
               Печать этикетки
             </button>
           </td>
           <td>
-            <i :class="packingStore.detailInfoPackingProduct?.id === item.id ? 'bi-circle-fill text-primary' : 'bi-circle'"
-               class="bi toggle-icon"
+            <i
+              :class="
+                packingStore.detailInfoPackingProduct?.id === item.id
+                  ? 'bi-circle-fill text-primary'
+                  : 'bi-circle'
+              "
+              class="bi toggle-icon"
             ></i>
           </td>
         </tr>
-        </tbody>
-        <tbody v-else class="in-table-empty">
+      </tbody>
+      <tbody v-else class="in-table-empty">
         <tr class="no-hover">
           <td class="text-center py-3" colspan="5">
-            {{ isLoading ? 'Загрузка...' : 'Ничего не найдено' }}
+            {{ isLoading ? "Загрузка..." : "Ничего не найдено" }}
           </td>
         </tr>
-        </tbody>
-      </table>
-    </div>
+      </tbody>
+    </table>
+  </div>
 </template>
 <script setup>
-import {ref, onMounted, nextTick} from 'vue';
-import {useDebounceFn} from '@vueuse/core';
-import {usePackingStore} from "@/stores/HTTP/PackingStore.js";
-import {useERPStore} from "@/stores/HTTP/ERPStore.js";
-import {useWarehouseStore} from "@/stores/HTTP/WarehouseStore.js";
-import {usePalletStore} from "@/stores/HTTP/PalletStore.js";
-import {useErrorCodeDictionary} from "@/composables/Dictionary/useErrorCodeDictionary.js";
-import {usePrintingStore} from "@/stores/HTTP/PrintingStore.js";
+import { ref, onMounted, nextTick } from "vue";
+import { useDebounceFn } from "@vueuse/core";
+import { usePackingStore } from "@/stores/HTTP/PackingStore.js";
+import { useERPStore } from "@/stores/HTTP/ERPStore.js";
+import { useWarehouseStore } from "@/stores/HTTP/WarehouseStore.js";
+import { usePalletStore } from "@/stores/HTTP/PalletStore.js";
+import { useErrorCodeDictionary } from "@/composables/Dictionary/useErrorCodeDictionary.js";
+import { usePrintingStore } from "@/stores/HTTP/PrintingStore.js";
 
 const warehouseStore = useWarehouseStore();
-const printingStore = usePrintingStore()
+const printingStore = usePrintingStore();
 const ERPStore = useERPStore();
 const packingStore = usePackingStore();
 const palletStore = usePalletStore();
 // Состояние поиска
 // Реактивная переменная для хранения выбранного item
 const selectedItem = ref(null);
-const searchQuery = ref('');
-const selectedFilter = ref('all');
+const searchQuery = ref("");
+const selectedFilter = ref("all");
 const searchResults = ref([]);
 const isLoading = ref(false);
 // Дебаунс для поиска (задержка 300мс)
@@ -118,48 +120,50 @@ const debouncedSearch = useDebounceFn(async () => {
       query: searchQuery.value,
       filter: selectedFilter.value,
       names_only: false,
-      order_by: 'name',
-      limit: 10
+      order_by: "name",
+      limit: 10,
     });
     searchResults.value = ERPStore.searchResultsComponents;
   } catch (e) {
-    console.error('Ошибка поиска:', e);
+    console.error("Ошибка поиска:", e);
     searchResults.value = [];
   } finally {
     isLoading.value = false;
   }
 }, 300);
 const handlePrintLabel = async (item) => {
-  selectedItem.value = item
+  selectedItem.value = item;
   try {
-    await nextTick()
-    const modalElement = document.getElementById('modalPrint');
+    await nextTick();
+    const modalElement = document.getElementById("modalPrint");
     if (!modalElement) {
-      console.error('Модальное окно не найдено');
+      console.error("Модальное окно не найдено");
       return;
     }
     const modalInstance = new bootstrap.Modal(modalElement);
     modalInstance.show();
-    await ERPStore.GET_BARCODE_COMPONENT_BY_ID(selectedItem.value)
-    await printingStore.GET_ZPL_PRINTERS()
-    await printingStore.GET_LABEL_TEMPLATE()
+    await ERPStore.GET_BARCODE_COMPONENT_BY_ID(selectedItem.value);
+    await printingStore.GET_ZPL_PRINTERS();
+    await printingStore.GET_LABEL_TEMPLATE();
     if (ERPStore.getBarcodeFromComponent) {
-      printingStore.clearDataToPrint()
-      printingStore.setDataToPrint([ERPStore.getBarcodeFromComponent])
+      printingStore.clearDataToPrint();
+      printingStore.setDataToPrint([ERPStore.getBarcodeFromComponent]);
     }
     if (warehouseStore.selectedZone.id) {
-      const printerInZone = printingStore.printersList.printers
-          .find(printer => printer.zone === warehouseStore.selectedZone.id);
+      const printerInZone = printingStore.printersList.printers.find(
+        (printer) => printer.zone === warehouseStore.selectedZone.id,
+      );
       if (printerInZone) {
-        await printingStore.setSelectedPrinter(printerInZone)
+        await printingStore.setSelectedPrinter(printerInZone);
       }
     }
     if (ERPStore.isComponentsActive) {
       if (printingStore.selectedPrinter.name !== "BIXOLON_SPP-L410 WiFi") {
         await printingStore.setSelectedLabelTemplate(
-            printingStore.labelTemplatesList.find(label =>
-                label.code === '300_этикетка_58*40_Комплектующая'
-            ))
+          printingStore.labelTemplatesList.find(
+            (label) => label.code === "300_этикетка_58*40_Комплектующая",
+          ),
+        );
       }
     }
   } catch (e) {
@@ -168,14 +172,14 @@ const handlePrintLabel = async (item) => {
 };
 const toggleDetailUnregProduct = async (item) => {
   try {
-      await ERPStore.GET_PRODUCT_TYPE_BY_ID(item);
+    await ERPStore.GET_PRODUCT_TYPE_BY_ID(item);
   } catch (e) {
     console.log(e);
   }
 };
 const handleErrorMessage = (errorMessage) => {
   if (errorMessage !== undefined) {
-    return errorMessage.map(err => useErrorCodeDictionary[err]);
+    return errorMessage.map((err) => useErrorCodeDictionary[err]);
   }
 };
 onMounted(async () => {

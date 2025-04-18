@@ -2,35 +2,49 @@
   <div class="profile-container">
     <div v-if="userStore.user" class="dropdown">
       <div class="avatar-mobile" data-bs-toggle="dropdown">
-        <span>Профиль: {{ userStore.getFullNameUser?.lastName }} {{ userStore.getFullNameUser?.initialsDot }}</span>
+        <span
+          >Профиль: {{ userStore.getFullNameUser?.lastName }}
+          {{ userStore.getFullNameUser?.initialsDot }}</span
+        >
       </div>
-      <div aria-expanded="false"
-           class="avatar-desktop rounded-circle d-flex align-items-center justify-content-center"
-           data-bs-toggle="dropdown"
-           style="width: 40px; height: 40px;"
+      <div
+        aria-expanded="false"
+        class="avatar-desktop rounded-circle d-flex align-items-center justify-content-center"
+        data-bs-toggle="dropdown"
+        style="width: 40px; height: 40px"
       >
         {{ userStore.getFullNameUser?.initials }}
       </div>
-      <div class="dropdown-menu dropdown-menu-dark p-0" style="background-color: #2e2e2e">
+      <div
+        class="dropdown-menu dropdown-menu-dark p-0"
+        style="background-color: #2e2e2e"
+      >
         <div class="profile-dropdown">
           <div class="profile-name">
-            <div aria-expanded="false"
-                 class="avatar-dropdown rounded-circle d-flex align-items-center justify-content-center"
-                 data-bs-toggle="dropdown"
-                 style="width: 40px; height: 40px;"
+            <div
+              aria-expanded="false"
+              class="avatar-dropdown rounded-circle d-flex align-items-center justify-content-center"
+              data-bs-toggle="dropdown"
+              style="width: 40px; height: 40px"
             >
               {{ userStore.getFullNameUser?.initials }}
             </div>
-            <div>{{ userStore.getFullNameUser?.lastName }} {{ userStore.getFullNameUser?.firstName }}
-                 {{ userStore.getFullNameUser?.middleName }}
+            <div>
+              {{ userStore.getFullNameUser?.lastName }}
+              {{ userStore.getFullNameUser?.firstName }}
+              {{ userStore.getFullNameUser?.middleName }}
             </div>
             <div>({{ userStore?.roleUser }})</div>
           </div>
-          <router-link :to="{name:'Profile'}" class="profile-item"><span>Профиль</span></router-link>
-          <router-link :to="{name:'Admin'}" class="profile-item"><span>Администрирование</span></router-link>
-          <div class="profile-logout"
-               @click="logout"
-          ><i class="bi bi-box-arrow-right" style="color: red"></i><span>Выйти из профиля</span>
+          <router-link :to="{ name: 'Profile' }" class="profile-item"
+            ><span>Профиль</span></router-link
+          >
+          <router-link :to="{ name: 'Admin' }" class="profile-item"
+            ><span>Администрирование</span></router-link
+          >
+          <div class="profile-logout" @click="logout">
+            <i class="bi bi-box-arrow-right" style="color: red"></i
+            ><span>Выйти из профиля</span>
           </div>
         </div>
       </div>
@@ -38,26 +52,26 @@
   </div>
 </template>
 <script setup>
-import {useUserStore} from "@/stores/HTTP/UserStore.js";
-import {useRouter} from 'vue-router'
-import {useErrorStore} from "@/stores/Error/ErrorStore.js";
+import { useUserStore } from "@/stores/HTTP/UserStore.js";
+import { useRouter } from "vue-router";
+import { useErrorStore } from "@/stores/Error/ErrorStore.js";
 
-const errorStore = useErrorStore()
-const router = useRouter()
-const userStore = useUserStore()
+const errorStore = useErrorStore();
+const router = useRouter();
+const userStore = useUserStore();
 const logout = async () => {
   try {
     userStore.clearUserData();
-    localStorage.clear()
-    await router.push({name: 'Login'});
+    localStorage.clear();
+    await router.push({ name: "Login" });
   } catch (error) {
-    console.error('Ошибка при выходе:', error)
+    console.error("Ошибка при выходе:", error);
     errorStore.setError({
       status: error.response?.status,
-      message: 'Произошла ошибка при выходе из системы.'
-    })
+      message: "Произошла ошибка при выходе из системы.",
+    });
   }
-}
+};
 </script>
 <style scoped>
 .profile-container {
@@ -68,7 +82,7 @@ const logout = async () => {
 .profile-dropdown {
   display: grid;
   grid-template-columns: 1fr;
-  grid-auto-rows: minmax(auto, .8fr);
+  grid-auto-rows: minmax(auto, 0.8fr);
 }
 
 .profile-name {
@@ -76,15 +90,15 @@ const logout = async () => {
   grid-template-columns: auto 250px;
   grid-template-rows: 1fr 1fr;
   align-items: center;
-  padding: .4rem 1rem;
+  padding: 0.4rem 1rem;
   column-gap: 1rem;
-  row-gap: .5rem;
-  color: #A4A4A4;
+  row-gap: 0.5rem;
+  color: #a4a4a4;
   border-bottom: 1px solid #414141;
 }
 
 .avatar-dropdown {
-  border: 1px solid #A4A4A4;
+  border: 1px solid #a4a4a4;
   grid-row: 1/3;
 }
 
@@ -96,7 +110,6 @@ const logout = async () => {
 
 .avatar-desktop:hover {
   background-color: #4a383882;
-
 }
 
 .avatar-mobile {

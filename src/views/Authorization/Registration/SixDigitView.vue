@@ -1,38 +1,41 @@
 <template>
   <div class="confirm-wrapper">
-    <h5>На ваш почтовый ящик отправлен код подтверждения. Для завершения регистрации введите полученный код:</h5>
+    <h5>
+      На ваш почтовый ящик отправлен код подтверждения. Для завершения
+      регистрации введите полученный код:
+    </h5>
     <div class="verification-inputs">
       <template v-for="index in 6" :key="index">
         <my-input
-            v-model="digits[index - 1]"
-            maxlength="1"
-            inputmode="numeric"
-            class="digit-input"
-            :placeholder="'•'"
-            :ref="el => setInputRef(el, index - 1)"
-            @input="value => handleInput(index - 1, value)"
-            @keydown="(e) => handleKeyDown(e, index - 1)"
-            @paste="handlePaste"
+          :ref="(el) => setInputRef(el, index - 1)"
+          v-model="digits[index - 1]"
+          :placeholder="'•'"
+          class="digit-input"
+          inputmode="numeric"
+          maxlength="1"
+          @input="(value) => handleInput(index - 1, value)"
+          @keydown="(e) => handleKeyDown(e, index - 1)"
+          @paste="handlePaste"
         />
       </template>
     </div>
     <div
-        v-if="error"
-        class="alert alert-danger alert-dismissible fade show"
-        role="alert"
+      v-if="error"
+      class="alert alert-danger alert-dismissible fade show"
+      role="alert"
     >
       {{ error }}
       <button
-          type="button"
-          class="btn-close"
-          @click="error = ''"
-          aria-label="Close"
+        aria-label="Close"
+        class="btn-close"
+        type="button"
+        @click="error = ''"
       ></button>
     </div>
     <button
-        :disabled="!isComplete"
-        class="btn btn-outline-warning"
-        @click="handleSubmit"
+      :disabled="!isComplete"
+      class="btn btn-outline-warning"
+      @click="handleSubmit"
     >
       Подтвердить
     </button>
@@ -40,25 +43,24 @@
       Повторная отправка через {{ countdown }}с
     </div>
     <button
-        :disabled="countdown > 0"
-        class="btn btn-outline-secondary"
-        @click="handleResend"
+      :disabled="countdown > 0"
+      class="btn btn-outline-secondary"
+      @click="handleResend"
     >
       Получить код повторно
     </button>
   </div>
 </template>
 <script setup>
-import {ref, computed, onMounted, nextTick, onUnmounted, watch} from 'vue'
-import MyInput from "@/components/UI/Inputs/MyInput.vue"
-import MyButton from "@/components/UI/Buttons/MyButton.vue"
-import {useUserStore} from "@/stores/HTTP/UserStore"
-import {useRouter} from 'vue-router'
-import {useVerificationCode} from "@/composables/Validations/useVerificationCode.js";
+import { ref, onMounted, nextTick, onUnmounted } from "vue";
+import MyInput from "@/components/UI/Inputs/MyInput.vue";
+import { useUserStore } from "@/stores/HTTP/UserStore";
+import { useRouter } from "vue-router";
+import { useVerificationCode } from "@/composables/Validations/useVerificationCode.js";
 
-const router = useRouter()
-const userStore = useUserStore()
-const error = ref('')
+const router = useRouter();
+const userStore = useUserStore();
+const error = ref("");
 const {
   digits,
   code,
@@ -67,59 +69,60 @@ const {
   handleInput,
   handleKeyDown,
   handlePaste,
-  focusInput
-} = useVerificationCode(6)
-const countdown = ref(30)
-let timer = null
+  focusInput,
+} = useVerificationCode(6);
+const countdown = ref(30);
+let timer = null;
 const startTimer = () => {
-  clearInterval(timer)
-  countdown.value = 30
+  clearInterval(timer);
+  countdown.value = 30;
   timer = setInterval(() => {
     if (countdown.value > 0) {
-      countdown.value--
+      countdown.value--;
     } else {
-      clearInterval(timer)
+      clearInterval(timer);
     }
-  }, 1000)
-}
+  }, 1000);
+};
 const handleSubmit = async () => {
   try {
-    const loginSuccess = await userStore.REQ_CONFIRM(code.value)
+    const loginSuccess = await userStore.REQ_CONFIRM(code.value);
     if (loginSuccess) {
-      router.push('/')
+      await router.push("/");
     }
   } catch (error) {
-    error.value = 'Неверный код подтверждения. Пожалуйста, проверьте код или запросите новый.'
+    error.value =
+      "Неверный код подтверждения. Пожалуйста, проверьте код или запросите новый.";
   }
-}
+};
 const handleResend = async () => {
   try {
-    error.value = '' // Сбрасываем предыдущие ошибки
-    const email = userStore.tempCredentials?.email
+    error.value = ""; // Сбрасываем предыдущие ошибки
+    const email = userStore.tempCredentials?.email;
     if (!email) {
-      error.value = 'Ошибка: Email не найден. Заполните регистрационные форму ещё раз.'
-      return
+      error.value =
+        "Ошибка: Email не найден. Заполните регистрационные форму ещё раз.";
+      return;
     }
-
-    await userStore.RESEND_CODE(email)
-    startTimer()
+    await userStore.RESEND_CODE(email);
+    startTimer();
     // Очищаем поля ввода
-    digits.value = Array(6).fill('')
-    focusInput(0)
+    digits.value = Array(6).fill("");
+    await focusInput(0);
   } catch (err) {
-    error.value = 'Не удалось отправить новый код. Попробуйте позже.'
+    error.value = "Не удалось отправить новый код. Попробуйте позже.";
   }
-}
+};
 onMounted(async () => {
-  startTimer()
+  startTimer();
   await nextTick().then(() => {
-    focusInput(0)
-  })
-})
+    focusInput(0);
+  });
+});
 // Очистка таймера при размонтировании
 onUnmounted(() => {
-  clearInterval(timer)
-})
+  clearInterval(timer);
+});
 </script>
 <style scoped>
 .confirm-wrapper {
@@ -130,21 +133,21 @@ onUnmounted(() => {
 
 .verification-inputs {
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
   gap: 0.5rem;
+  grid-template-columns: repeat(6, 1fr);
 }
 
 .digit-input {
-  text-align: center;
   aspect-ratio: 1;
-  padding: 0 !important;
-  font-size: 3rem !important;
   border-color: #ffc107;
-  color: #80FF00;
+  color: #80ff00;
+  font-size: 3rem !important;
+  padding: 0 !important;
+  text-align: center;
 }
 
 .timer {
-  text-align: center;
   opacity: 0.8;
+  text-align: center;
 }
 </style>

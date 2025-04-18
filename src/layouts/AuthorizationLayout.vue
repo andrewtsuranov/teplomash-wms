@@ -1,6 +1,6 @@
 <template>
   <div class="authorization-layout">
-    <login-view/>
+    <login-view />
   </div>
 </template>
 <script setup>

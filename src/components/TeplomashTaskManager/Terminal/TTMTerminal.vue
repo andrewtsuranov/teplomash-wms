@@ -10,19 +10,17 @@
   </div>
 </template>
 <script setup>
-import {useWebSocketStore} from '@/stores/WebSockets/WebSocketStore.js'
+import { useWebSocketStore } from "@/stores/WebSockets/WebSocketStore.js";
 import Transactions from "@/components/TeplomashTaskManager/Terminal/Transactions.vue";
-import {useTSDStore} from "@/stores/HTTP/TSDStore.js";
-import {watch} from "vue";
+import { useTSDStore } from "@/stores/HTTP/TSDStore.js";
 
-const webSocketStore = useWebSocketStore()
-const TSDStore = useTSDStore()
+const webSocketStore = useWebSocketStore();
+const TSDStore = useTSDStore();
 const testGetTransaction = async () => {
   try {
-    await webSocketStore.GET_TRANSACTION_DATA(3880)
-  } catch (e) {
-  }
-}
+    await webSocketStore.GET_TRANSACTION_DATA(3880);
+  } catch (e) {}
+};
 </script>
 <style scoped>
 .ttm-terminal-container {
@@ -33,19 +31,19 @@ const testGetTransaction = async () => {
 }
 
 .ttm-terminal-active-tsd {
-  font-size: 1.5rem;
   background-color: #0000004a;
   border-bottom: 1px solid #605039e0;
+  font-size: 1.5rem;
   padding: 1rem;
   place-content: center;
 }
 
 .ttm-terminal-view {
   display: grid;
-  grid-template-columns: minmax(auto, 1fr);
   font-size: 1.2rem;
+  grid-template-columns: minmax(auto, 1fr);
+  overflow-y: auto;
   padding: 0 1rem;
   row-gap: 1rem;
-  overflow-y: auto;
 }
 </style>

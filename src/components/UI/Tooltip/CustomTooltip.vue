@@ -1,26 +1,17 @@
 <template>
   <div class="tooltip-wrapper">
-    <div
-        class="trigger"
-        @mouseenter="showTooltip"
-        @mouseleave="hideTooltip"
-    >
+    <div class="trigger" @mouseenter="showTooltip" @mouseleave="hideTooltip">
       <slot></slot>
     </div>
-
     <Transition name="fade">
-      <div
-v-if="isVisible"
-class="tooltip-custom"
-:style="tooltipStyle"
-      >
+      <div v-if="isVisible" :style="tooltipStyle" class="tooltip-custom">
         {{ error }}
       </div>
     </Transition>
   </div>
 </template>
 <script setup>
-import { ref, computed} from 'vue'
+import { ref } from "vue";
 
 defineProps({
   error: {
@@ -28,30 +19,26 @@ defineProps({
     required: true,
   },
 });
-
 // Состояние видимости подсказки
-const isVisible = ref(false)
-
+const isVisible = ref(false);
 // Позиция подсказки
 const tooltipStyle = ref({
-  left: '0',
-  top: '0',
-})
-
+  left: "0",
+  top: "0",
+});
 // Показ подсказки
 const showTooltip = (event) => {
-  const rect = event.currentTarget.getBoundingClientRect()
+  const rect = event.currentTarget.getBoundingClientRect();
   tooltipStyle.value = {
     left: `${rect.left}px`,
-    top: `${rect.bottom + 5 }px`, // Отступ 5px от элемента
-  }
-  isVisible.value = true
-}
-
+    top: `${rect.bottom + 5}px`, // Отступ 5px от элемента
+  };
+  isVisible.value = true;
+};
 // Скрытие подсказки
 const hideTooltip = () => {
-  isVisible.value = false
-}
+  isVisible.value = false;
+};
 </script>
 <style scoped>
 .tooltip-wrapper {
@@ -63,20 +50,20 @@ const hideTooltip = () => {
 }
 
 .tooltip-custom {
-  position: fixed;
-  padding: 8px 12px;
   background: #333;
-  color: white;
   border-radius: 4px;
+  color: white;
   font-size: 14px;
-  white-space: pre-line;
+  padding: 8px 12px;
   pointer-events: none; /* Чтобы подсказка не перехватывала события */
+  position: fixed;
+  white-space: pre-line;
 }
 
 /* Анимация появления/исчезновения */
 .fade-enter-active,
 .fade-leave-active {
-  transition: opacity .5s ease;
+  transition: opacity 0.5s ease;
 }
 
 .fade-enter-from,

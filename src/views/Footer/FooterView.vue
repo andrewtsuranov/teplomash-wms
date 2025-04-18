@@ -1,26 +1,28 @@
 <template>
   <div class="footer-container">
     <div class="footer-copyright">
-      <span>&copy; 2024 &mdash; {{ yearNow }} Тепломаш&reg; warehouse management system.</span>
+      <span
+        >&copy; 2024 &mdash; {{ yearNow }} Тепломаш&reg; warehouse management
+        system.</span
+      >
     </div>
     <div class="footer-about">
-      <span>Система управления складом Тепломаш&reg; с адресным хранением.</span>
+      <span
+        >Система управления складом Тепломаш&reg; с адресным хранением.</span
+      >
     </div>
-    <div class="footer-support">
-      Поддержка: team@teplomash.ru
-    </div>
+    <div class="footer-support">Поддержка: team@teplomash.ru</div>
   </div>
 </template>
 <script setup>
-import {ref} from "vue";
+import { ref } from "vue";
 
-const yearNow = ref(new Date().getFullYear())
+const yearNow = ref(new Date().getFullYear());
 </script>
 <style scoped>
 .footer-container {
   display: grid;
-  grid-template-areas:
-        "copyright about support";
+  grid-template-areas: "copyright about support";
   grid-template-columns: auto 1fr auto;
   grid-template-rows: minmax(50px, auto) auto;
   column-gap: 20px;
@@ -51,9 +53,9 @@ const yearNow = ref(new Date().getFullYear())
   .footer-container {
     grid-template-columns: 1fr;
     grid-template-areas:
-        'about'
-        'support'
-        'copyright';
+      "about"
+      "support"
+      "copyright";
     row-gap: 20px;
     grid-template-rows: max-content;
     padding: 20px;

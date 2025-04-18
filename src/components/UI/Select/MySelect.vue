@@ -1,61 +1,64 @@
 <template>
   <div class="dropdown-wrapper" ref="dropDown">
-    <div class="dropdown-selected-option"
-         @click="isDropdownVisible = !isDropdownVisible"
+    <div
+      class="dropdown-selected-option"
+      @click="isDropdownVisible = !isDropdownVisible"
     >
       {{ mappedSelectOption }} <span>&#9663;</span>
     </div>
     <transition>
-      <div class="options-wrapper"
-           v-if="isDropdownVisible"
-      >
-        <div class="option"
-             v-for="(option, index) in options"
-             :key="index"
-             @click="toggleOptionSelect(option)"
-        >{{ option.name || option }}
+      <div class="options-wrapper" v-if="isDropdownVisible">
+        <div
+          class="option"
+          v-for="(option, index) in options"
+          :key="index"
+          @click="toggleOptionSelect(option)"
+        >
+          {{ option.name || option }}
         </div>
       </div>
     </transition>
   </div>
 </template>
 <script setup>
-import {computed, onBeforeUnmount, onMounted, ref} from "vue";
+import { computed, onBeforeUnmount, onMounted, ref } from "vue";
 
 defineProps({
   options: {
     type: Array,
-    required: true
+    required: true,
   },
   modelValue: {
-    default: null
-  }
-})
-const emit = defineEmits([
-  'update:modelValue'
-])
-const dropDown = ref('')
-const isDropdownVisible = ref(false)
-const selectedOption = ref('')
+    default: null,
+  },
+});
+const emit = defineEmits(["update:modelValue"]);
+const dropDown = ref("");
+const isDropdownVisible = ref(false);
+const selectedOption = ref("");
 const toggleOptionSelect = (option) => {
-  selectedOption.value = option
-  emit('update:modelValue', option.value)
-  isDropdownVisible.value = false
-}
+  selectedOption.value = option;
+  emit("update:modelValue", option.value);
+  isDropdownVisible.value = false;
+};
 const mappedSelectOption = computed(() => {
-  return (selectedOption.value?.name || selectedOption.value) || 'Пожалуйста, выберете из списка...'
-})
+  return (
+    selectedOption.value?.name ||
+    selectedOption.value ||
+    "Пожалуйста, выберете из списка..."
+  );
+});
 const closeDropdown = (el) => {
   if (!dropDown.value.contains(el.target)) {
-    isDropdownVisible.value = false
+    isDropdownVisible.value = false;
   }
-}
+};
 onMounted(() => {
-  window.addEventListener('click', closeDropdown)
-})
+  window.addEventListener("click", closeDropdown);
+});
 onBeforeUnmount(() => {
-  window.removeEventListener('click', closeDropdown)
-})
+  window.removeEventListener("click", closeDropdown);
+});
 </script>
 <style scoped>
 .dropdown-wrapper {

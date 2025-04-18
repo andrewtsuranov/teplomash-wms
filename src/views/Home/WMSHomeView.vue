@@ -2,55 +2,62 @@
   <div v-if="$route.name === 'Home'" class="home-view">
     <div class="welcome-text">
       <h3>
-        Приветствуем Вас, {{ userStore.getFullNameUser?.firstName }} {{ userStore.getFullNameUser?.middleName }}!
+        Приветствуем Вас, {{ userStore.getFullNameUser?.firstName }}
+        {{ userStore.getFullNameUser?.middleName }}!
       </h3>
       <p>
-        Тепломаш® Warehouse Management System (WMS) — это информационная система, предназначенная для
-        автоматизации управления складскими процессами и инфраструктурой склада в целом.
+        Тепломаш® Warehouse Management System (WMS) — это информационная
+        система, предназначенная для автоматизации управления складскими
+        процессами и инфраструктурой склада в целом.
       </p>
       <ul>
         Система состоит из аппаратной и программной части:
         <li>
-          Под аппаратной подразумеваются терминалы сбора данных (ТСД), серверы для хранения информации и
-          другое оборудование, применение которого необходимо для автоматизированной работы складского комплекса.
+          Под аппаратной подразумеваются терминалы сбора данных (ТСД), серверы
+          для хранения информации и другое оборудование, применение которого
+          необходимо для автоматизированной работы складского комплекса.
         </li>
         <li>
-          Программная часть — это IT-решения, которые позволяют организовать централизованное управление всеми
-          складскими процессами и максимально эффективно использовать инфраструктуру склада.
+          Программная часть — это IT-решения, которые позволяют организовать
+          централизованное управление всеми складскими процессами и максимально
+          эффективно использовать инфраструктуру склада.
         </li>
       </ul>
     </div>
     <div class="welcome-image" @click="router.push({ name: 'WMS' })">
-        <span class="welcome-btn" style="font-size: 5rem; text-transform: uppercase">
-          Начать работу!
-        </span>
+      <span
+        class="welcome-btn"
+        style="font-size: 5rem; text-transform: uppercase"
+      >
+        Начать работу!
+      </span>
     </div>
   </div>
-  <RouterView/>
+  <RouterView />
 </template>
 <script setup>
-import {useRouter} from "vue-router";
-import {useUserStore} from "@/stores/HTTP/UserStore.js";
-import {onMounted} from "vue";
-import {useWebSocketStore} from "@/stores/WebSockets/WebSocketStore.js";
-import {useErrorStore} from "@/stores/Error/ErrorStore.js";
+import { useRouter } from "vue-router";
+import { useUserStore } from "@/stores/HTTP/UserStore.js";
+import { onMounted } from "vue";
+import { useWebSocketStore } from "@/stores/WebSockets/WebSocketStore.js";
+import { useErrorStore } from "@/stores/Error/ErrorStore.js";
 
-const userStore = useUserStore()
-const router = useRouter()
-const errorStore = useErrorStore()
-const webSocketStore = useWebSocketStore()
+const userStore = useUserStore();
+const router = useRouter();
+const errorStore = useErrorStore();
+const webSocketStore = useWebSocketStore();
 onMounted(async () => {
   try {
-    await webSocketStore.initWebSocket()
+    await webSocketStore.initWebSocket();
   } catch (e) {
-    console.log(e)
+    console.log(e);
     errorStore.setError({
       status: e.response?.status || 500,
-      message: 'Ошибка соединения WebSocket'
-    })
-    throw e
+      message: "Ошибка соединения WebSocket",
+    });
+    throw e;
   }
-})
+});
 </script>
 <style scoped>
 .home-view {
@@ -115,7 +122,7 @@ ul li {
 }
 
 .welcome-image:before {
-  content: '';
+  content: "";
   background: linear-gradient(-45deg, #e71313, #e73c7e, #23a6d5, #0f32e2);
   /*backgrounds: linear-gradient(45deg, #ff0000, #ff7300, #fffb00, #48ff00, #00ffd5, #002bff, #7a00ff, #ff00c8, #ff0000);*/
   position: absolute;
@@ -129,7 +136,7 @@ ul li {
   /*animation: gradient 10s ease infinite;*/
   animation: gradient 10s linear infinite;
   opacity: 0;
-  transition: opacity .3s ease-in-out;
+  transition: opacity 0.3s ease-in-out;
   border-radius: 30px;
 }
 
@@ -138,7 +145,7 @@ ul li {
 }
 
 .welcome-image:active:after {
-  background: #2F2D2B;
+  background: #2f2d2b;
   /*background: transparent;*/
 }
 
@@ -148,7 +155,7 @@ ul li {
 
 .welcome-image:after {
   z-index: -1;
-  content: '';
+  content: "";
   position: absolute;
   width: 100%;
   height: 100%;

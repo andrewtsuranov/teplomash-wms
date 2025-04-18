@@ -3,23 +3,25 @@
     <h2>Создать новый тип продукции</h2>
     <form @submit.prevent="submitForm">
       <div class="mb-3">
-        <label for="productName" class="form-label">Наименование типа продукции</label>
+        <label for="productName" class="form-label"
+          >Наименование типа продукции</label
+        >
         <input
-            type="text"
-            class="form-control"
-            id="productName"
-            v-model="productForm.name"
-            required
+          type="text"
+          class="form-control"
+          id="productName"
+          v-model="productForm.name"
+          required
         />
       </div>
 
       <div class="mb-3">
         <label for="productType" class="form-label">Тип изделия</label>
         <select
-            class="form-select"
-            id="productType"
-            v-model="productForm.type"
-            required
+          class="form-select"
+          id="productType"
+          v-model="productForm.type"
+          required
         >
           <option value="" disabled selected>Выберите тип изделия</option>
           <option value="product">Продукция</option>
@@ -32,34 +34,34 @@
         <div class="col-md-4 mb-3">
           <label for="length" class="form-label">Длина (мм)</label>
           <input
-              type="number"
-              class="form-control"
-              id="length"
-              v-model.number="productForm.dimensions.length"
-              min="1"
-              required
+            type="number"
+            class="form-control"
+            id="length"
+            v-model.number="productForm.dimensions.length"
+            min="1"
+            required
           />
         </div>
         <div class="col-md-4 mb-3">
           <label for="width" class="form-label">Ширина (мм)</label>
           <input
-              type="number"
-              class="form-control"
-              id="width"
-              v-model.number="productForm.dimensions.width"
-              min="1"
-              required
+            type="number"
+            class="form-control"
+            id="width"
+            v-model.number="productForm.dimensions.width"
+            min="1"
+            required
           />
         </div>
         <div class="col-md-4 mb-3">
           <label for="height" class="form-label">Высота (мм)</label>
           <input
-              type="number"
-              class="form-control"
-              id="height"
-              v-model.number="productForm.dimensions.height"
-              min="1"
-              required
+            type="number"
+            class="form-control"
+            id="height"
+            v-model.number="productForm.dimensions.height"
+            min="1"
+            required
           />
         </div>
       </div>
@@ -67,12 +69,12 @@
       <div class="mb-3">
         <label for="packAmount" class="form-label">Количество в упаковке</label>
         <input
-            type="number"
-            class="form-control"
-            id="packAmount"
-            v-model.number="productForm.packAmount"
-            min="1"
-            required
+          type="number"
+          class="form-control"
+          id="packAmount"
+          v-model.number="productForm.packAmount"
+          min="1"
+          required
         />
       </div>
 
@@ -87,22 +89,22 @@
 </template>
 
 <script setup>
-import { reactive, ref, computed } from 'vue';
+import { reactive, ref } from "vue";
 
 // Реактивное состояние формы
 const productForm = reactive({
-  name: '',
-  type: '',
+  name: "",
+  type: "",
   dimensions: {
     length: null,
     width: null,
-    height: null
+    height: null,
   },
-  packAmount: null
+  packAmount: null,
 });
 
 const formSubmitted = ref(false);
-const formOutput = ref('');
+const formOutput = ref("");
 
 // Обработка отправки формы
 const submitForm = () => {
@@ -112,8 +114,7 @@ const submitForm = () => {
   formSubmitted.value = true;
 
   // В реальном проекте здесь был бы API-запрос
-  console.log('Отправляем данные:', outputData);
+  console.log("Отправляем данные:", outputData);
 };
 </script>
-<style scoped>
-</style>
+<style scoped></style>

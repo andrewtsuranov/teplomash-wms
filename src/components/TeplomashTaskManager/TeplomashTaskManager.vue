@@ -1,156 +1,191 @@
 <template>
   <div class="teplomash-task-manager-container">
-    <label class="ttm-title gold-black-block">Тепломаш&reg; Task Manager : </label>
+    <label class="ttm-title gold-black-block"
+      >Тепломаш&reg; Task Manager :
+    </label>
     <div class="ttm-settings gold-black-block">
       <div class="ttm-setting-panel">
         <div class="ttm-setting-panel-items">
           <span>Статус соединения:</span>
           <span
-              :class="['status', { 'connected': webSocketStore.isConnected, 'disconnected': !webSocketStore.isConnected }]"
-          >{{ webSocketStore.connectionStatus }}
-        </span>
+            :class="[
+              'status',
+              {
+                connected: webSocketStore.isConnected,
+                disconnected: !webSocketStore.isConnected,
+              },
+            ]"
+            >{{ webSocketStore.connectionStatus }}
+          </span>
         </div>
-        <div v-if="webSocketStore.isConnected"
-             class="ttm-setting-panel-items"
-        >
+        <div v-if="webSocketStore.isConnected" class="ttm-setting-panel-items">
           <span>ТСД в сети:</span>
-          <span v-if="webSocketStore.isConnected && TSDStore.onlineTSDList?.length > 0"
-                class="online-users-count"
-          >{{ TSDStore.onlineTSDList.length }}
-        </span>
-          <span v-else-if="webSocketStore.isConnected && TSDStore.onlineTSDList?.length === 0"
-                class="none-users-count non-active-color"
-          >Нет активных ТСД
-        </span>
+          <span
+            v-if="
+              webSocketStore.isConnected && TSDStore.onlineTSDList?.length > 0
+            "
+            class="online-users-count"
+            >{{ TSDStore.onlineTSDList.length }}
+          </span>
+          <span
+            v-else-if="
+              webSocketStore.isConnected && TSDStore.onlineTSDList?.length === 0
+            "
+            class="none-users-count non-active-color"
+            >Нет активных ТСД
+          </span>
         </div>
-        <div v-if="webSocketStore.reconnectAttempts > 0"
-             class="ttm-setting-panel-items"
+        <div
+          v-if="webSocketStore.reconnectAttempts > 0"
+          class="ttm-setting-panel-items"
         >
           <span class="wsSetting-panel-reconnected">Попыток соединения:</span>
-          <span class="reconnected-count"
-          >
+          <span class="reconnected-count">
             {{ webSocketStore.reconnectAttempts }} из 5
           </span>
         </div>
-        <div v-if="webSocketStore.reconnectError || webSocketStore.error"
-             class="ttm-setting-panel-items"
+        <div
+          v-if="webSocketStore.reconnectError || webSocketStore.error"
+          class="ttm-setting-panel-items"
         >
           <span class="error">Ошибка:</span>
-          <span class="error"
-          >
-            {{ webSocketStore.error || 'Ошибка' }}
-        </span>
+          <span class="error">
+            {{ webSocketStore.error || "Ошибка" }}
+          </span>
         </div>
       </div>
       <div class="ttm-settings-button-group">
-        <my-button :disabled="webSocketStore.isConnected"
-                   class="my-btn-connect"
-                   @click="webSocketStore.initWebSocket"
-        >Connect
+        <my-button
+          :disabled="webSocketStore.isConnected"
+          class="my-btn-connect"
+          @click="webSocketStore.initWebSocket"
+          >Connect
         </my-button>
-        <my-button :disabled="!webSocketStore.isConnected"
-                   class="my-btn-disconnect"
-                   @click="handlerDisconnect"
-        >Disconnect
+        <my-button
+          :disabled="!webSocketStore.isConnected"
+          class="my-btn-disconnect"
+          @click="handlerDisconnect"
+          >Disconnect
         </my-button>
       </div>
     </div>
     <div class="ttm-tsd gold-gray-block">
-      <label v-if="!webSocketStore.isConnected" class="ttm-tsd-name-offline">Нет соединения с ТСД</label>
+      <label v-if="!webSocketStore.isConnected" class="ttm-tsd-name-offline"
+        >Нет соединения с ТСД</label
+      >
       <div v-else class="ttm-tsd-online">
         <label class="ttm-tsd-header-online">Активные ТСД:</label>
-        <div v-if="webSocketStore.isConnected && TSDStore.onlineTSDList?.length > 0"
-             class="ttm-tsd-list-online"
+        <div
+          v-if="
+            webSocketStore.isConnected && TSDStore.onlineTSDList?.length > 0
+          "
+          class="ttm-tsd-list-online"
         >
-          <div v-for="device in TSDStore.onlineTSDList"
-               :key="device.id"
-               class="ttm-tsd-item-online gold-black-block"
+          <div
+            v-for="device in TSDStore.onlineTSDList"
+            :key="device.id"
+            class="ttm-tsd-item-online gold-black-block"
           >
-            <router-link :class="{'active' : TSDStore.selectedTSD?.id === device.id || route.query.id === device.id}"
-                         :to="{name: 'TTM-packing', query: {id: device.id }}"
-                         class="ttm-tsd-item-name-online"
-                         @click="TSDStore.set_selectedTSD(device)"
+            <div
+              :class="{
+                active:
+                  TSDStore.selectedTSD?.id === device.id ||
+                  route.query.id === device.id,
+              }"
+              class="ttm-tsd-item-name-online"
+              @click="TSDStore.set_selectedTSD(device)"
             >
-              <span class="item-title">{{ device.name }} (ID={{device.id}})</span>
-<!--              <span :class="{-->
-<!--                'no-task': device.current_task === null,-->
-<!--                'has-task': device.current_task !== null-->
-<!--              }"-->
-<!--                    class="item-title"-->
-<!--              >-->
-<!--                <i v-if="device.current_task === null"-->
-<!--                   class="bi bi-circle-fill"-->
-<!--                ></i>-->
-<!--                <i v-else class="bi bi-circle-fill"></i>-->
-<!--                {{ device.current_task?.type ?? 'Доступен' }}-->
-<!--              </span>-->
-            </router-link>
+              <span class="item-title"
+                >{{ device.name }} (ID={{ device.id }})</span
+              >
+              <!--              <span :class="{-->
+              <!--                'no-task': device.current_task === null,-->
+              <!--                'has-task': device.current_task !== null-->
+              <!--              }"-->
+              <!--                    class="item-title"-->
+              <!--              >-->
+              <!--                <i v-if="device.current_task === null"-->
+              <!--                   class="bi bi-circle-fill"-->
+              <!--                ></i>-->
+              <!--                <i v-else class="bi bi-circle-fill"></i>-->
+              <!--                {{ device.current_task?.type ?? 'Доступен' }}-->
+              <!--              </span>-->
+            </div>
           </div>
         </div>
-        <div v-if="webSocketStore.isConnected && TSDStore.onlineTSDList?.length === 0"
-             class="ttm-tsd-none-online">
-          <label class="ttm-tsd-none-item-online non-active-color">Список пуст</label>
+        <div
+          v-if="
+            webSocketStore.isConnected && TSDStore.onlineTSDList?.length === 0
+          "
+          class="ttm-tsd-none-online"
+        >
+          <label class="ttm-tsd-none-item-online non-active-color"
+            >Список пуст</label
+          >
         </div>
       </div>
     </div>
     <div class="ttm-terminal gold-gray-block">
-      <div v-if="!webSocketStore.isConnected"
-           class="ttm-terminal-name-offline"
-      >Терминал
+      <div v-if="!webSocketStore.isConnected" class="ttm-terminal-name-offline">
+        Терминал
       </div>
-      <RouterView v-if="webSocketStore.isConnected && route.query.id"/>
-      <div v-if="webSocketStore.isConnected && !route.query.id"
-           class="ttm-terminal-name-offline"
-      >Выберите активный ТСД
+      <!--      <RouterView v-if="webSocketStore.isConnected && route.query.id"/>-->
+      <div
+        v-if="webSocketStore.isConnected && !route.query.id"
+        class="ttm-terminal-name-offline"
+      >
+        Выберите активный ТСД
       </div>
     </div>
   </div>
 </template>
 <script setup>
-import {useWebSocketStore} from '@/stores/WebSockets/WebSocketStore.js'
-import {useTSDStore} from "@/stores/HTTP/TSDStore.js";
-import {useRouter, useRoute} from "vue-router";
-import {onMounted, watch} from "vue";
-import MyButton from "@/components/UI/Buttons/MyButton.vue"
-import {useUserStore} from "@/stores/HTTP/UserStore.js";
+import { useWebSocketStore } from "@/stores/WebSockets/WebSocketStore.js";
+import { useTSDStore } from "@/stores/HTTP/TSDStore.js";
+import { useRouter, useRoute } from "vue-router";
+import { onMounted, watch } from "vue";
+import MyButton from "@/components/UI/Buttons/MyButton.vue";
+import { useUserStore } from "@/stores/HTTP/UserStore.js";
 
-const TSDStore = useTSDStore()
-const userStore = useUserStore()
-const router = useRouter()
-const route = useRoute()
-const webSocketStore = useWebSocketStore()
+const TSDStore = useTSDStore();
+const userStore = useUserStore();
+const router = useRouter();
+const route = useRoute();
+const webSocketStore = useWebSocketStore();
 const handlerDisconnect = () => {
-  webSocketStore.disconnect()
-}
+  webSocketStore.disconnect();
+};
 const clearQuery = () => {
-  router.replace({query: {}})
-}
-watch(() => TSDStore.onlineTSDList, (newDevice, oldDevice) => {
-  console.log(newDevice, oldDevice)
-}, { immediate: true })
+  router.replace({ query: {} });
+};
+watch(
+  () => TSDStore.onlineTSDList,
+  (newDevice, oldDevice) => {
+    console.log(newDevice, oldDevice);
+  },
+  { immediate: true },
+);
 onMounted(async () => {
   try {
-    if(!webSocketStore.isConnected) {
-      await webSocketStore.initWebSocket()
+    if (!webSocketStore.isConnected) {
+      await webSocketStore.initWebSocket();
     }
-    await userStore.GET_USERS()
-    if(TSDStore.selectedTSD) {
-      await router.push({name: 'TTM-packing', query: {id: route.query.id || TSDStore.selectedTSD.id}})
+    await userStore.GET_USERS();
+    if (TSDStore.selectedTSD) {
+      // await router.push({name: 'TTM-Terminal', query: {id: route.query.id || TSDStore.selectedTSD.id}})
     }
-
-  }catch (e) {
-    console.log(e)
+  } catch (e) {
+    console.log(e);
   }
-})
-
+});
 </script>
 <style scoped>
 .teplomash-task-manager-container {
   display: grid;
   grid-template-areas:
-      "title title"
-      "settings task"
-      "tsd task";
+    "title title"
+    "settings task"
+    "tsd task";
   grid-template-columns: minmax(auto, 1fr) minmax(auto, 1fr);
   grid-auto-rows: min-content auto 1fr;
   gap: 1rem;
@@ -209,7 +244,7 @@ onMounted(async () => {
 }
 
 .non-active-color {
-  color: #514D4C;
+  color: #514d4c;
 }
 
 .ttm-settings-button-group {
@@ -225,7 +260,7 @@ onMounted(async () => {
 .my-btn-connect:hover,
 .ttm-tsd-header-online,
 .online-users-count {
-  color: #4CAF50;
+  color: #4caf50;
 }
 
 .red,
@@ -279,12 +314,12 @@ onMounted(async () => {
   place-items: center;
   font-size: 1.5rem;
   font-weight: bold;
-  color: #514D4C;
+  color: #514d4c;
 }
 
 .ttm-tsd-header-online {
   font-weight: bold;
-  padding: .5rem 1rem;
+  padding: 0.5rem 1rem;
   border-bottom: 1px solid #605039e0;
 }
 

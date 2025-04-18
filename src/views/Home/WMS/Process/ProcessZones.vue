@@ -1,29 +1,33 @@
 <template>
-  <template v-if="$route.name === 'wmsPackingZone'">
-  <div v-if="zones" class="process-zone-container">
-    <div v-for="item in zones"
-         :key="item.code"
-         class="process-zone"
-         @click="handleZoneClick(item)"
-    >
-      <div class="process-zone-header">{{ item?.name.replace(/_/g, ' ') }}</div>
-      <div class="process-zone-info">
-        <span>Общая площадь: {{ item?.total_area }} м2</span>
-        <span>Занято: {{ item?.occupied_area }} м2</span>
-        <span>Загруженность: {{ item?.capacity_percentage }} %</span>
+  <template v-if="$route.name === `${props.processRouteName}Zone`">
+    <div v-if="zones" class="process-zone-container">
+      <div
+        v-for="item in zones"
+        :key="item.code"
+        class="process-zone"
+        @click="handleZoneClick(item)"
+      >
+        <div class="process-zone-header">
+          {{ item?.name.replace(/_/g, " ") }}
+        </div>
+        <div class="process-zone-info">
+          <span>Общая площадь: {{ item?.total_area }} м2</span>
+          <span>Занято: {{ item?.occupied_area }} м2</span>
+          <span>Загруженность: {{ item?.capacity_percentage }} %</span>
+        </div>
       </div>
     </div>
-  </div>
   </template>
-  <RouterView/>
+  <RouterView />
 </template>
 <script setup>
-import {useWarehouseStore} from "@/stores/HTTP/WarehouseStore.js";
-import {computed} from "vue";
-import {useRouter} from "vue-router";
+import { useWarehouseStore } from "@/stores/HTTP/WarehouseStore.js";
+import { computed } from "vue";
+import { useRouter, useRoute } from "vue-router";
 
-const router = useRouter()
-const warehouseStore = useWarehouseStore()
+const router = useRouter();
+const route = useRoute();
+const warehouseStore = useWarehouseStore();
 const props = defineProps({
   process: {
     type: String || Number,
@@ -31,14 +35,19 @@ const props = defineProps({
   },
   processRouteName: {
     type: String,
-    required: true
-  }
+    required: true,
+  },
 });
-const zones = computed(() => warehouseStore.customSortByZone[props.process] || []);
+const zones = computed(
+  () => warehouseStore.customSortByZone[props.process] || [],
+);
 const handleZoneClick = (zone) => {
-  warehouseStore.setSelectedZone(zone)
-  router.push({name: props.processRouteName, params: {code: zone.code.toLowerCase()}})
-}
+  warehouseStore.setSelectedZone(zone);
+  router.push({
+    name: props.processRouteName,
+    params: { code: zone.code.toLowerCase() },
+  });
+};
 </script>
 <style scoped>
 .process-zone-container {
@@ -54,11 +63,10 @@ const handleZoneClick = (zone) => {
   display: grid;
   grid-template-columns: 1fr;
   grid-template-rows: min-content auto;
-  border: 2px double #E32029;
+  border: 2px double #e32029;
   row-gap: 1rem;
-  padding: .7rem;
+  padding: 0.7rem;
   cursor: pointer;
-
 }
 
 .process-zone-header {
@@ -74,7 +82,7 @@ const handleZoneClick = (zone) => {
 }
 
 .process-zone:hover {
-  background-color: #2F2D2B;
+  background-color: #2f2d2b;
 }
 
 @media (max-width: 800px) {

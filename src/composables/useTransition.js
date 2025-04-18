@@ -1,14 +1,14 @@
-import { ref } from 'vue'
+import { ref } from "vue";
 
 export function useTransition() {
-    const transitionKey = ref(Date.now())
+  const transitionKey = ref(Date.now());
 
-    const triggerTransition = () => {
-        transitionKey.value = Date.now()
-    }
+  const triggerTransition = () => {
+    transitionKey.value = Date.now();
+  };
 
-    return {
-        transitionKey,
-        triggerTransition
-    }
+  return {
+    transitionKey,
+    triggerTransition,
+  };
 }

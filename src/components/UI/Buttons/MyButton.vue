@@ -1,14 +1,12 @@
 <template>
-  <button class="btn"
-          :disabled="props.disabled"
-  >
+  <button class="btn" :disabled="props.disabled">
     <slot></slot>
   </button>
 </template>
 <script setup>
 const props = defineProps({
   disabled: Boolean,
-})
+});
 </script>
 <style scoped>
 .btn {
