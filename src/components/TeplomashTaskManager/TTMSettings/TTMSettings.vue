@@ -1,34 +1,13 @@
 <script setup>
 import { useWebSocketStore } from "@/stores/WebSockets/WebSocketStore.js";
 import { useTSDStore } from "@/stores/HTTP/TSDStore.js";
-import { useUserStore } from "@/stores/HTTP/UserStore.js";
-import { useRouter } from "vue-router";
-import { onMounted } from "vue";
 import MyButton from "@/components/UI/Buttons/MyButton.vue";
 
 const webSocketStore = useWebSocketStore();
 const TSDStore = useTSDStore();
-const userStore = useUserStore();
-const router = useRouter();
 const handlerDisconnect = () => {
   webSocketStore.disconnect();
 };
-// const clearQuery = () => {
-//   router.replace({ query: {} });
-// };
-// onMounted(async () => {
-//   try {
-//     if (!webSocketStore.isConnected) {
-//       await webSocketStore.initWebSocket();
-//     }
-//     await userStore.GET_USERS();
-//     if (TSDStore.selectedTSD) {
-//       // await router.push({ name: "TTM-TTMTerminal", query: { id: route.query.id || TSDStore.selectedTSD.id } });
-//     }
-//   } catch (e) {
-//     console.log(e);
-//   }
-// });
 </script>
 <template>
   <div class="ttm-settings-container gold-black-block">
@@ -102,10 +81,12 @@ const handlerDisconnect = () => {
   grid-template-columns: minmax(auto, 1fr);
   grid-template-rows: repeat(3, 3rem) auto;
 }
+
 .gold-black-block {
   background-color: #0000004a;
   border: 1px solid #605039e0;
 }
+
 .ttm-setting-panel-items {
   display: grid;
   font-size: 1.2rem;
