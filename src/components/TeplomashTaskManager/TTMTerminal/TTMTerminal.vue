@@ -1,10 +1,9 @@
 <script setup>
-import { useWebSocketStore } from "@/stores/WebSockets/WebSocketStore.js";
+import {useWebSocketStore} from "@/stores/WebSockets/WebSocketStore.js";
+import {useTSDStore} from "@/stores/HTTP/TSDStore.js";
 import Transactions from "@/components/TeplomashTaskManager/TTMTerminal/Transactions.vue";
-import { useTSDStore } from "@/stores/HTTP/TSDStore.js";
-import { watch } from "vue";
 
-const webSocketStore = useWebSocketStore();
+const webSocketStore = useWebSocketStore()
 const TSDStore = useTSDStore();
 const testGetTransaction = async (id) => {
   try {
@@ -13,14 +12,6 @@ const testGetTransaction = async (id) => {
     console.log(e);
   }
 };
-watch(
-  () => TSDStore.selectedTSD,
-  (newDevice, oldDevice) => {
-    if (!newDevice) TSDStore.clear_selectedTSD();
-    console.log(newDevice, oldDevice);
-  },
-  { immediate: true }
-);
 </script>
 <template>
   <div class="ttm-terminal-container gold-gray-block">
@@ -30,8 +21,8 @@ watch(
       Терминал
     </div>
     <div
-      v-else-if="!TSDStore.selectedTSD"
-      class="ttm-terminal-name-offline"
+        v-else-if="!TSDStore.selectedTSD"
+        class="ttm-terminal-name-offline"
     >
       Выберите активный ТСД
     </div>
@@ -42,7 +33,7 @@ watch(
         Выбран: {{ TSDStore.selectedTSD?.name }}
         <button @click="testGetTransaction(3880)">Тест</button>
       </div>
-      <Transactions class="ttm-terminal-view" />
+      <Transactions class="ttm-terminal-view"/>
     </div>
   </div>
 </template>
@@ -50,7 +41,6 @@ watch(
 .ttm-terminal-container {
   display: grid;
   grid-template-columns: minmax(auto, 1fr);
-  /*grid-template-rows: minmax(500px, 510px);*/
   border-radius: 10px;
 }
 

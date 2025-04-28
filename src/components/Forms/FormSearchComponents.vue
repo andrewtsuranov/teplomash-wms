@@ -1,91 +1,3 @@
-<template>
-  <div class="search-form mb-3">
-    <div class="input-group">
-      <input
-        v-model="searchQuery"
-        class="form-control"
-        placeholder="Поиск по номенклатуре..."
-        type="text"
-        @input="debouncedSearch"
-      />
-      <select
-        v-model="selectedFilter"
-        class="form-select"
-        style="max-width: 200px"
-        @change="debouncedSearch"
-      >
-        <option value="all">Все поля</option>
-        <option value="1">Комплектующая</option>
-        <option value="2">Продукция</option>
-      </select>
-      <button class="btn btn-outline-primary" @click="debouncedSearch">
-        Найти
-      </button>
-    </div>
-  </div>
-  <div>
-    <p>Найдено: {{ ERPStore.searchResultsComponents?.length || 0 }}</p>
-  </div>
-  <!-- Таблица с результатами -->
-  <div class="in-table-container table-responsive">
-    <table class="table-content table table-dark align-middle table-hover">
-      <colgroup>
-        <col style="width: 1%" />
-        <col style="width: 40%" />
-        <col style="width: 10%" />
-        <col style="width: 19%" />
-        <col style="width: 5%" />
-      </colgroup>
-      <thead>
-        <tr>
-          <th scope="col">№</th>
-          <th scope="col">Комплектующие</th>
-          <th scope="col">ID</th>
-          <th scope="col">Задача</th>
-          <th scope="col">Инфо</th>
-        </tr>
-      </thead>
-      <tbody v-if="searchResults.length > 0">
-        <tr
-          v-for="(item, index) in searchResults"
-          :key="item.id"
-          style="cursor: pointer"
-          @click="toggleDetailUnregProduct(item)"
-        >
-          <th scope="row">{{ index + 1 }}</th>
-          <td>{{ item.name }}</td>
-          <td>{{ item.id }}</td>
-          <td>
-            <button
-              v-if="item.item_type_group_code === 'К'"
-              class="btn btn-outline-success"
-              @click.stop="handlePrintLabel(item)"
-            >
-              Печать этикетки
-            </button>
-          </td>
-          <td>
-            <i
-              :class="
-                packingStore.detailInfoPackingProduct?.id === item.id
-                  ? 'bi-circle-fill text-primary'
-                  : 'bi-circle'
-              "
-              class="bi toggle-icon"
-            ></i>
-          </td>
-        </tr>
-      </tbody>
-      <tbody v-else class="in-table-empty">
-        <tr class="no-hover">
-          <td class="text-center py-3" colspan="5">
-            {{ isLoading ? "Загрузка..." : "Ничего не найдено" }}
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-</template>
 <script setup>
 import { ref, onMounted, nextTick } from "vue";
 import { useDebounceFn } from "@vueuse/core";
@@ -186,6 +98,83 @@ onMounted(async () => {
   // Инициализация, если нужна
 });
 </script>
+<template>
+  <div class="search-form mb-3">
+    <div class="input-group">
+      <input
+          v-model="searchQuery"
+          class="form-control"
+          placeholder="Поиск по номенклатуре..."
+          type="text"
+          @input="debouncedSearch"
+      />
+      <select
+          v-model="selectedFilter"
+          class="form-select"
+          style="max-width: 200px"
+          @change="debouncedSearch"
+      >
+        <option value="all">Все поля</option>
+        <option value="1">Комплектующая</option>
+        <option value="2">Продукция</option>
+      </select>
+      <button class="btn btn-outline-primary" @click="debouncedSearch">
+        Найти
+      </button>
+    </div>
+  </div>
+  <div>
+    <p>Найдено: {{ ERPStore.searchResultsComponents?.length || 0 }}</p>
+  </div>
+  <!-- Таблица с результатами -->
+  <div class="in-table-container table-responsive">
+    <table class="table-content table table-dark align-middle table-hover">
+      <colgroup>
+        <col style="width: 1%" />
+        <col style="width: 45%" />
+        <col style="width: 10%" />
+        <col style="width: 19%" />
+      </colgroup>
+      <thead>
+      <tr>
+        <th scope="col">№</th>
+        <th scope="col">Комплектующие</th>
+        <th scope="col">ID</th>
+        <th scope="col">Задача</th>
+      </tr>
+      </thead>
+      <tbody v-if="searchResults.length > 0">
+      <tr
+          v-for="(item, index) in searchResults"
+          :key="item.id"
+          style="cursor: pointer"
+          @click="toggleDetailUnregProduct(item)"
+      >
+        <th scope="row">{{ index + 1 }}</th>
+        <td>{{ item.name }}</td>
+        <td>{{ item.id }}</td>
+        <td>
+          <button
+              v-if="item.item_type_group_code === 'К'"
+              class="btn btn-outline-success"
+              @click.stop="handlePrintLabel(item)"
+          >
+            Печать этикетки
+          </button>
+        </td>
+
+      </tr>
+      </tbody>
+      <tbody v-else class="in-table-empty">
+      <tr class="no-hover">
+        <td class="text-center py-3" colspan="5">
+          {{ isLoading ? "Загрузка..." : "Ничего не найдено" }}
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+</template>
 <style scoped>
 .in-table-container {
   display: grid;

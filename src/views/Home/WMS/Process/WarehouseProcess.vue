@@ -1,55 +1,16 @@
-<template>
-  <div class="storage-id-container">
-    <div class="storage-id-title">
-      <div>
-        Склад {{ warehouseStore.warehouseData?.number }}:
-        {{ warehouseStore.warehouseData?.name }},
-        {{ warehouseStore.warehouseData?.address }} [ Ёмкость:
-        {{ warehouseStore.warehouseData?.max_capacity }}
-        ячеек ]
-      </div>
-    </div>
-    <div
-      v-if="warehouseStore.loading"
-      class="spinner-border text-warning"
-      role="status"
-    >
-      <span class="visually-hidden">Loading...</span>
-    </div>
-    <div v-else class="storage-id-actions">
-      <router-link
-        v-for="(zones, process) in warehouseStore.customSortByZone"
-        :key="process"
-        :to="{ name: getRouteName(process) }"
-        class="storage-id-actions-items"
-      >
-        {{ process }}
-      </router-link>
-      <!--      <router-link :to="{name: 'wmsInventory'}"-->
-      <!--                   class="storage-id-actions-items"-->
-      <!--      >Инвентаризация-->
-      <!--      </router-link>-->
-      <!--      <router-link :to="{name: 'wmsReporting'}"-->
-      <!--                   class="storage-id-actions-items"-->
-      <!--      >Аналитика-->
-      <!--      </router-link>-->
-    </div>
-    <div class="storage-id-terminal">
-      <RouterView />
-    </div>
-  </div>
-</template>
 <script setup>
-import { useWarehouseStore } from "@/stores/HTTP/WarehouseStore.js";
-import { computed, onMounted } from "vue";
-import { useErrorStore } from "@/stores/Error/ErrorStore.js";
+import {useWarehouseStore} from "@/stores/HTTP/WarehouseStore.js";
+import {computed, onMounted} from "vue";
+import {useWebSocketStore} from "@/stores/WebSockets/WebSocketStore.js";
+import {useRoute, useRouter} from "vue-router";
+import {useErrorStore} from "@/stores/Error/ErrorStore.js";
 
-defineProps({
-  id: Number,
-});
-const errorStore = useErrorStore();
 const warehouseStore = useWarehouseStore();
-const getRouteName = computed(() => (process) => {
+const webSocketStore = useWebSocketStore()
+const errorStore = useErrorStore()
+const router = useRouter()
+const route = useRoute()
+const getRouteName = (process) => {
   switch (process) {
     case "Упаковка":
       return "wmsPackingZone";
@@ -62,19 +23,71 @@ const getRouteName = computed(() => (process) => {
     default:
       return "wmsPackingZone"; // Или какой-то дефолтный маршрут
   }
-});
-onMounted(async () => {
+}
+const handleClickWarehouseProcess = async (zone) => {
   try {
-    await warehouseStore.GET_WAREHOUSES_ZONE_BY_ID({
-      warehouse_id: warehouseStore.getWarehouseId,
-    });
+    if (zone) {
+      await warehouseStore.setSelectedZone(zone)
+      await router.push({
+        name: getRouteName(zone.name),
+        params: {zone_type: zone.code.toLowerCase()}
+      })
+    }
   } catch (e) {
+    errorStore.setError({
+      error: e,
+      message: "Ошибка при получении выбранной зоны",
+      component: "WarehousesProcess",
+    });
     console.log(e);
-    errorStore.setError("Ошибка в WarehouseProcess");
-    throw e;
   }
-});
+}
+onMounted(async () => {
+    try {
+      if (warehouseStore.selectedWarehouse && webSocketStore.isConnected) {
+      await webSocketStore.GET_WAREHOUSE_ZONE_STATISTICS(warehouseStore.selectedWarehouse.id)
+      }
+    }catch (e) {
+      console.log(e)
+    }
+})
+
 </script>
+<template>
+  <div class="storage-id-container">
+    <div class="storage-id-title">
+      <div>
+        {{ warehouseStore.selectedWarehouse?.name.replace(/_/g, "-").toUpperCase() }}
+      </div>
+    </div>
+    <div
+        v-if="warehouseStore.loading"
+        class="spinner-border text-warning"
+        role="status"
+    >
+      <span class="visually-hidden">Loading...</span>
+    </div>
+    <div v-else class="storage-id-actions">
+      <nav
+          v-for="(zone, index) in warehouseStore.zoneStatisticsByWarehouseID?.zone_types"
+          :key="index"
+          class="storage-id-actions-items"
+          @click="handleClickWarehouseProcess(zone)"
+      >
+        {{ zone.name }}
+      </nav>
+    </div>
+    <div class="storage-id-terminal">
+      <!-- Основное представление (ProcessZones.vue) -->
+      <router-view :key="route.params.zone_type"></router-view>
+      <!-- Представление для зон  -->
+      <router-view name="packing"></router-view>
+      <router-view name="receiving"></router-view>
+      <router-view name="storage"></router-view>
+      <router-view name="shipping"></router-view>
+    </div>
+  </div>
+</template>
 <style scoped>
 .storage-id-container {
   display: grid;
@@ -116,6 +129,7 @@ onMounted(async () => {
 
 .storage-id-actions-items:hover {
   background: #4a383882;
+  cursor: pointer;
 }
 
 .storage-id-terminal {
@@ -126,13 +140,6 @@ onMounted(async () => {
 .teplomash-active-exact-link {
   background-color: #4a383882;
   border: 1px solid #486693;
-}
-
-a {
-  color: inherit;
-  text-decoration: none;
-  margin: 0;
-  padding: 0;
 }
 
 @media (max-width: 800px) {

@@ -1,5 +1,5 @@
 <template>
-  <div v-if="$route.name === 'Home'" class="home-view">
+  <div v-if="route.name === 'Home'" class="home-view">
     <div class="welcome-text">
       <h3>
         Приветствуем Вас, {{ userStore.getFullNameUser?.firstName }}
@@ -24,7 +24,9 @@
         </li>
       </ul>
     </div>
-    <div class="welcome-image" @click="router.push({ name: 'WMS' })">
+    <div class="welcome-image"
+         @click="router.push({ name: 'WMS' })"
+    >
       <span
         class="welcome-btn"
         style="font-size: 5rem; text-transform: uppercase"
@@ -36,16 +38,17 @@
   <RouterView />
 </template>
 <script setup>
-import { useRouter } from "vue-router";
 import { useUserStore } from "@/stores/HTTP/UserStore.js";
-import { onMounted } from "vue";
 import { useWebSocketStore } from "@/stores/WebSockets/WebSocketStore.js";
 import { useErrorStore } from "@/stores/Error/ErrorStore.js";
+import { onMounted } from "vue";
+import { useRouter, useRoute } from "vue-router";
 
 const userStore = useUserStore();
-const router = useRouter();
-const errorStore = useErrorStore();
 const webSocketStore = useWebSocketStore();
+const errorStore = useErrorStore();
+const router = useRouter();
+const route = useRoute()
 onMounted(async () => {
   try {
     await webSocketStore.initWebSocket();
@@ -71,6 +74,7 @@ onMounted(async () => {
 
 .welcome-text {
   display: grid;
+  border: 1px solid #605039e0;
   row-gap: 1rem;
   grid-template-columns: minmax(auto, 1fr);
   grid-auto-rows: minmax(min-content, auto);

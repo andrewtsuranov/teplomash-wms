@@ -9,7 +9,7 @@ export default {
     {
       path: "",
       name: "Home",
-      component: () => import("@/views/Home/WMSHomeView.vue"),
+      component: () => import("@/views/Home/HomeView.vue"),
       meta: {
         breadcrumb: {
           text: "Home",

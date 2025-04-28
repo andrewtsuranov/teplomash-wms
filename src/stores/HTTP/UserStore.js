@@ -41,7 +41,7 @@ const kySignup = kyStd.extend({
             errorStore.setError({
               status: response.status,
               message: "Такой пользователь существует", // можно использовать оригинальное сообщение errorData.email[0]
-              field: "email", // добавляем поле, чтобы знать где произошла ошибка
+              field: "email", // добавляем поле, чтобы знать, где произошла ошибка
             });
           }
         }
@@ -181,10 +181,9 @@ export const useUserStore = defineStore("userStore", () => {
     };
     errorStore.clearError();
     try {
-      const response = await kyStd
+      return await kyStd
         .post("resend-activation/", { json: data })
         .json();
-      return response;
     } catch (err) {
       errorStore.setError(err.message);
       throw err;

@@ -11,12 +11,21 @@
         >Система управления складом Тепломаш&reg; с адресным хранением.</span
       >
     </div>
-    <div class="footer-support">Поддержка: team@teplomash.ru</div>
+    <div class="footer-support">
+      <div>Поддержка: team@teplomash.ru </div>
+      <label class="ws-indicator"
+             v-if="webSocketStore.isConnected"
+      >
+        WebSocket
+      </label>
+    </div>
   </div>
 </template>
 <script setup>
 import { ref } from "vue";
+import {useWebSocketStore} from "@/stores/WebSockets/WebSocketStore.js";
 
+const webSocketStore = useWebSocketStore()
 const yearNow = ref(new Date().getFullYear());
 </script>
 <style scoped>
@@ -46,9 +55,12 @@ const yearNow = ref(new Date().getFullYear());
 .footer-support {
   grid-area: support;
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: auto auto;
+  column-gap: 1rem;
 }
-
+.ws-indicator {
+  color: #4CAF50;
+}
 @media (max-width: 1024px) {
   .footer-container {
     grid-template-columns: 1fr;

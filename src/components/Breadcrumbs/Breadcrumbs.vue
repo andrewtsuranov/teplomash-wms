@@ -1,164 +1,195 @@
 <template>
-  <nav
-    aria-label="breadcrumb"
-    class="my-breadcrumbs"
-    style="
-      --bs-breadcrumb-divider: &quot;>&quot;;
-      --bs-breadcrumb-divider-color: #2d3da2;
-    "
+  <nav v-if="breadcrumbs.length"
+       aria-label="breadcrumb"
+       class="my-breadcrumbs"
+       style="--bs-breadcrumb-divider: '>'"
   >
     <ol class="breadcrumb">
       <li
-        v-for="(breadcrumb, index) in breadcrumbs"
-        :key="breadcrumb.path + index"
-        :class="{ active: index === breadcrumbs.length - 1 }"
-        class="breadcrumb-item"
-        style="color: #6c757d"
+          v-for="(breadcrumb, index) in breadcrumbs"
+          :key="breadcrumb.path"
+          :class="{ active: index === breadcrumbs.length - 1 }"
+          class="breadcrumb-item"
+          style="color: #6c757d"
       >
         <router-link
-          v-if="index < breadcrumbs.length - 1"
-          :to="breadcrumb.path"
+            v-if="index < breadcrumbs.length - 1"
+            :to="getRouteLocation(breadcrumb)"
         >
           <span class="breadcrumb-item-style">
             <!-- Bootstrap Icon -->
             <i
-              v-if="getBreadcrumbIcon(breadcrumb)"
-              :class="[
+                v-if="getBreadcrumbIcon(breadcrumb)"
+                :aria-label="
+    shouldShowText(breadcrumb)
+      ? undefined
+      : getBreadcrumbText(breadcrumb)
+  "
+                :class="[
                 `bi ${getBreadcrumbIcon(breadcrumb)}`,
                 getIconExtraClasses(breadcrumb),
               ]"
-              :style="getIconSizeStyle(breadcrumb)"
-              :title="
+                :style="getIconSizeStyle(breadcrumb)"
+                :title="
                 shouldShowText(breadcrumb)
                   ? undefined
                   : getBreadcrumbText(breadcrumb)
               "
-              aria-hidden="true"
+                aria-hidden="true"
             ></i>
             <!-- Показываем текст только если он должен отображаться -->
             <span v-if="shouldShowText(breadcrumb)">{{
-              getBreadcrumbText(breadcrumb)
-            }}</span>
+                getBreadcrumbText(breadcrumb)
+                                                    }}</span>
           </span>
         </router-link>
         <span v-else>
           <!-- Bootstrap Icon для активного элемента -->
           <i
-            v-if="getBreadcrumbIcon(breadcrumb)"
-            :class="`bi ${getBreadcrumbIcon(breadcrumb)}`"
-            :style="getIconSizeStyle(breadcrumb)"
-            :title="
+              v-if="getBreadcrumbIcon(breadcrumb)"
+              :class="`bi ${getBreadcrumbIcon(breadcrumb)}`"
+              :style="getIconSizeStyle(breadcrumb)"
+              :title="
               shouldShowText(breadcrumb)
                 ? undefined
                 : getBreadcrumbText(breadcrumb)
             "
-            aria-hidden="true"
+              aria-hidden="true"
           ></i>
           <!-- Показываем текст только если он должен отображаться -->
           <span v-if="shouldShowText(breadcrumb)">{{
-            getBreadcrumbText(breadcrumb)
-          }}</span>
+              getBreadcrumbText(breadcrumb)
+                                                  }}</span>
         </span>
       </li>
     </ol>
   </nav>
 </template>
 <script setup>
-import { watch, ref, computed } from "vue";
-import { useRoute } from "vue-router";
+import {watch, computed, shallowRef} from "vue";
+import {useRoute} from "vue-router";
 
 const route = useRoute();
-const breadcrumbs = ref([]);
-// Использование более нативного реактивного API Vue 3.4
+const breadcrumbs = shallowRef([]);
 const matchedRoutes = computed(() => route.matched);
 watch(
-  matchedRoutes,
-  (newMatched) => {
-    // Получаем все подходящие маршруты
-    let matchingRoutes = newMatched.filter(
-      (route) => route.name || route.meta?.breadcrumb,
-    );
-
-    // Сначала ищем маршрут, помеченный как корневой
-    const rootIndex = matchingRoutes.findIndex(
-      (route) =>
-        route.meta?.breadcrumb &&
-        typeof route.meta.breadcrumb === "object" &&
-        route.meta.breadcrumb.root === true,
-    );
-
-    // Если нашли корневой маршрут, отсекаем всё перед ним
-    if (rootIndex > 0) {
-      matchingRoutes = matchingRoutes.slice(rootIndex);
-    }
-
-    breadcrumbs.value = matchingRoutes;
-  },
-  { immediate: true },
+    matchedRoutes,
+    (newMatched) => {
+      // Получаем все подходящие маршруты
+      let matchingRoutes = newMatched.filter(
+          (route) => route.name || route.meta?.breadcrumb,
+      );
+      // Сначала ищем маршрут, помеченный как корневой
+      const rootIndex = matchingRoutes.findIndex(
+          (route) =>
+              route.meta?.breadcrumb &&
+              typeof route.meta.breadcrumb === "object" &&
+              route.meta.breadcrumb.root === true,
+      );
+      // Если нашли корневой маршрут, отсекаем всё перед ним
+      if (rootIndex > 0) {
+        matchingRoutes = matchingRoutes.slice(rootIndex);
+      }
+      breadcrumbs.value = matchingRoutes;
+    },
+    {immediate: true},
 );
 
-function formatRouteName(path) {
+// Форматирование имени маршрута
+const formatRouteName = (path) => {
   if (!path) return "";
-  const formattedName = path
-    .split("/")
-    .filter((part) => part && !part.startsWith(":"))
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-    .join(" ");
-  return formattedName;
-}
+  const parts = path.split("/").filter((part) => part);
+  return parts
+      .map((part) => {
+        if (part.startsWith(":")) {
+          const paramName = part.slice(1);
+          return route.params[paramName] || paramName;
+        }
+        return part.charAt(0).toUpperCase() + part.slice(1);
+      })
+      .join(" ");
+};
 
-// Методы для работы с Bootstrap иконками
-function getBreadcrumbIcon(breadcrumb) {
+// Получение иконки для хлебной крошки
+const getBreadcrumbIcon = (breadcrumb) => {
   const breadcrumbMeta = breadcrumb.meta?.breadcrumb;
-  if (typeof breadcrumbMeta === "object" && breadcrumbMeta.icon) {
-    return breadcrumbMeta.icon;
-  }
-  return null;
-}
+  return (typeof breadcrumbMeta === "object" && breadcrumbMeta.icon) ? breadcrumbMeta.icon : null;
+};
 
-function getBreadcrumbText(breadcrumb) {
+// Формирование объекта для навигации
+const getRouteLocation = (breadcrumb) => {
+  // Проверяем, принадлежит ли breadcrumb маршруту с idWarehouse
+  if (breadcrumb.path &&
+      (breadcrumb.path.includes(':idWarehouse') || breadcrumb.name === 'WMSProcess')) {
+    return {
+      name: breadcrumb.name,
+      params: {
+        idWarehouse: route.params.idWarehouse || ''
+      }
+    };
+  }
+
+  // Расширенная проверка для других параметров (масштабируемость)
+  const params = {};
+  for (const key in route.params) {
+    // Проверяем, есть ли параметр в пути текущего breadcrumb
+    if (breadcrumb.path?.includes(`:${key}`)) {
+      params[key] = route.params[key];
+    }
+  }
+
+  return Object.keys(params).length > 0
+      ? { name: breadcrumb.name, params }
+      : { name: breadcrumb.name };
+};
+
+// Получение текста для хлебной крошки
+const getBreadcrumbText = (breadcrumb) => {
   const breadcrumbMeta = breadcrumb.meta?.breadcrumb;
   if (typeof breadcrumbMeta === "object" && breadcrumbMeta.text) {
-    return breadcrumbMeta.text;
+    // Если text — функция, вызываем её с текущим route
+    return typeof breadcrumbMeta.text === "function"
+        ? breadcrumbMeta.text(route)
+        : breadcrumbMeta.text;
   }
   return breadcrumbMeta || breadcrumb.name || formatRouteName(breadcrumb.path);
-}
+};
 
-// Метод для определения, нужно ли показывать текст
-function shouldShowText(breadcrumb) {
+// Определение видимости текста
+const shouldShowText = (breadcrumb) => {
   const breadcrumbMeta = breadcrumb.meta?.breadcrumb;
-  if (typeof breadcrumbMeta === "object" && breadcrumbMeta.textOnly === false) {
-    return false;
-  }
-  return true;
-}
+  return !(typeof breadcrumbMeta === "object" && breadcrumbMeta.textOnly === false);
+};
 
+// Получение дополнительных классов для иконки
 const getIconExtraClasses = (breadcrumb) => {
   const breadcrumbMeta = breadcrumb.meta?.breadcrumb;
-  if (typeof breadcrumbMeta === "object" && breadcrumbMeta.iconClass) {
-    return breadcrumbMeta.iconClass;
-  }
-  return "";
+  return (typeof breadcrumbMeta === "object" && breadcrumbMeta.iconClass)
+      ? breadcrumbMeta.iconClass
+      : "";
 };
-// Новый метод для работы с размерами иконок через стили
+
+// Получение стилей для размера иконки
 const getIconSizeStyle = (breadcrumb) => {
   const breadcrumbMeta = breadcrumb.meta?.breadcrumb;
   if (typeof breadcrumbMeta !== "object" || !breadcrumbMeta.iconSize) {
-    return {}; // Возвращаем пустой объект, если размер не указан
+    return {};
   }
-  // Карта размеров Bootstrap
+
   const sizeMap = {
     sm: "0.75em",
-    md: "1em", // стандартный размер
+    md: "1em",
     lg: "1.25em",
     xl: "1.5em",
     "2xl": "2em",
   };
-  // Проверяем, есть ли такой размер в карте
+
   const fontSize = sizeMap[breadcrumbMeta.iconSize] || "1em";
-  return {
-    fontSize: fontSize,
-  };
+  if (!sizeMap[breadcrumbMeta.iconSize]) {
+    console.warn(`Invalid iconSize: ${breadcrumbMeta.iconSize}`);
+  }
+
+  return { fontSize };
 };
 </script>
 <style scoped>

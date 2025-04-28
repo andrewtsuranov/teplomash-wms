@@ -1,125 +1,31 @@
-<template>
-  <div class="wms-container">
-    <!-- Переключатели вкладок вынесены над основным контейнером -->
-    <div class="erp-tab-container">
-      <ul id="erpTabs" class="nav nav-tabs" role="tablist">
-        <li class="nav-item" role="presentation">
-          <button
-            id="products-tab"
-            aria-controls="products"
-            :aria-selected="ERPStore.isProductsActive"
-            :class="['nav-link', ERPStore.isProductsActive ? 'active' : '']"
-            type="button"
-            @click="ERPStore.setActiveTabs('products')"
-          >
-            Продукция
-          </button>
-        </li>
-        <li class="nav-item" role="presentation">
-          <button
-            id="components-tab"
-            aria-controls="components"
-            :aria-selected="ERPStore.isComponentsActive"
-            :class="['nav-link', ERPStore.isComponentsActive ? 'active' : '']"
-            type="button"
-            @click="ERPStore.setActiveTabs('components')"
-          >
-            Комплектующие
-          </button>
-        </li>
-      </ul>
-    </div>
-    <!-- Основной контейнер -->
-    <div class="wms-packing-erp-data">
-      <div class="erp-data">
-        <!-- Содержимое вкладок -->
-        <div id="erpTabContent" class="tab-content">
-          <div
-            id="products"
-            aria-labelledby="products-tab"
-            :class="[
-              'tab-pane fade',
-              ERPStore.isProductsActive ? 'show active' : '',
-            ]"
-            role="tabpanel"
-            tabindex="0"
-          >
-            <div class="erp-product-data">
-              <div class="erp-product-info">
-                <div class="erp-product-alert alert m-0" role="alert">
-                  <i class="bi bi-info-circle erp-update-alert-logo"></i>
-                  <span class="erp-update-alert-text">
-                    Табличные данные формируются на заключительном этапе сборки
-                    и синхронизируются в автоматическом режиме. При
-                    необходимости используйте кнопку ручного обновления.
-                  </span>
-                </div>
-                <button
-                  class="btn btn-outline-info"
-                  title="Обновить"
-                  type="button"
-                  @click="webSocketStore.GET_UNREGISTERED_ITEMS()"
-                >
-                  <i class="bi bi-arrow-repeat" style="font-size: 2rem"></i>
-                </button>
-              </div>
-              <table-group-unregistered-products />
-            </div>
-          </div>
-          <div
-            id="components"
-            aria-labelledby="components-tab"
-            :class="[
-              'tab-pane fade',
-              ERPStore.isComponentsActive ? 'show active' : '',
-            ]"
-            role="tabpanel"
-            tabindex="0"
-          >
-            <FormSearchComponents />
-          </div>
-        </div>
-      </div>
-      <svg-logo-erp class="erp-logo" />
-      <div class="erp-settings-group-btn">
-        <div class="qrcode">
-          <label style="text-transform: uppercase"
-            >Задача: Собрать паллету</label
-          >
-          <div v-html="qrcode"></div>
-        </div>
-      </div>
-    </div>
-  </div>
-</template>
 <script setup>
-import { useWebSocketStore } from "@/stores/WebSockets/WebSocketStore.js";
-import { useWarehouseStore } from "@/stores/HTTP/WarehouseStore.js";
-import { useERPStore } from "@/stores/HTTP/ERPStore.js";
-import { ref, onMounted, watch } from "vue";
+import {useWebSocketStore} from "@/stores/WebSockets/WebSocketStore.js";
+import {useWarehouseStore} from "@/stores/HTTP/WarehouseStore.js";
+import {useERPStore} from "@/stores/HTTP/ERPStore.js";
+import {ref, onMounted, watch, watchEffect} from "vue";
 import TableGroupUnregisteredProducts from "@/components/Tables/ERP/TableGroupUnregisteredProducts.vue";
 import SvgLogoErp from "@/components/UI/SVG/svgLogoErp.vue";
 import QRCode from "qrcode";
 import FormSearchComponents from "@/components/Forms/FormSearchComponents.vue";
-import { usePackingStore } from "@/stores/HTTP/PackingStore.js";
+import {usePackingStore} from "@/stores/HTTP/PackingStore.js";
+import {useRoute} from "vue-router";
 
 const warehouseStore = useWarehouseStore();
 const webSocketStore = useWebSocketStore();
 const ERPStore = useERPStore();
 const qrcode = ref(null);
 const packingStore = usePackingStore();
-
+const route = useRoute()
 watch(
-  () => ERPStore.isProductsActive,
-  (newValue) => {
-    // Действия для вкладки продукции
-    if (!newValue) {
-      packingStore.closeTableItemUnregProduct();
-    }
-  },
-  { immediate: true },
+    () => ERPStore.isProductsActive,
+    (newValue) => {
+      // Действия для вкладки продукции
+      if (!newValue) {
+        packingStore.closeTableItemUnregProduct();
+      }
+    },
+    {immediate: true},
 );
-
 const generateQR = async (data) => {
   const opts = {
     errorCorrectionLevel: "H",
@@ -138,12 +44,15 @@ const generateQR = async (data) => {
     });
   });
 };
+watch(() => route.params, async (newValue, oldValue) => {
+  qrcode.value = await generateQR(taskScanData());
+})
 const taskScanData = () => {
   const data = {
     task_code: "CREATE_PALLET_WITH_SCAN",
     variables: {
-      warehouse_id: warehouseStore.warehouseData.id,
-      to_zone_id: warehouseStore.selectedZone.id,
+      warehouse_id: warehouseStore.selectedWarehouse.id,
+      to_zone_id: warehouseStore.selectedZonesByZoneType.id,
       total: 1,
     },
   };
@@ -160,15 +69,110 @@ onMounted(async () => {
     console.log(e);
   }
 });
-
 // При необходимости сохраняем текущую вкладку в localStorage при изменении
 watch(
-  () => ERPStore.activeTab,
-  (newTab) => {
-    localStorage.setItem("wms-erp-active-tab", newTab);
-  },
+    () => ERPStore.activeTab,
+    (newTab) => {
+      localStorage.setItem("wms-erp-active-tab", newTab);
+    },
 );
 </script>
+<template>
+  <div class="wms-container">
+    <!-- Переключатели вкладок вынесены над основным контейнером -->
+    <div class="erp-tab-container">
+      <ul id="erpTabs" class="nav nav-tabs" role="tablist">
+        <li class="nav-item" role="presentation">
+          <button
+              id="products-tab"
+              :aria-selected="ERPStore.isProductsActive"
+              :class="['nav-link', ERPStore.isProductsActive ? 'active' : '']"
+              aria-controls="products"
+              type="button"
+              @click="ERPStore.setActiveTabs('products')"
+          >
+            Продукция
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button
+              id="components-tab"
+              :aria-selected="ERPStore.isComponentsActive"
+              :class="['nav-link', ERPStore.isComponentsActive ? 'active' : '']"
+              aria-controls="components"
+              type="button"
+              @click="ERPStore.setActiveTabs('components')"
+          >
+            Комплектующие
+          </button>
+        </li>
+      </ul>
+    </div>
+    <!-- Основной контейнер -->
+    <div class="wms-packing-erp">
+      <div class="erp-data">
+        <!-- Содержимое вкладок -->
+        <div id="erpTabContent" class="tab-content">
+          <div
+              id="products"
+              :class="[
+              'tab-pane fade',
+              ERPStore.isProductsActive ? 'show active' : '',
+            ]"
+              aria-labelledby="products-tab"
+              role="tabpanel"
+              tabindex="0"
+          >
+            <div class="erp-product-data">
+              <div class="erp-product-info">
+                <div class="erp-product-alert alert m-0" role="alert">
+                  <i class="bi bi-info-circle erp-update-alert-logo"></i>
+                  <span class="erp-update-alert-text">
+                    Табличные данные формируются на заключительном этапе сборки
+                    и синхронизируются в автоматическом режиме. При
+                    необходимости используйте кнопку ручного обновления.
+                  </span>
+                </div>
+                <button
+                    class="btn btn-outline-info"
+                    title="Обновить"
+                    type="button"
+                    @click="webSocketStore.GET_UNREGISTERED_ITEMS()"
+                >
+                  <i class="bi bi-arrow-repeat" style="font-size: 2rem"></i>
+                </button>
+              </div>
+              <table-group-unregistered-products/>
+            </div>
+          </div>
+          <div
+              id="components"
+              :class="[
+              'tab-pane fade',
+              ERPStore.isComponentsActive ? 'show active' : '',
+            ]"
+              aria-labelledby="components-tab"
+              role="tabpanel"
+              tabindex="0"
+          >
+            <FormSearchComponents/>
+          </div>
+        </div>
+      </div>
+      <div class="erp-qr-task">
+        <svg-logo-erp class="erp-logo"/>
+        <div class="erp-task-zone">
+          <div class="qrcode">
+            <label style="text-transform: uppercase"
+            >Собрать паллету по QR коду</label
+            >
+            <div v-html="qrcode"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
 <style scoped>
 /* Общий контейнер для страницы */
 .wms-container {
@@ -198,7 +202,7 @@ watch(
   background-color: #2e2e2e;
   border: 1px solid #605039e0;
   border-bottom: none;
-  border-radius: 0.75rem 0.75rem 0 0;
+  border-radius: .5rem .5rem 0 0;
   padding: 0.75rem 1.5rem;
   transition: all 0.2s ease;
   font-weight: 500;
@@ -218,18 +222,13 @@ watch(
 }
 
 /* Основной контейнер */
-.wms-packing-erp-data {
+.wms-packing-erp {
   display: grid;
   grid-template-areas:
-    "data logo"
-    "data buttons";
-  grid-template-columns: 1fr auto;
-  grid-template-rows: min-content 1fr;
-  background-color: #2e2e2e;
-  border: 1px solid #605039e0;
-  border-radius: 1rem;
-  border-top-left-radius: 0;
-  padding: 1rem;
+    "data qr-task"
+    "data qr-task";
+  grid-template-columns: 1fr 320px;
+  /*grid-template-rows: min-content 1fr;*/
   column-gap: 1.5rem;
 }
 
@@ -238,6 +237,10 @@ watch(
   display: grid;
   grid-template-columns: minmax(auto, 1fr);
   row-gap: 2rem;
+  padding: 1rem;
+  background-color: #2e2e2e;
+  border: 1px solid #605039e0;
+  border-radius: .5rem;
 }
 
 .erp-product-data {
@@ -262,6 +265,15 @@ watch(
   border-color: #605039e0;
 }
 
+.erp-qr-task {
+  grid-area: qr-task;
+  padding: 1rem;
+  background-color: #2e2e2e;
+  border: 1px solid #605039e0;
+  border-radius: .5rem;
+
+}
+
 .erp-update-alert-logo {
   font-size: 1.5rem;
 }
@@ -272,14 +284,12 @@ watch(
 }
 
 .erp-logo {
-  grid-area: logo;
   display: grid;
   grid-template-rows: minmax(auto, 200px);
   justify-items: center;
 }
 
-.erp-settings-group-btn {
-  grid-area: buttons;
+.erp-task-zone {
   display: grid;
   grid-template-columns: minmax(auto, 300px);
   row-gap: 1rem;

@@ -1,65 +1,61 @@
+import { defineStore } from "pinia";
 import { ref, computed } from "vue";
 import { useWebSocketStore } from "@/stores/WebSockets/WebSocketStore.js";
+import { useTSDStore } from "@/stores/HTTP/TSDStore.js";
 import { useDifferenceById } from "@/composables/useDifferenceById.js";
-import { defineStore } from "pinia";
 
 export const useTransactionStore = defineStore("transaction", () => {
-  //Store
   const webSocketStore = useWebSocketStore();
+  const TSDStore = useTSDStore();
   // State
   const allTransactionsList100 = ref(
-    JSON.parse(localStorage.getItem("transactions")) || [],
+    JSON.parse(localStorage.getItem("transactions")) || []
   );
   //Getters
   const last10Transactions = computed(() =>
-    allTransactionsList100.value.slice(0, 10),
+    allTransactionsList100.value.slice(0, 10)
   );
   const getStageProgress = computed(() =>
-    last10Transactions.value.map((progress) => progress.stage_progress),
+    last10Transactions.value.map((progress) => progress.stage_progress)
   );
   // получения сгруппированных по ID транзакций
   const getLatestTransactionsByDevice = computed(() => {
-    return (deviceId) => {
-      if (!deviceId || !allTransactionsList100.value.length) return [];
-      // Фильтруем по устройству
-      const deviceTransactions = allTransactionsList100.value.filter(
-        (item) => item.assigned_to_id === deviceId,
-      );
-      // Группируем по ID
-      const transactionsMap = new Map();
-      for (const transaction of deviceTransactions) {
-        const existingTransaction = transactionsMap.get(transaction.id);
-        if (
-          !existingTransaction ||
-          transaction.timestamp > existingTransaction.timestamp
-        ) {
-          transactionsMap.set(transaction.id, transaction);
-        }
+    if (!TSDStore.selectedTSD || !allTransactionsList100.value.length) return [];
+
+    // Фильтруем и сортируем по устройству
+    const deviceTransactions = allTransactionsList100.value
+        .filter(item => item.assigned_to_id === TSDStore.selectedTSD.id)
+        .sort((a, b) => b.timestamp - a.timestamp);
+
+    // Создаём Map для хранения уникальных транзакций по id
+    const transactionsMap = new Map();
+    for (const transaction of deviceTransactions) {
+      if (!transactionsMap.has(transaction.id)) {
+        transactionsMap.set(transaction.id, transaction);
       }
-      // Сортируем
-      return Array.from(transactionsMap.values()).sort(
-        (a, b) => b.timestamp - a.timestamp,
-      );
-    };
+    }
+
+    // Возвращаем массив значений из Map
+    return Array.from(transactionsMap.values());
   });
   //Actions
   const addCurrentTransaction = (transaction) => {
     // Проверяем, существует ли транзакция с таким ID уже
     const existingIndex = allTransactionsList100.value.findIndex(
-      (t) => t.id === transaction.id,
+      (t) => t.id === transaction.id
     );
     if (existingIndex !== -1) {
       // Если существует - обновляем статус
       allTransactionsList100.value[existingIndex] = {
         ...allTransactionsList100.value[existingIndex],
         ...transaction,
-        timestamp: Date.now(),
+        timestamp: Date.now()
       };
     } else {
       // Если новая - добавляем
       allTransactionsList100.value.unshift({
         ...transaction,
-        timestamp: Date.now(),
+        timestamp: Date.now()
       });
     }
     // Ограничиваем длину массива
@@ -69,7 +65,7 @@ export const useTransactionStore = defineStore("transaction", () => {
     updateUnregItemsByTransaction(transaction);
     localStorage.setItem(
       "transactions",
-      JSON.stringify(allTransactionsList100.value),
+      JSON.stringify(allTransactionsList100.value)
     );
   };
   const updateUnregItemsByTransaction = (transaction) => {
@@ -80,7 +76,7 @@ export const useTransactionStore = defineStore("transaction", () => {
       if (transaction.pallet !== null) {
         return (webSocketStore.wsUnregisteredProducts.value = useDifferenceById(
           webSocketStore.wsUnregisteredProducts,
-          transaction.pallet.items,
+          transaction.pallet.items
         ).difference);
       }
     }
@@ -96,7 +92,7 @@ export const useTransactionStore = defineStore("transaction", () => {
   // Method to handle WebSocket updates
   const updateTransactionStatus = (transactionId, newStatus) => {
     const transactionIndex = allTransactionsList100.value.findIndex(
-      (t) => t.id === transactionId,
+      (t) => t.id === transactionId
     );
     if (transactionIndex !== -1) {
       allTransactionsList100.value[transactionIndex].status = newStatus;
@@ -104,7 +100,7 @@ export const useTransactionStore = defineStore("transaction", () => {
       // Persist updated state
       localStorage.setItem(
         "transactions",
-        JSON.stringify(allTransactionsList100.value),
+        JSON.stringify(allTransactionsList100.value)
       );
     }
   };
@@ -114,7 +110,7 @@ export const useTransactionStore = defineStore("transaction", () => {
     getStageProgress,
     getLatestTransactionsByDevice,
     addCurrentTransaction,
-    updateTransactionStatus,
+    updateTransactionStatus
     // clearOldTransactions
   };
 });

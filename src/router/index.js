@@ -1,9 +1,8 @@
 import { createRouter, createWebHistory } from "vue-router";
-import { setupGuards } from "@/router/guards.js";
-import authRoutes from "@/router/auth.routes.js";
-import adminRoutes from "@/router/admin.routes.js";
-import homeRoutes from "@/router/home.routes.js";
-import notFoundRoute from "@/router/notFound.routes.js";
+import authRoutes from "@/router/routes/auth.routes.js";
+import adminRoutes from "@/router/routes/admin.routes.js";
+import homeRoutes from "@/router/routes/home.routes.js";
+import notFoundRoute from "@/router/routes/notFound.routes.js";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -13,11 +12,11 @@ const router = createRouter({
     homeRoutes,
     notFoundRoute
   ],
-  linkExactActiveClass: "teplomash-active-exact-link"
-});
-// Настраиваем гварды авторизации
-setupGuards(router);
+  linkExactActiveClass: "teplomash-active-exact-link",
+
+})
+
 router.onError((error) => {
-  console.error("Ошибка роутинга:", error);
-});
+  console.error("Ошибка маршрутизации:", error);
+})
 export default router;

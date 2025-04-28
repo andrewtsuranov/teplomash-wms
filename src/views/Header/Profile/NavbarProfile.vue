@@ -110,6 +110,7 @@ const logout = async () => {
 
 .avatar-desktop:hover {
   background-color: #4a383882;
+
 }
 
 .avatar-mobile {

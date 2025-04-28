@@ -1,78 +1,13 @@
-<template>
-  <div
-    v-if="packingStore.isShownTableItemUnregProduct"
-    class="packing-product-data-container"
-  >
-    <label class="packing-product-data-title">
-      Информация об упаковке продукции
-      {{ packingStore.detailInfoPackingProduct?.name }}:
-    </label>
-    <div
-      v-if="packingStore.detailInfoPackingProduct?.error"
-      class="modal-grid-msg"
-    >
-      <div class="alert alert-warning" data-bs-theme="dark" role="alert">
-        Ошибка:
-        <ol class="mb-0">
-          <li v-for="(err, index) in errorMessages" :key="index">
-            {{ err }}
-          </li>
-        </ol>
-      </div>
-      <FormCreatePalletType class="packing-product-form" />
-    </div>
-    <div v-else class="packing-product-data">
-      <div class="packing-product-data-pallet">
-        <PalletConfigurator />
-      </div>
-      <div class="packing-product-data-detail">
-        <TableItemUnregisteredProduct />
-        <div>
-          <label>Тип паллеты:</label>
-          <ul>
-            <li>{{ palletStore.palletTypeByID?.name }}</li>
-          </ul>
-          <label>Габариты паллеты:</label>
-          <ul>
-            <li>
-              {{ palletStore.palletTypeByID?.length }} x
-              {{ palletStore.palletTypeByID?.width }} x
-              {{ palletStore.palletTypeByID?.height }} (мм)
-            </li>
-          </ul>
-          <label>Тип поддона:</label>
-          <ul>
-            <li>
-              {{ palletStore.basePalletTypeById?.code }} &mdash; 1200 x
-              {{ palletStore.basePalletTypeById?.width }} x 145 (мм)
-            </li>
-          </ul>
-          <label>Изделий в паллете:</label>
-          <ul>
-            <li>{{ totalCountProductPallet }} шт.</li>
-          </ul>
-          <label>Масса паллеты:</label>
-          <ul>
-            <li>{{ totalWeightPallet }} &#177; 1 кг.</li>
-          </ul>
-        </div>
-        <button class="btn btn-outline-primary grp-btn" @click="handlerPrint">
-          Печать Barcode
-        </button>
-      </div>
-    </div>
-  </div>
-</template>
 <script setup>
-import { usePackingStore } from "@/stores/HTTP/PackingStore.js";
-import { usePrintingStore } from "@/stores/HTTP/PrintingStore.js";
-import { useWarehouseStore } from "@/stores/HTTP/WarehouseStore.js";
-import { useERPStore } from "@/stores/HTTP/ERPStore.js";
+import {usePackingStore} from "@/stores/HTTP/PackingStore.js";
+import {usePrintingStore} from "@/stores/HTTP/PrintingStore.js";
+import {useWarehouseStore} from "@/stores/HTTP/WarehouseStore.js";
+import {useERPStore} from "@/stores/HTTP/ERPStore.js";
 import PalletConfigurator from "@/components/UI/SVG/Pallet/PalletConfigurator.vue";
 import TableItemUnregisteredProduct from "@/components/Tables/ERP/TableItemUnregisteredProduct.vue";
-import { computed, nextTick } from "vue";
-import { useErrorCodeDictionary } from "@/composables/Dictionary/useErrorCodeDictionary.js";
-import { usePalletStore } from "@/stores/HTTP/PalletStore.js";
+import {computed, nextTick} from "vue";
+import {useErrorCodeDictionary} from "@/composables/Dictionary/useErrorCodeDictionary.js";
+import {usePalletStore} from "@/stores/HTTP/PalletStore.js";
 import FormCreatePalletType from "@/components/Forms/FormCreatePalletType.vue";
 
 const ERPStore = useERPStore();
@@ -82,23 +17,23 @@ const printingStore = usePrintingStore();
 const warehouseStore = useWarehouseStore();
 const totalCountProductPallet = computed(() => {
   return (
-    palletStore.palletTypeByID.rows_length *
-    palletStore.palletTypeByID.rows_width *
-    palletStore.palletTypeByID.rows_height
+      palletStore.palletTypeByID.rows_length *
+      palletStore.palletTypeByID.rows_width *
+      palletStore.palletTypeByID.rows_height
   );
 });
 const totalWeightPallet = computed(() => {
   return (
-    Number(palletStore.basePalletTypeById.weight) +
-    Math.round(
-      Number(ERPStore.productTypeId.max_weight) * totalCountProductPallet.value,
-    )
+      Number(palletStore.basePalletTypeById.weight) +
+      Math.round(
+          Number(ERPStore.productTypeId.max_weight) * totalCountProductPallet.value,
+      )
   );
 });
 const errorMessages = computed(() => {
   if (!packingStore.detailInfoPackingProduct?.error) return [];
   return packingStore.detailInfoPackingProduct.error.map(
-    (err) => useErrorCodeDictionary[err] || `Неизвестная ошибка (${err})`,
+      (err) => useErrorCodeDictionary[err] || `Неизвестная ошибка (${err})`,
   );
 });
 const handlerPrint = async () => {
@@ -117,9 +52,9 @@ const handlerPrint = async () => {
     }
     await printingStore.GET_ZPL_PRINTERS();
     await printingStore.GET_LABEL_TEMPLATE();
-    if (warehouseStore.selectedZone.id) {
+    if (warehouseStore.selectedZone) {
       const printerInZone = printingStore.printersList.printers.find(
-        (printer) => printer.zone === warehouseStore.selectedZone.id,
+          (printer) => printer.zone === warehouseStore.selectedZonesByZoneType.id,
       );
       if (printerInZone) {
         await printingStore.setSelectedPrinter(printerInZone);
@@ -127,18 +62,18 @@ const handlerPrint = async () => {
       if (ERPStore.isProductsActive) {
         if (printingStore.selectedPrinter.name !== "BIXOLON_SPP-L410 WiFi") {
           await printingStore.setSelectedLabelTemplate(
-            printingStore.labelTemplatesList.find(
-              (label) => label.code === "300_этикетка_58*40_Продукция",
-            ),
+              printingStore.labelTemplatesList.find(
+                  (label) => label.code === "300_этикетка_58*40_Продукция",
+              ),
           );
         }
       }
       if (ERPStore.isComponentsActive) {
         if (printingStore.selectedPrinter.name !== "BIXOLON_SPP-L410 WiFi") {
           await printingStore.setSelectedLabelTemplate(
-            printingStore.labelTemplatesList.find(
-              (label) => label.code === "300_этикетка_58*40_Комплектующая",
-            ),
+              printingStore.labelTemplatesList.find(
+                  (label) => label.code === "300_этикетка_58*40_Комплектующая",
+              ),
           );
         }
       }
@@ -149,49 +84,128 @@ const handlerPrint = async () => {
   }
 };
 </script>
+<template>
+  <div
+      v-if="packingStore.isShownTableItemUnregProduct"
+      class="packing-product-data-container"
+  >
+    <label class="packing-product-data-title">
+      Информация об упаковке продукции
+      {{ packingStore.detailInfoPackingProduct?.name }}:
+    </label>
+    <div
+        v-if="packingStore.detailInfoPackingProduct?.error"
+        class="modal-grid-msg"
+    >
+      <div class="alert alert-warning" data-bs-theme="dark" role="alert">
+        Ошибка:
+        <ol class="mb-0">
+          <li v-for="(err, index) in errorMessages" :key="index">
+            {{ err }}
+          </li>
+        </ol>
+      </div>
+      <FormCreatePalletType class="packing-product-form"/>
+    </div>
+    <div v-else class="packing-product-data">
+      <PalletConfigurator class="packing-product-data-pallet"/>
+      <div  class="packing-product-data-table">
+      <TableItemUnregisteredProduct/>
+      </div>
+      <div class="packing-product-data-detail">
+        <label>Тип паллеты:</label>
+        <div>{{ palletStore.palletTypeByID?.name }}</div>
+        <label>Габариты паллеты:</label>
+        <div>
+          {{ palletStore.palletTypeByID?.length }} x
+          {{ palletStore.palletTypeByID?.width }} x
+          {{ palletStore.palletTypeByID?.height }} (мм)
+        </div>
+        <label>Тип поддона:</label>
+        <div>
+          {{ palletStore.basePalletTypeById?.code }} &mdash; 1200 x
+          {{ palletStore.basePalletTypeById?.width }} x 145 (мм)
+        </div>
+        <label>Изделий в паллете:</label>
+        <div>{{ totalCountProductPallet }} шт.</div>
+        <label>Масса паллеты:</label>
+        <div>{{ totalWeightPallet }} &#177; 1 кг.</div>
+      </div>
+      <div class="grp-btn">
+        <button class="btn btn-outline-primary" @click="handlerPrint">
+          Печать этикеток
+        </button>
+      </div>
+    </div>
+  </div>
+</template>
 <style scoped>
 .packing-product-data-container {
-  background-color: #2e2e2e;
-  border: 1px solid #605039e0;
-  border-radius: 1rem;
+
   display: grid;
   grid-template-columns: minmax(auto, 1fr);
   grid-template-rows: min-content minmax(auto, 1fr);
-  padding: 1rem;
   row-gap: 2rem;
 }
 
 .packing-product-data-title {
+  padding: .4rem 1.5rem;
+  background-color: #2e2e2e;
+  border: 1px solid #605039e0;
+  border-radius: .5rem;
   font-size: 1.7rem;
 }
 
 .packing-product-data {
-  align-items: start;
   display: grid;
-  grid-template-columns: minmax(auto, 1fr);
+  grid-template-columns: minmax(auto, 1fr) auto;
   grid-template-rows: min-content min-content;
   overflow: auto;
-  row-gap: 2rem;
+  gap: 2rem;
 }
 
 .modal-grid-msg,
 .packing-product-form {
+  padding: 1rem;
+  background-color: #2e2e2e;
+  border: 1px solid #605039e0;
+  border-radius: 1rem;
   max-width: 500px;
 }
 
 .packing-product-data-pallet {
   display: grid;
+  padding: 1rem;
+  background-color: #2e2e2e;
+  border: 1px solid #605039e0;
+  border-radius: .5rem;
   grid-template-columns: minmax(auto, 1fr);
 }
 
 .packing-product-data-detail {
-  column-gap: 2rem;
   display: grid;
-  grid-template-columns: auto auto auto;
-  grid-template-rows: 1fr;
+  grid-template-columns: auto auto;
+  color: silver;
+  font-size: 1.2rem;
+  padding: .5rem 1rem;
+  background-color: #2e2e2e;
+  border: 1px solid #605039e0;
+  border-radius: .5rem;
+}
+
+.packing-product-data-table {
+  display: grid;
+  padding: 1rem;
+  background-color: #2e2e2e;
+  border: 1px solid #605039e0;
+  border-radius: .5rem;
 }
 
 .grp-btn {
-  align-self: start;
+  display: grid;
+  border: 1px solid #605039e0;
+  border-radius: .5rem;
+  place-items: center;
+
 }
 </style>

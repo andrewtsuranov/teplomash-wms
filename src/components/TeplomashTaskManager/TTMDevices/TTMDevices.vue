@@ -1,61 +1,136 @@
 <script setup>
-import { useWebSocketStore } from "@/stores/WebSockets/WebSocketStore.js";
-import { useTSDStore } from "@/stores/HTTP/TSDStore.js";
-import { watch } from "vue";
+import {useWebSocketStore} from "@/stores/WebSockets/WebSocketStore.js";
+import {useTSDStore} from "@/stores/HTTP/TSDStore.js";
+import {onMounted, watch} from "vue";
+import {useUserStore} from "@/stores/HTTP/UserStore.js";
+import {useTransactionStore} from "@/stores/WebSockets/transactionStore.js";
 
+const userStore = useUserStore();
 const TSDStore = useTSDStore();
+const transactionStore = useTransactionStore();
 const webSocketStore = useWebSocketStore();
+// Функция для обновления статуса is_busy устройств
+const updateDeviceBusyStatus = () => {
+  // Проверяем, что списки транзакций и устройств доступны и не пусты
+  if (!transactionStore.allTransactionsList100?.length || !TSDStore.onlineTSDList?.length) {
+    return; // Прерываем выполнение, если данные не загружены или пусты
+  }
+
+  TSDStore.onlineTSDList = TSDStore.onlineTSDList.map(device => {
+    // Ищем транзакции для устройства
+    const transactions = transactionStore.allTransactionsList100.filter(tr => tr.assigned_to_id === device.id);
+    const transaction = transactions[0]; // Берем первую транзакцию, если она есть
+
+    if (transaction) {
+      // Если транзакция PENDING или IN_PROGRESS, устанавливаем is_busy: true
+      if (transaction.status === "PENDING" || transaction.status === "IN_PROGRESS") {
+        return { ...device, is_busy: true };
+      }
+      // Если транзакция COMPLETED или CANCELED, устанавливаем is_busy: false
+      if (transaction.status === "COMPLETED" || transaction.status === "CANCELED") {
+        return { ...device, is_busy: false };
+      }
+    }
+    // Если транзакции нет или статус не соответствует, устанавливаем is_busy: false
+    return { ...device, is_busy: false };
+  });
+};
+// Следим за изменениями в списке онлайн ТСД
+watch(
+    () => TSDStore.onlineTSDList,
+    (newDevice) => {
+      // Если есть выбранный ТСД и он отсутствует в новом списке, очищаем его
+      if (
+          TSDStore.selectedTSD &&
+          newDevice &&
+          !newDevice.some((device) => device.id === TSDStore.selectedTSD.id)
+      ) {
+        TSDStore.clear_selectedTSD();
+      }
+    },
+    {deep: true}
+);
+// Следим за изменениями в списке транзакций
+watch(
+    () => transactionStore.allTransactionsList100,
+    () => {
+      updateDeviceBusyStatus();
+    },
+    {deep: true}
+);
+const handleSelectedDevices = async (device) => {
+  await TSDStore.set_selectedTSD(device);
+};
+onMounted(async () => {
+  try {
+    // Загружаем список пользователей, если он пуст
+    if (!userStore.fullListUsers) {
+      await userStore.GET_USERS();
+    }
+    // Проверяем наличие устройств и транзакций
+    if (!TSDStore.onlineTSDList?.length || !transactionStore.allTransactionsList100?.length) {
+      const unwatch = watch(
+          () => ({
+            devices: TSDStore.onlineTSDList,
+            transactions: transactionStore.allTransactionsList100,
+          }),
+          ({devices, transactions}) => {
+            if (devices?.length && transactions?.length) {
+              updateDeviceBusyStatus();
+              unwatch(); // Отключаем наблюдатель после первого обновления
+            }
+          },
+          {deep: true}
+      );
+    } else {
+      updateDeviceBusyStatus();
+    }
+  } catch (e) {
+    console.log("Error in onMounted:", e);
+  }
+});
 </script>
 <template>
   <div class="ttm-devices-container gold-gray-block">
-    <label v-if="!webSocketStore.isConnected"
-           class="ttm-devices-name-offline"
-    >
-      Нет соединения с ТСД</label
-    >
+    <label v-if="!webSocketStore.isConnected" class="ttm-devices-name-offline">
+      Нет соединения с ТСД
+    </label>
     <div v-else class="ttm-devices-online">
       <label class="ttm-devices-header-online">Активные ТСД:</label>
       <div
-        v-if="webSocketStore.isConnected && TSDStore.onlineTSDList?.length > 0"
-        class="ttm-devices-list-online"
+          v-if="webSocketStore.isConnected && TSDStore.onlineTSDList?.length > 0"
+          class="ttm-devices-list-online"
       >
         <div
-          v-for="device in TSDStore.onlineTSDList"
-          :key="device.id"
-          class="ttm-devices-item-online gold-black-block"
+            v-for="device in TSDStore.onlineTSDList"
+            :key="device.id"
+            class="ttm-devices-item-online gold-black-block"
         >
           <div
-            :class="{active:TSDStore.selectedTSD?.id === device.id}"
-            class="ttm-devices-item-name-online"
-            @click="TSDStore.set_selectedTSD(device)"
+              :class="{ active: TSDStore.selectedTSD?.id === device.id }"
+              class="ttm-devices-item-name-online"
+              @click="handleSelectedDevices(device)"
           >
-              <span class="item-title"
-              >{{ device.name }} (ID={{ device.id }})</span
-              >
-            <!--            <span :class="{-->
-            <!--                            'no-task': device.current_task === null,-->
-            <!--                            'has-task': device.current_task !== null-->
-            <!--                          }"-->
-            <!--                  class="item-title"-->
-            <!--            >-->
-            <!--                            <i v-if="device.current_task === null"-->
-            <!--                               class="bi bi-circle-fill"-->
-            <!--                            ></i>-->
-            <!--                            <i v-else class="bi bi-circle-fill"></i>-->
-            <!--                            {{ device.current_task?.type ?? "Доступен" }}-->
-            <!--                          </span>-->
+            <span class="item-title">{{ device.name }} (ID={{ device.id }})</span>
+            <span
+                :class="{
+                'no-task': !device.is_busy,
+                'has-task': device.is_busy
+              }"
+                class="item-title-status"
+            >
+              <i v-if="device.is_busy" class="bi bi-circle-fill"></i>
+              <i v-else class="bi bi-circle-fill"></i>
+              {{ device.is_busy ? "Выполняется задача..." : "Нет задач" }}
+            </span>
           </div>
         </div>
       </div>
       <div
-        v-if="
-            webSocketStore.isConnected && TSDStore.onlineTSDList?.length === 0
-          "
-        class="ttm-devices-none-online"
+          v-if="webSocketStore.isConnected && TSDStore.onlineTSDList?.length === 0"
+          class="ttm-devices-none-online"
       >
-        <label class="ttm-devices-none-item-online non-active-color"
-        >Список пуст</label
-        >
+        <label class="ttm-devices-none-item-online non-active-color">Список пуст</label>
       </div>
     </div>
   </div>
@@ -115,13 +190,11 @@ const webSocketStore = useWebSocketStore();
 .ttm-devices-item-online {
   display: grid;
   align-items: stretch;
-
 }
 
 .ttm-devices-item-online:first-of-type {
   border-top: none;
 }
-
 
 .ttm-devices-item-name-online {
   align-items: center;
@@ -148,6 +221,14 @@ const webSocketStore = useWebSocketStore();
   font-weight: bold;
 }
 
+.item-title-status {
+  display: grid;
+  grid-template-columns: min-content auto;
+  align-items: center;
+  font-size: 17px;
+  column-gap: .5rem;
+}
+
 .ttm-devices-none-online {
   display: grid;
   place-items: center;
@@ -168,7 +249,6 @@ const webSocketStore = useWebSocketStore();
 }
 
 @media (max-width: 800px) {
-
   .ttm-devices-container {
     display: grid;
     grid-template-rows: minmax(10rem, 1fr);

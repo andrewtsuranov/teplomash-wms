@@ -1,25 +1,19 @@
-<template>
-  <div class="wms-packing-container">
-    <h2 v-if="warehouseStore.selectedZone">
-      {{ warehouseStore.selectedZone.name.replace(/_/g, " ").toUpperCase() }}
-    </h2>
-    <ERPData />
-    <PackingProductData />
-    <TeplomashTaskManager />
-    <PalletData />
-    <ModalPrint />
-  </div>
-</template>
 <script setup>
-import { useWarehouseStore } from "@/stores/HTTP/WarehouseStore.js";
 import ERPData from "@/components/WMS/Process/PAC/ERPData.vue";
 import PackingProductData from "@/components/WMS/Process/PAC/PackingProductData.vue";
 import TeplomashTaskManager from "@/components/TeplomashTaskManager/TeplomashTaskManager.vue";
-import PalletData from "@/components/WMS/Process/PAC/PalletData.vue";
 import ModalPrint from "@/components/Modals/ModalPrint.vue";
-
-const warehouseStore = useWarehouseStore();
+import PalletData from "@/components/WMS/Process/PAC/PalletData.vue";
 </script>
+<template>
+  <div class="wms-packing-container">
+    <ERPData/>
+    <PackingProductData/>
+    <TeplomashTaskManager/>
+    <PalletData/>
+    <ModalPrint/>
+  </div>
+</template>
 <style scoped>
 .wms-packing-container {
   display: grid;

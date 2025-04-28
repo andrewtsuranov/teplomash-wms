@@ -1,62 +1,8 @@
-<template>
-  <div class="wms-packing-pallet">
-    <div
-      v-for="pallet in palletsList"
-      :key="pallet.id"
-      :class="[
-        'pallet-status',
-        'pallet-background',
-        {
-          pending: isPending(pallet),
-          finish: isCompleted(pallet),
-          error: isDeleted(pallet),
-          blinking: pallet.isBlinking,
-        },
-      ]"
-      class="pallet-item-content"
-    >
-      <div class="pallet-item-row-one">
-        <div class="piro">
-          <div class="piro-id">Паллета #{{ pallet.id }}</div>
-          <div v-if="pallet.abc_class" class="piro-abc">
-            Класс: {{ pallet.abc_class }}
-          </div>
-          <div v-if="pallet.length" class="piro-size">
-            Габарит: {{ pallet.length }}мм
-          </div>
-          <div v-if="pallet.items" class="piro-qyt">
-            Кол-во груза: {{ pallet.items.length }} шт
-          </div>
-          <div v-if="pallet.weight" class="piro-weight">
-            Масса с грузом: {{ pallet.weight }} кг
-          </div>
-        </div>
-        <div class="pirt-qr" v-html="pallet.qrCode"></div>
-      </div>
-      <div class="pallet-item-row-two">
-        <div class="pirt-content">
-          <div style="font-size: 1.75rem; font-weight: bold">
-            {{ pallet.barcode || "Ожидание данных..." }}
-          </div>
-          <div v-if="pallet.xyz_class">
-            Зона: {{ pallet.current_zone }}, Класс XYZ: {{ pallet.xyz_class }}
-          </div>
-        </div>
-      </div>
-      <div class="pallet-item-row-three">
-        <div class="piro-date">Создано: {{ formatDate(pallet.createdAt) }}</div>
-        <div class="piro-status">
-          Статус: {{ getStatusText(pallet.status) }}
-        </div>
-      </div>
-    </div>
-  </div>
-</template>
 <script setup>
-import { ref, onMounted, watch } from "vue";
-import { useTransactionStore } from "@/stores/WebSockets/transactionStore.js";
-import { usePalletStore } from "@/stores/HTTP/PalletStore.js";
-import { useTranslationsDictionary } from "@/composables/Dictionary/useTransactionsDictionary.js";
+import {ref, onMounted, watch} from "vue";
+import {useTransactionStore} from "@/stores/WebSockets/transactionStore.js";
+import {usePalletStore} from "@/stores/HTTP/PalletStore.js";
+import {useTranslationsDictionary} from "@/composables/Dictionary/useTransactionsDictionary.js";
 import QRCode from "qrcode";
 
 const transactionStore = useTransactionStore();
@@ -106,8 +52,8 @@ const generateQR = async (data) => {
 // Создание новой паллеты из данных транзакции
 const createPalletFromTransaction = async (transaction) => {
   if (
-    !transaction.stage_progress?.stage_name?.includes("Создание паллеты") &&
-    transaction.transaction_type !== "ADD_PALLET"
+      !transaction.stage_progress?.stage_name?.includes("Создание паллеты") &&
+      transaction.transaction_type !== "ADD_PALLET"
   ) {
     return null;
   }
@@ -123,22 +69,22 @@ const createPalletFromTransaction = async (transaction) => {
   };
   // Если статус COMPLETED и есть полные данные паллеты
   if (
-    transaction.status === TRANSACTION_STATUS.COMPLETED &&
-    transaction.pallet
+      transaction.status === TRANSACTION_STATUS.COMPLETED &&
+      transaction.pallet
   ) {
     // Копируем все данные из transaction.pallet
     Object.assign(palletData, transaction.pallet);
   }
   // Генерируем QR-код с доступными данными
   const qrText =
-    transaction.pallet?.barcode ||
-    `Паллета-${palletId}-${new Date().toISOString().slice(0, 10)}`;
+      transaction.pallet?.barcode ||
+      `Паллета-${palletId}-${new Date().toISOString().slice(0, 10)}`;
   palletData.qrCode = await generateQR(qrText);
   // Устанавливаем вес если его нет
   if (!palletData.weight && transaction.pallet?.items) {
     palletData.weight = transaction.pallet.items.reduce(
-      (sum, item) => sum + (item.weight || 0),
-      0,
+        (sum, item) => sum + (item.weight || 0),
+        0,
     );
   }
   return palletData;
@@ -158,10 +104,7 @@ const handleDeletedStatus = (palletIndex) => {
   }, 10000); // 10 секунд
 };
 // Обновление паллеты на основе статуса транзакции
-const updatePalletFromTransaction = async (
-  transaction,
-  existingPalletIndex,
-) => {
+const updatePalletFromTransaction = async (transaction, existingPalletIndex,) => {
   const pallet = palletsList.value[existingPalletIndex];
   // Если статус изменился
   if (pallet.status !== transaction.status) {
@@ -169,8 +112,8 @@ const updatePalletFromTransaction = async (
     pallet.status = transaction.status;
     // Если статус COMPLETED и есть данные паллеты
     if (
-      transaction.status === TRANSACTION_STATUS.COMPLETED &&
-      transaction.pallet
+        transaction.status === TRANSACTION_STATUS.COMPLETED &&
+        transaction.pallet
     ) {
       // Обновляем все свойства из pallet
       Object.assign(pallet, transaction.pallet);
@@ -188,55 +131,51 @@ const updatePalletFromTransaction = async (
   return false;
 };
 // Отслеживаем изменения в транзакциях
-watch(
-  () => transactionStore.allTransactionsList100,
-  async (newTransactions) => {
-    if (!newTransactions || newTransactions.length === 0) return;
-    for (const transaction of newTransactions) {
-      // Проверяем, относится ли транзакция к созданию паллеты
-      if (
-        (transaction.stage_progress?.stage_name?.includes("Создание паллеты") ||
-          transaction.transaction_type === "ADD_PALLET") &&
-        transaction.status
-      ) {
-        // Ищем существующую паллету по ID транзакции
-        const existingPalletIndex = palletsList.value.findIndex(
-          (p) => p.transactionId === transaction.id,
-        );
-        if (existingPalletIndex !== -1) {
-          // Если паллета уже существует, обновляем её статус
-          const wasUpdated = await updatePalletFromTransaction(
-            transaction,
-            existingPalletIndex,
+watch(() => transactionStore.allTransactionsList100, async (newTransactions) => {
+      if (!newTransactions || newTransactions.length === 0) return;
+      for (const transaction of newTransactions) {
+        // Проверяем, относится ли транзакция к созданию паллеты
+        if (
+            (transaction.stage_progress?.stage_name?.includes("Создание паллеты") ||
+                transaction.transaction_type === "ADD_PALLET") &&
+            transaction.status
+        ) {
+          // Ищем существующую паллету по ID транзакции
+          const existingPalletIndex = palletsList.value.findIndex(
+              (p) => p.transactionId === transaction.id,
           );
-          // Если были изменения и это не удаление
-          if (
-            wasUpdated &&
-            transaction.status !== TRANSACTION_STATUS.CANCELED
-          ) {
-            // Удаляем и вставляем в начало списка для сортировки
-            const updatedPallet = palletsList.value.splice(
-              existingPalletIndex,
-              1,
-            )[0];
-            palletsList.value.unshift(updatedPallet);
-          }
-        } else {
-          // Если это новая транзакция, создаем новую паллету
-          const newPallet = await createPalletFromTransaction(transaction);
-          if (newPallet) {
-            palletsList.value.unshift(newPallet);
-            // Если статус CANCELED, запускаем обработку сразу
-            if (transaction.status === TRANSACTION_STATUS.CANCELED) {
-              handleDeletedStatus(0);
+          if (existingPalletIndex !== -1) {
+            // Если паллета уже существует, обновляем её статус
+            const wasUpdated = await updatePalletFromTransaction(
+                transaction,
+                existingPalletIndex,
+            );
+            // Если были изменения и это не удаление
+            if (
+                wasUpdated &&
+                transaction.status !== TRANSACTION_STATUS.CANCELED
+            ) {
+              // Удаляем и вставляем в начало списка для сортировки
+              const updatedPallet = palletsList.value.splice(
+                  existingPalletIndex,
+                  1,
+              )[0];
+              palletsList.value.unshift(updatedPallet);
+            }
+          } else {
+            // Если это новая транзакция, создаем новую паллету
+            const newPallet = await createPalletFromTransaction(transaction);
+            if (newPallet) {
+              palletsList.value.unshift(newPallet);
+              // Если статус CANCELED, запускаем обработку сразу
+              if (transaction.status === TRANSACTION_STATUS.CANCELED) {
+                handleDeletedStatus(0);
+              }
             }
           }
         }
       }
-    }
-  },
-  { deep: true },
-);
+    }, {deep: true});
 // Инициализация компонента
 onMounted(async () => {
   isLoading.value = true;
@@ -248,20 +187,20 @@ onMounted(async () => {
     if (transactions && transactions.length > 0) {
       // Сортируем транзакции по timestamp (новые сверху)
       const sortedTransactions = [...transactions].sort(
-        (a, b) => new Date(b.timestamp) - new Date(a.timestamp),
+          (a, b) => new Date(b.timestamp) - new Date(a.timestamp),
       );
       // Обрабатываем только транзакции создания паллет
       for (const transaction of sortedTransactions) {
         if (
-          (transaction.stage_progress?.stage_name?.includes(
-            "Создание паллеты",
-          ) ||
-            transaction.transaction_type === "ADD_PALLET") &&
-          transaction.status
+            (transaction.stage_progress?.stage_name?.includes(
+                    "Создание паллеты",
+                ) ||
+                transaction.transaction_type === "ADD_PALLET") &&
+            transaction.status
         ) {
           // Проверяем, не обработали ли мы уже эту транзакцию
           const existingPalletIndex = palletsList.value.findIndex(
-            (p) => p.transactionId === transaction.id,
+              (p) => p.transactionId === transaction.id,
           );
           if (existingPalletIndex === -1) {
             const pallet = await createPalletFromTransaction(transaction);
@@ -283,6 +222,59 @@ onMounted(async () => {
   }
 });
 </script>
+<template>
+  <div class="wms-packing-pallet">
+    <div v-for="pallet in palletsList"
+        :key="pallet.id"
+        :class="[
+        'pallet-status',
+        'pallet-background',
+        {
+          pending: isPending(pallet),
+          finish: isCompleted(pallet),
+          error: isDeleted(pallet),
+          blinking: pallet.isBlinking,
+        },
+      ]"
+        class="pallet-item-content"
+    >
+      <div class="pallet-item-row-one">
+        <div class="piro">
+          <div class="piro-id">Паллета #{{ pallet.id }}</div>
+          <div v-if="pallet.abc_class" class="piro-abc">
+            Класс: {{ pallet.abc_class }}
+          </div>
+          <div v-if="pallet.length" class="piro-size">
+            Габарит: {{ pallet.length }}мм
+          </div>
+          <div v-if="pallet.items" class="piro-qyt">
+            Кол-во груза: {{ pallet.items.length }} шт
+          </div>
+          <div v-if="pallet.weight" class="piro-weight">
+            Масса с грузом: {{ pallet.weight }} кг
+          </div>
+        </div>
+        <div class="pirt-qr" v-html="pallet.qrCode"></div>
+      </div>
+      <div class="pallet-item-row-two">
+        <div class="pirt-content">
+          <div style="font-size: 1.75rem; font-weight: bold">
+            {{ pallet.barcode || "Ожидание данных..." }}
+          </div>
+          <div v-if="pallet.xyz_class">
+            Зона: {{ pallet.current_zone }}, Класс XYZ: {{ pallet.xyz_class }}
+          </div>
+        </div>
+      </div>
+      <div class="pallet-item-row-three">
+        <div class="piro-date">Создано: {{ formatDate(pallet.createdAt) }}</div>
+        <div class="piro-status">
+          Статус: {{ getStatusText(pallet.status) }}
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
 <style scoped>
 .wms-packing-pallet {
   display: grid;

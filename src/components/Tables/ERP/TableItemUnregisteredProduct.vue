@@ -1,22 +1,21 @@
 <template>
-  <div class="packing-product-data-table">
-    <table class="table table-dark table-hover">
-      <thead class="table-info">
+  <div class="in-table-container table-responsive">
+    <table class="table-content table table-dark align-middle table-hover">
+      <thead>
       <tr>
         <th>№</th>
-        <th>Название</th>
-        <th>Штрихкод</th>
-        <th>Дата</th>
+        <th>Изделие</th>
+        <th>Зав.номер</th>
+        <th>Выпуск</th>
       </tr>
       </thead>
       <tbody v-if="ERPStore.minItemsByIdUnreg">
       <tr v-for="(item, index) in ERPStore.minItemsByIdUnreg" :key="index">
         <td>{{ index + 1 }}</td>
         <td>{{ packingStore.detailInfoPackingProduct?.name }}</td>
-        <td>{{ item.barcode }}</td>
+        <td style="color: coral">{{ item.barcode }}</td>
         <td>
           {{ useSplitDateByT(item.created_at).date }}
-          {{ useSplitDateByT(item.created_at).time }}
         </td>
       </tr>
       </tbody>
@@ -32,21 +31,23 @@ const packingStore = usePackingStore();
 const ERPStore = useERPStore();
 </script>
 <style scoped>
-.packing-product-data-table {
+.in-table-container {
   display: grid;
   grid-template-columns: minmax(auto, 1fr);
   max-height: 370px;
   overflow: auto;
-
 }
-
-table {
-  margin: 0;
-}
-
 table thead {
+  box-shadow: 0 1px 0 0 red;
   position: sticky;
   top: 0;
-  z-index: 10;
+  z-index: 1;
+}
+@media (max-width: 800px) {
+  .in-table-container {
+    display: grid;
+    grid-column: 1;
+    grid-template-columns: 1fr;
+  }
 }
 </style>
