@@ -38,8 +38,8 @@
   <RouterView />
 </template>
 <script setup>
-import { useUserStore } from "@/stores/HTTP/UserStore.js";
-import { useWebSocketStore } from "@/stores/WebSockets/WebSocketStore.js";
+import { useUserStore } from "@/stores/WMSStores/UserStore.js";
+import { useWebSocketStore } from "@/stores/WebSocketStore.js";
 import { useErrorStore } from "@/stores/Error/ErrorStore.js";
 import { onMounted } from "vue";
 import { useRouter, useRoute } from "vue-router";

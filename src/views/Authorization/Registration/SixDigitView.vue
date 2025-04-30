@@ -54,7 +54,7 @@
 <script setup>
 import { ref, onMounted, nextTick, onUnmounted } from "vue";
 import MyInput from "@/components/UI/Inputs/MyInput.vue";
-import { useUserStore } from "@/stores/HTTP/UserStore";
+import { useUserStore } from "@/stores/WMSStores/UserStore";
 import { useRouter } from "vue-router";
 import { useVerificationCode } from "@/composables/Validations/useVerificationCode.js";
 

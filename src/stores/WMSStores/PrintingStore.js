@@ -3,8 +3,8 @@ import { ref } from "vue";
 import ky from "ky";
 import { requestUrls } from "@/stores/request-urls.js";
 import { useErrorStore } from "@/stores/Error/ErrorStore.js";
-import { useUserStore } from "@/stores/HTTP/UserStore.js";
-import { usePackingStore } from "@/stores/HTTP/PackingStore.js";
+import { useUserStore } from "@/stores/WMSStores/UserStore.js";
+import { usePackingStore } from "@/stores/WMSStores/PackingStore.js";
 
 const userStore = useUserStore();
 const kyStd = ky.create({

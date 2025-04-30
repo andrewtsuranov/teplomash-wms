@@ -19,7 +19,7 @@ import SearchResults from "@/components/WMS/Process/REC/map/SearchResults.vue";
 import RackProfileView from "@/components/WMS/Process/REC/RackProfileView.vue";
 import TeplomashTaskManager from "@/components/TeplomashTaskManager/TeplomashTaskManager.vue";
 import WarehouseSearch from "@/components/WMS/Process/REC/map/WarehouseSearch.vue";
-import { useStorageStore } from "@/stores/HTTP/StorageStore.js";
+import { useStorageStore } from "@/stores/WMSStores/StorageStore.js";
 
 
 const storageStore = useStorageStore();

@@ -1,13 +1,13 @@
 <script setup>
-import {usePackingStore} from "@/stores/HTTP/PackingStore.js";
-import {usePrintingStore} from "@/stores/HTTP/PrintingStore.js";
-import {useWarehouseStore} from "@/stores/HTTP/WarehouseStore.js";
-import {useERPStore} from "@/stores/HTTP/ERPStore.js";
+import {usePackingStore} from "@/stores/WMSStores/PackingStore.js";
+import {usePrintingStore} from "@/stores/WMSStores/PrintingStore.js";
+import {useWarehouseStore} from "@/stores/WMSStores/WarehouseStore.js";
+import {useERPStore} from "@/stores/WMSStores/ERPStore.js";
 import PalletConfigurator from "@/components/UI/SVG/Pallet/PalletConfigurator.vue";
 import TableItemUnregisteredProduct from "@/components/Tables/ERP/TableItemUnregisteredProduct.vue";
 import {computed, nextTick} from "vue";
 import {useErrorCodeDictionary} from "@/composables/Dictionary/useErrorCodeDictionary.js";
-import {usePalletStore} from "@/stores/HTTP/PalletStore.js";
+import {usePalletStore} from "@/stores/WMSStores/PalletStore.js";
 import FormCreatePalletType from "@/components/Forms/FormCreatePalletType.vue";
 
 const ERPStore = useERPStore();
@@ -109,8 +109,8 @@ const handlerPrint = async () => {
     </div>
     <div v-else class="packing-product-data">
       <PalletConfigurator class="packing-product-data-pallet"/>
-      <div  class="packing-product-data-table">
-      <TableItemUnregisteredProduct/>
+      <div class="packing-product-data-table">
+        <TableItemUnregisteredProduct/>
       </div>
       <div class="packing-product-data-detail">
         <label>Тип паллеты:</label>
@@ -164,13 +164,10 @@ const handlerPrint = async () => {
   gap: 2rem;
 }
 
-.modal-grid-msg,
 .packing-product-form {
-  padding: 1rem;
-  background-color: #2e2e2e;
-  border: 1px solid #605039e0;
-  border-radius: 1rem;
-  max-width: 500px;
+  display: grid;
+  grid-template-columns: minmax(auto, 1fr);
+  grid-template-rows: minmax(auto, 1fr);
 }
 
 .packing-product-data-pallet {

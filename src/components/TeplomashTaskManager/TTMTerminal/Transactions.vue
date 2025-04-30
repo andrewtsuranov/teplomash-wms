@@ -1,12 +1,16 @@
 <script setup>
-import {useTSDStore} from "@/stores/HTTP/TSDStore.js";
-import {useWarehouseStore} from "@/stores/HTTP/WarehouseStore.js";
-import {useTransactionStore} from "@/stores/WebSockets/transactionStore.js";
+import {useTSDStore} from "@/stores/WMSStores/TSDStore.js";
+import {useWarehouseStore} from "@/stores/WMSStores/WarehouseStore.js";
+import {useTransactionStore} from "@/stores/WMSStores/TransactionStore.js";
 import {useTranslationsDictionary} from "@/composables/Dictionary/useTransactionsDictionary.js";
 import {useTransactionsColorDictionary} from "@/composables/Dictionary/useTransactionsColorDictionary.js";
 import {useFormatDate} from "@/composables/Date/useFormatDate.js";
+import {computed, onMounted} from "vue";
+import {useUserStore} from "@/stores/WMSStores/UserStore.js";
 
 const TSDStore = useTSDStore();
+
+const userStore = useUserStore()
 const warehouseStore = useWarehouseStore();
 const transactionStore = useTransactionStore();
 const {formatTimestamp} = useFormatDate();

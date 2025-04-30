@@ -1,7 +1,7 @@
 <script setup>
-import {useWebSocketStore} from "@/stores/WebSockets/WebSocketStore.js";
-import {useTSDStore} from "@/stores/HTTP/TSDStore.js";
-import Transactions from "@/components/TeplomashTaskManager/TTMTerminal/Transactions.vue";
+import {useWebSocketStore} from "@/stores/WebSocketStore.js";
+import {useTSDStore} from "@/stores/WMSStores/TSDStore.js";
+import Transactions from "@/components/TeplomashTaskManager/TTMTerminal/Transactions.vue"
 
 const webSocketStore = useWebSocketStore()
 const TSDStore = useTSDStore();
@@ -31,7 +31,7 @@ const testGetTransaction = async (id) => {
     >
       <div class="ttm-terminal-active-devices">
         Выбран: {{ TSDStore.selectedTSD?.name }}
-        <button @click="testGetTransaction(3880)">Тест</button>
+        <button78 @click="testGetTransaction(3880)">Тест</button78>
       </div>
       <Transactions class="ttm-terminal-view"/>
     </div>

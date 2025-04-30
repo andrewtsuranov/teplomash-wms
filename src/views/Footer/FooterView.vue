@@ -23,7 +23,7 @@
 </template>
 <script setup>
 import { ref } from "vue";
-import {useWebSocketStore} from "@/stores/WebSockets/WebSocketStore.js";
+import {useWebSocketStore} from "@/stores/WebSocketStore.js";
 
 const webSocketStore = useWebSocketStore()
 const yearNow = ref(new Date().getFullYear());

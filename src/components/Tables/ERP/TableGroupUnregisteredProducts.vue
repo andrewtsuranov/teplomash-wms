@@ -1,12 +1,12 @@
 <script setup>
-import { computed, onMounted } from "vue";
-import { useWebSocketStore } from "@/stores/WebSockets/WebSocketStore.js";
-import { usePackingStore } from "@/stores/HTTP/PackingStore.js";
-import { useERPStore } from "@/stores/HTTP/ERPStore.js";
-import { useWarehouseStore } from "@/stores/HTTP/WarehouseStore.js";
+import {computed, onMounted, onUpdated, watch} from "vue";
+import { useWebSocketStore } from "@/stores/WebSocketStore.js";
+import { usePackingStore } from "@/stores/WMSStores/PackingStore.js";
+import { useERPStore } from "@/stores/WMSStores/ERPStore.js";
+import { useWarehouseStore } from "@/stores/WMSStores/WarehouseStore.js";
 import CustomTooltip from "@/components/UI/Tooltip/CustomTooltip.vue";
 import { useErrorCodeDictionary } from "@/composables/Dictionary/useErrorCodeDictionary.js";
-import { usePalletStore } from "@/stores/HTTP/PalletStore.js";
+import { usePalletStore } from "@/stores/WMSStores/PalletStore.js";
 
 const warehouseStore = useWarehouseStore();
 const ERPStore = useERPStore();
@@ -58,6 +58,7 @@ onMounted(async () => {
     console.log(e);
   }
 });
+
 </script>
 <template>
   <div class="in-table-container table-responsive">

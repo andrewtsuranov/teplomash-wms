@@ -3,10 +3,10 @@ import {computed, ref} from "vue";
 
 export const useWebSocketStore = defineStore("webSocketStore", () => {
 // Lazy store access
-    const getUserStore = () => import('@/stores/HTTP/UserStore.js').then(m => m.useUserStore());
-    const getTransactionStore = () => import('@/stores/WebSockets/TransactionStore.js').then(m => m.useTransactionStore());
-    const getTSDStore = () => import('@/stores/HTTP/TSDStore.js').then(m => m.useTSDStore());
-    const getWarehouseStore = () => import('@/stores/HTTP/WarehouseStore.js').then(m => m.useWarehouseStore());
+    const getUserStore = () => import('@/stores/WMSStores/UserStore.js').then(m => m.useUserStore());
+    const getTransactionStore = () => import('@/stores/WMSStores/TransactionStore.js').then(m => m.useTransactionStore());
+    const getTSDStore = () => import('@/stores/WMSStores/TSDStore.js').then(m => m.useTSDStore());
+    const getWarehouseStore = () => import('@/stores/WMSStores/WarehouseStore.js').then(m => m.useWarehouseStore());
     //State
     const isConnected = ref(false);
     const onlineDevices = ref([]);

@@ -1,11 +1,11 @@
 <script setup>
-import {useWarehouseStore} from "@/stores/HTTP/WarehouseStore.js";
+import {useWarehouseStore} from "@/stores/WMSStores/WarehouseStore.js";
 import {computed, onActivated, onMounted, ref, watch} from "vue";
 import {onBeforeRouteUpdate, useRoute, useRouter} from "vue-router";
 import gsap from 'gsap'
 import {useGeneralDictionary} from "@/composables/Dictionary/useGeneralDictionary.js";
 import Button78 from "@/components/UI/Buttons/button78.vue";
-import {useWebSocketStore} from "@/stores/WebSockets/WebSocketStore.js";
+import {useWebSocketStore} from "@/stores/WebSocketStore.js";
 
 const router = useRouter();
 const route = useRoute();

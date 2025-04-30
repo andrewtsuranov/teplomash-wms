@@ -1,7 +1,7 @@
 <script setup>
-import {useWarehouseStore} from "@/stores/HTTP/WarehouseStore.js";
+import {useWarehouseStore} from "@/stores/WMSStores/WarehouseStore.js";
 import {computed, onMounted} from "vue";
-import {useWebSocketStore} from "@/stores/WebSockets/WebSocketStore.js";
+import {useWebSocketStore} from "@/stores/WebSocketStore.js";
 import {useRoute, useRouter} from "vue-router";
 import {useErrorStore} from "@/stores/Error/ErrorStore.js";
 
@@ -44,8 +44,9 @@ const handleClickWarehouseProcess = async (zone) => {
 }
 onMounted(async () => {
     try {
-      if (warehouseStore.selectedWarehouse && webSocketStore.isConnected) {
+      if (warehouseStore.selectedWarehouse) {
       await webSocketStore.GET_WAREHOUSE_ZONE_STATISTICS(warehouseStore.selectedWarehouse.id)
+        // await handleClickWarehouseProcess(warehouseStore.selectedZone)
       }
     }catch (e) {
       console.log(e)

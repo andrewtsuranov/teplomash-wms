@@ -2,46 +2,29 @@ import { useErrorStore } from "@/stores/Error/ErrorStore.js";
 import { defineStore } from "pinia";
 import { ref } from "vue";
 import ky from "ky";
-import { useUserStore } from "@/stores/HTTP/UserStore.js";
+import { useUserStore } from "@/stores/WMSStores/UserStore.js";
 import { requestUrls } from "@/stores/request-urls.js";
 
-const userStore = useUserStore();
-const kyStd = ky.create({
-  prefixUrl: requestUrls.storage,
-  retry: 0,
-  headers: {
-    Authorization: `Bearer ${userStore.getTokenAccess}`,
-  },
-});
+
 export const usePackingStore = defineStore("packingStore", () => {
+  const userStore = useUserStore();
+  const kyStd = ky.create({
+    prefixUrl: requestUrls.storage,
+    retry: 0,
+    headers: {
+      Authorization: `Bearer ${userStore.getTokenAccess}`,
+    },
+  });
   const loading = ref(false);
   const errorStore = useErrorStore();
   const detailInfoPackingProduct = ref(null);
   const packingId = ref(JSON.parse(localStorage.getItem("packingId")) || null);
-  const dataYYYYMMDD = ref(new Date().toISOString().slice(0, 10));
   const isShownTableItemUnregProduct = ref(false);
   const newPalletType = ref();
   const updateProductType = ref();
   //state
-  const palletData = {
-    issue: dataYYYYMMDD.value,
-    numberByDay: "01",
-    zoneStorage: "A",
-    dimensions: "800",
-    productType: "Продукция",
-    productName: "КЭВ-9П2021Е",
-    productQty: "9",
-    addInfo: "Панель из глянцевой нержавеющей стали",
-    palletID: "",
-  };
-  const palletStatus = {
-    pending: "Ожидание...",
-    packing: "Упаковка...",
-    handPacking: "Ручная упаковка...",
-    finish: "Паллета упакована",
-    sent: "Отправлена на склад",
-    error: "Ошибка действия",
-  };
+
+
   //getters
   //actions
   const CREATE_PALLET_TYPE = async (data) => {
@@ -88,8 +71,6 @@ export const usePackingStore = defineStore("packingStore", () => {
     loading,
     detailInfoPackingProduct,
     isShownTableItemUnregProduct,
-    palletData,
-    palletStatus,
     packingId,
     newPalletType,
     updateProductType,

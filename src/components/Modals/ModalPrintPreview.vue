@@ -49,9 +49,9 @@
   </div>
 </template>
 <script setup>
-import { usePackingStore } from "@/stores/HTTP/PackingStore.js";
-import { useERPStore } from "@/stores/HTTP/ERPStore.js";
-import { usePrintingStore } from "@/stores/HTTP/PrintingStore.js";
+import { usePackingStore } from "@/stores/WMSStores/PackingStore.js";
+import { useERPStore } from "@/stores/WMSStores/ERPStore.js";
+import { usePrintingStore } from "@/stores/WMSStores/PrintingStore.js";
 import { watch, nextTick, computed } from "vue";
 import JsBarcode from "jsbarcode";
 

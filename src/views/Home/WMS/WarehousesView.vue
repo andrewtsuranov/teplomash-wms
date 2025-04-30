@@ -1,7 +1,7 @@
 <script setup>
 import {onMounted} from "vue";
 import {useRouter, useRoute} from "vue-router";
-import {useWarehouseStore} from "@/stores/HTTP/WarehouseStore.js";
+import {useWarehouseStore} from "@/stores/WMSStores/WarehouseStore.js";
 import {useErrorStore} from "@/stores/Error/ErrorStore.js";
 import {useTransliterate} from "@/composables/useTransliterate.js";
 
@@ -104,7 +104,7 @@ onMounted(async () => {
 .wms-revolutsii-warehouses,
 .wms-himikov-warehouses {
   display: grid;
-  grid-template-columns: repeat(auto-fill, 1fr);
+  grid-template-columns: minmax(auto, 1fr);
   gap: 1rem;
 }
 

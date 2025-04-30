@@ -108,8 +108,8 @@
   <ModalPrintPreview />
 </template>
 <script setup>
-import { useERPStore } from "@/stores/HTTP/ERPStore.js";
-import { usePrintingStore } from "@/stores/HTTP/PrintingStore.js";
+import { useERPStore } from "@/stores/WMSStores/ERPStore.js";
+import { usePrintingStore } from "@/stores/WMSStores/PrintingStore.js";
 import { computed, ref } from "vue";
 import { useNumbersOnlyWithoutDot } from "@/composables/NumbersOnlyWithoutDot.js";
 import ModalPrintPreview from "@/components/Modals/ModalPrintPreview.vue";

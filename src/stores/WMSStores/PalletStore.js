@@ -1,28 +1,37 @@
 import { defineStore } from "pinia";
-import { ref } from "vue";
+import {computed, ref} from "vue";
 import ky from "ky";
 import { useErrorStore } from "@/stores/Error/ErrorStore.js";
 import { requestUrls } from "@/stores/request-urls.js";
-import { useUserStore } from "@/stores/HTTP/UserStore.js";
+import { useUserStore } from "@/stores/WMSStores/UserStore.js";
+import {useTransactionStore} from "@/stores/WMSStores/TransactionStore.js";
+import {useFormatDate} from "@/composables/Date/useFormatDate.js";
 
-const userStore = useUserStore();
-const kyStd = ky.create({
-  prefixUrl: requestUrls.storage,
-  retry: 0,
-  headers: {
-    Authorization: `Bearer ${userStore.getTokenAccess}`,
-  },
-});
+
 export const usePalletStore = defineStore("palletStore", () => {
+  const userStore = useUserStore();
+  const kyStd = ky.create({
+    prefixUrl: requestUrls.storage,
+    retry: 0,
+    headers: {
+      Authorization: `Bearer ${userStore.getTokenAccess}`,
+    },
+  });
   //state
   const loading = ref(false);
   const errorStore = useErrorStore();
+  const transactionStore = useTransactionStore()
   const palletItemTypeList = ref(null);
   const palletTypeList = ref(null);
   const palletTypeByID = ref(null);
   const basePalletTypeList = ref(null);
   const basePalletTypeById = ref(null);
+
   //getters
+const getTransactionsByTypeADD_PALLET = computed(() =>
+    transactionStore.allTransactionsList100.filter(tr => tr.transaction_type === "ADD_PALLET")
+)
+
   //actions
   const GET_PALLET_TYPE_LIST = async () => {
     loading.value = true;
@@ -104,6 +113,7 @@ export const usePalletStore = defineStore("palletStore", () => {
     basePalletTypeById,
     palletItemTypeList,
     //getters
+    getTransactionsByTypeADD_PALLET,
     //actions
     GET_PALLET_TYPE_LIST,
     GET_PALLET_TYPE_BY_ID,

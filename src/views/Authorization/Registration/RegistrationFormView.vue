@@ -123,7 +123,7 @@
 <script setup>
 import { ref, computed } from "vue";
 import { useRouter } from "vue-router";
-import { useUserStore } from "@/stores/HTTP/UserStore";
+import { useUserStore } from "@/stores/WMSStores/UserStore";
 import { useErrorStore } from "@/stores/Error/ErrorStore.js";
 import { usePasswordValidation } from "@/composables/Validations/usePasswordValidation";
 import { usePasswordToggle } from "@/composables/Validations/usePasswordToggle";

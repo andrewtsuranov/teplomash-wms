@@ -2,7 +2,7 @@ import {defineStore} from "pinia";
 import ky from "ky";
 import {computed, ref} from "vue";
 import {useErrorStore} from "@/stores/Error/ErrorStore.js";
-import {useUserStore} from "@/stores/HTTP/UserStore.js";
+import {useUserStore} from "@/stores/WMSStores/UserStore.js";
 import {requestUrls} from "@/stores/request-urls.js";
 
 export const useWarehouseStore = defineStore("warehouseStore", () => {

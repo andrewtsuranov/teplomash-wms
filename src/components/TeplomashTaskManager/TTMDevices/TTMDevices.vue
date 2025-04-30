@@ -1,9 +1,10 @@
 <script setup>
-import {useWebSocketStore} from "@/stores/WebSockets/WebSocketStore.js";
-import {useTSDStore} from "@/stores/HTTP/TSDStore.js";
+import {useWebSocketStore} from "@/stores/WebSocketStore.js";
+import {useTSDStore} from "@/stores/WMSStores/TSDStore.js";
 import {onMounted, watch} from "vue";
-import {useUserStore} from "@/stores/HTTP/UserStore.js";
-import {useTransactionStore} from "@/stores/WebSockets/transactionStore.js";
+import {useUserStore} from "@/stores/WMSStores/UserStore.js";
+import {useTransactionStore} from "@/stores/WMSStores/TransactionStore.js";
+import router from "@/router/index.js";
 
 const userStore = useUserStore();
 const TSDStore = useTSDStore();
@@ -59,7 +60,15 @@ watch(
     {deep: true}
 );
 const handleSelectedDevices = async (device) => {
-  await TSDStore.set_selectedTSD(device);
+  if (!device || !device.name) {
+    console.error('Device is invalid or missing name');
+    return;
+  }
+  try {
+    await TSDStore.set_selectedTSD(device);
+  } catch (error) {
+    console.error('Error handling selected device:', error);
+  }
 };
 onMounted(async () => {
   try {

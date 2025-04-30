@@ -23,9 +23,9 @@
   </div>
 </template>
 <script setup>
-import { useERPStore } from "@/stores/HTTP/ERPStore.js";
+import { useERPStore } from "@/stores/WMSStores/ERPStore.js";
 import { useSplitDateByT } from "@/composables/SpliDateByT.js";
-import { usePackingStore } from "@/stores/HTTP/PackingStore.js";
+import { usePackingStore } from "@/stores/WMSStores/PackingStore.js";
 
 const packingStore = usePackingStore();
 const ERPStore = useERPStore();

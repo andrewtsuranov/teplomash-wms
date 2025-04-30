@@ -25,7 +25,7 @@
 </template>
 <script setup>
 import { ref, watch } from "vue";
-import { useStorageStore } from "@/stores/HTTP/StorageStore.js";
+import { useStorageStore } from "@/stores/WMSStores/StorageStore.js";
 
 const storageStore = useStorageStore();
 const searchQuery = ref("");

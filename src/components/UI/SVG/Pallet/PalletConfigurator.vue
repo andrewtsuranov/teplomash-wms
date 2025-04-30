@@ -217,9 +217,9 @@
 </template>
 <script setup>
 import { ref, computed, watchEffect } from "vue";
-import { useERPStore } from "@/stores/HTTP/ERPStore.js";
+import { useERPStore } from "@/stores/WMSStores/ERPStore.js";
 import PalletSVG from "@/components/UI/SVG/Pallet/PalletSVG.vue";
-import { usePalletStore } from "@/stores/HTTP/PalletStore.js";
+import { usePalletStore } from "@/stores/WMSStores/PalletStore.js";
 
 const ERPStore = useERPStore();
 const palletStore = usePalletStore();

@@ -13,7 +13,7 @@
 </template>
 <script setup>
 import HeaderView from "@/views/Header/NavbarView.vue";
-import { useUserStore } from "@/stores/HTTP/UserStore.js";
+import { useUserStore } from "@/stores/WMSStores/UserStore.js";
 import Breadcrumbs from "@/components/Breadcrumbs/Breadcrumbs.vue";
 
 const userStore = useUserStore();

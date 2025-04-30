@@ -1,16 +1,16 @@
 <script setup>
 import ERPData from "@/components/WMS/Process/PAC/ERPData.vue";
-import PackingProductData from "@/components/WMS/Process/PAC/PackingProductData.vue";
+import PalletTypeData from "@/components/WMS/Process/PAC/PalletTypeData.vue";
 import TeplomashTaskManager from "@/components/TeplomashTaskManager/TeplomashTaskManager.vue";
 import ModalPrint from "@/components/Modals/ModalPrint.vue";
-import PalletData from "@/components/WMS/Process/PAC/PalletData.vue";
+import PalletPackingData from "@/components/WMS/Process/PAC/PalletPackingData.vue";
 </script>
 <template>
   <div class="wms-packing-container">
     <ERPData/>
-    <PackingProductData/>
+    <PalletTypeData/>
     <TeplomashTaskManager/>
-    <PalletData/>
+    <PalletPackingData/>
     <ModalPrint/>
   </div>
 </template>

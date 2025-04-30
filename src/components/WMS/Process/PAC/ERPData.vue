@@ -1,13 +1,13 @@
 <script setup>
-import {useWebSocketStore} from "@/stores/WebSockets/WebSocketStore.js";
-import {useWarehouseStore} from "@/stores/HTTP/WarehouseStore.js";
-import {useERPStore} from "@/stores/HTTP/ERPStore.js";
+import {useWebSocketStore} from "@/stores/WebSocketStore.js";
+import {useWarehouseStore} from "@/stores/WMSStores/WarehouseStore.js";
+import {useERPStore} from "@/stores/WMSStores/ERPStore.js";
 import {ref, onMounted, watch, watchEffect} from "vue";
 import TableGroupUnregisteredProducts from "@/components/Tables/ERP/TableGroupUnregisteredProducts.vue";
 import SvgLogoErp from "@/components/UI/SVG/svgLogoErp.vue";
 import QRCode from "qrcode";
 import FormSearchComponents from "@/components/Forms/FormSearchComponents.vue";
-import {usePackingStore} from "@/stores/HTTP/PackingStore.js";
+import {usePackingStore} from "@/stores/WMSStores/PackingStore.js";
 import {useRoute} from "vue-router";
 
 const warehouseStore = useWarehouseStore();

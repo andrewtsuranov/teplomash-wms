@@ -1,12 +1,12 @@
 <script setup>
 import { ref, onMounted, nextTick } from "vue";
 import { useDebounceFn } from "@vueuse/core";
-import { usePackingStore } from "@/stores/HTTP/PackingStore.js";
-import { useERPStore } from "@/stores/HTTP/ERPStore.js";
-import { useWarehouseStore } from "@/stores/HTTP/WarehouseStore.js";
-import { usePalletStore } from "@/stores/HTTP/PalletStore.js";
+import { usePackingStore } from "@/stores/WMSStores/PackingStore.js";
+import { useERPStore } from "@/stores/WMSStores/ERPStore.js";
+import { useWarehouseStore } from "@/stores/WMSStores/WarehouseStore.js";
+import { usePalletStore } from "@/stores/WMSStores/PalletStore.js";
 import { useErrorCodeDictionary } from "@/composables/Dictionary/useErrorCodeDictionary.js";
-import { usePrintingStore } from "@/stores/HTTP/PrintingStore.js";
+import { usePrintingStore } from "@/stores/WMSStores/PrintingStore.js";
 
 const warehouseStore = useWarehouseStore();
 const printingStore = usePrintingStore();

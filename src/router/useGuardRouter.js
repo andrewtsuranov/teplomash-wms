@@ -1,4 +1,4 @@
-import {useUserStore} from "@/stores/HTTP/UserStore.js"
+import {useUserStore} from "@/stores/WMSStores/UserStore.js"
 
 export function useGuardRouter(router) {
     router.beforeEach(async (to, from, next) => {

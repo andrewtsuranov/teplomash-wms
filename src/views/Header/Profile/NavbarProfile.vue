@@ -52,7 +52,7 @@
   </div>
 </template>
 <script setup>
-import { useUserStore } from "@/stores/HTTP/UserStore.js";
+import { useUserStore } from "@/stores/WMSStores/UserStore.js";
 import { useRouter } from "vue-router";
 import { useErrorStore } from "@/stores/Error/ErrorStore.js";
 

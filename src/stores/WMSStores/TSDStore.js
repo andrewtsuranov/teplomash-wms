@@ -1,6 +1,6 @@
 import {defineStore} from "pinia";
 import {computed, reactive, ref} from "vue";
-import {useUserStore} from "@/stores/HTTP/UserStore.js";
+import {useUserStore} from "@/stores/WMSStores/UserStore.js";
 
 export const useTSDStore = defineStore("TSDStore", () => {
     // Store
@@ -62,6 +62,6 @@ export const useTSDStore = defineStore("TSDStore", () => {
         //Actions
         set_onlineTSDList,
         set_selectedTSD,
-        clear_selectedTSD
+        clear_selectedTSD,
     };
 });

@@ -1,10 +1,10 @@
 import { defineStore } from "pinia";
 import { ref, computed } from "vue";
-import { useWebSocketStore } from "@/stores/WebSockets/WebSocketStore.js";
-import { useTSDStore } from "@/stores/HTTP/TSDStore.js";
+import { useWebSocketStore } from "@/stores/WebSocketStore.js";
+import { useTSDStore } from "@/stores/WMSStores/TSDStore.js";
 import { useDifferenceById } from "@/composables/useDifferenceById.js";
 
-export const useTransactionStore = defineStore("transaction", () => {
+export const useTransactionStore = defineStore("transactionStore", () => {
   const webSocketStore = useWebSocketStore();
   const TSDStore = useTSDStore();
   // State
