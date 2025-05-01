@@ -9,7 +9,7 @@ export const requestUrls = new Proxy(
   },
   {
     get: (target, property) => {
-      const baseUrl = baseUrls.teplomash;
+      const baseUrl = baseUrls.lab;
       return `${baseUrl}${target[property]}`;
     },
   },

@@ -29,8 +29,8 @@ export const useWebSocketStore = defineStore("webSocketStore", () => {
     //Actions
     const initWebSocket = async () => {
         const userStore = await getUserStore();
-        // const wsUrl = `ws://lab:8081/ws/inventory/?token=${userStore.getTokenAccess}`;
-        const wsUrl = `ws://192.168.1.144/ws/inventory/?token=${userStore.getTokenAccess}`
+        const wsUrl = `ws://lab:8081/ws/inventory/?token=${userStore.getTokenAccess}`;
+        // const wsUrl = `ws://192.168.1.144/ws/inventory/?token=${userStore.getTokenAccess}`
         socket.value = new WebSocket(wsUrl);
         socket.value.onopen = onOpen.bind(this);
         socket.value.onclose = onClose.bind(this);

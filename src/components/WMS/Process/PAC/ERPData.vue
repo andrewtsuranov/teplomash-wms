@@ -51,8 +51,8 @@ const taskScanData = () => {
   const data = {
     task_code: "CREATE_PALLET_WITH_SCAN",
     variables: {
-      warehouse_id: warehouseStore.selectedWarehouse.id,
-      to_zone_id: warehouseStore.selectedZonesByZoneType.id,
+      warehouse_id: warehouseStore.selectedWarehouse?.id,
+      to_zone_id: warehouseStore.selectedZonesByZoneType?.id,
       total: 1,
     },
   };

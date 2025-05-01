@@ -38,7 +38,7 @@ const handlerClickWarehouse = async (warehouse) => {
 };
 onMounted(async () => {
   try {
-    await warehouseStore.GET_ALL_WAREHOUSES();
+      await warehouseStore.GET_ALL_WAREHOUSES();
   } catch (e) {
     errorStore.setError({
       error: e,

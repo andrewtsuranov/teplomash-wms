@@ -158,7 +158,7 @@ const handlerPrint = async () => {
 
 .packing-product-data {
   display: grid;
-  grid-template-columns: minmax(auto, 1fr) auto;
+  grid-template-columns: minmax(auto, 1fr) minmax(auto, 1fr);
   grid-template-rows: min-content min-content;
   overflow: auto;
   gap: 2rem;
@@ -172,12 +172,13 @@ const handlerPrint = async () => {
 
 .packing-product-data-pallet {
   display: grid;
+  grid-template-columns: minmax(auto, 1fr);
   padding: 1rem;
   background-color: #2e2e2e;
   border: 1px solid #605039e0;
   border-radius: .5rem;
-  grid-template-columns: minmax(auto, 1fr);
 }
+
 
 .packing-product-data-detail {
   display: grid;
@@ -192,6 +193,7 @@ const handlerPrint = async () => {
 
 .packing-product-data-table {
   display: grid;
+  /*min-width: 500px;*/
   padding: 1rem;
   background-color: #2e2e2e;
   border: 1px solid #605039e0;

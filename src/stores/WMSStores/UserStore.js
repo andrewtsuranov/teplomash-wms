@@ -85,7 +85,9 @@ export const useUserStore = defineStore("userStore", () => {
     };
   });
   const roleUser = computed(() => user.value?.user?.role);
-  const getTokenAccess = computed(() => user.value?.access);
+  const getTokenAccess = computed(() => {
+    if (user.value) return user.value.access
+  });
   const getUserId = computed(() => user.value?.user?.id);
   const getUserEmail = computed(() => user.value?.user?.email);
   //actions

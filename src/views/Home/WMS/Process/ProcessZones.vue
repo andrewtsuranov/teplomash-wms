@@ -1,31 +1,29 @@
 <script setup>
 import {useWarehouseStore} from "@/stores/WMSStores/WarehouseStore.js";
-import {computed, onActivated, onMounted, ref, watch} from "vue";
-import {onBeforeRouteUpdate, useRoute, useRouter} from "vue-router";
+import {onMounted, ref, watch} from "vue";
+import {useRoute, useRouter} from "vue-router";
 import gsap from 'gsap'
-import {useGeneralDictionary} from "@/composables/Dictionary/useGeneralDictionary.js";
-import Button78 from "@/components/UI/Buttons/button78.vue";
 import {useWebSocketStore} from "@/stores/WebSocketStore.js";
 
 const router = useRouter();
 const route = useRoute();
-const warehouseStore = useWarehouseStore();
 const webSocketStore = useWebSocketStore()
+const warehouseStore = useWarehouseStore();
 // Реактивные переменные
 const selectedPackingZone = ref(null);
 const animatedTotalArea = ref(0);
 const animatedOccupiedArea = ref(0);
 const animatedCapacityPercentage = ref(0);
-const props = defineProps({
-  process: {
-    type: String || Number,
-    required: true,
-  },
-  processRouteName: {
-    type: String,
-    required: true,
-  },
-});
+// const props = defineProps({
+//   process: {
+//     type: String || Number,
+//     required: true,
+//   },
+//   processRouteName: {
+//     type: String,
+//     required: true,
+//   },
+// });
 // Анимация total_area
 const animateTotalArea = (newValue) => {
   gsap.killTweensOf(animatedTotalArea); // Очищаем предыдущие анимации
@@ -53,18 +51,17 @@ const animateCapacityPercentage = (newValue) => {
     value: Number(newValue.occupancy_percentage) || 0,
   });
 };
-const handleZoneClick = async (zone) => {
+const handleZoneChange = async (zone) => {
   if (webSocketStore.isConnected) {
-    webSocketStore.GET_WAREHOUSE_ZONE_STATISTICS(warehouseStore.selectedWarehouse.id, zone.id, true)
-    warehouseStore.setSelectedZonesByZoneType(zone);
-    await router.push({
-      name: props.processRouteName,
-      params: {
-        idWarehouse: route.params.idWarehouse,
-        code: zone.code.toLowerCase()
-      },
-    });
+    await webSocketStore.GET_WAREHOUSE_ZONE_STATISTICS(warehouseStore.selectedWarehouse.id, zone.id, true)
   }
+  await warehouseStore.setSelectedZonesByZoneType(zone);
+  await router.push({
+    params: {
+      idWarehouse: route.params.idWarehouse,
+      code: zone.code.toLowerCase()
+    },
+  });
 };
 // Отслеживание изменений selectedPackingZone
 watch(
@@ -84,9 +81,9 @@ watch(
 );
 onMounted(async () => {
   try {
-    if (warehouseStore.selectedZonesByZoneType) {
+    if (warehouseStore.zonesByZoneType) {
       selectedPackingZone.value = await warehouseStore.zonesByZoneType[0]
-      await handleZoneClick(selectedPackingZone.value)
+      await handleZoneChange(selectedPackingZone.value)
     }
   } catch (e) {
     console.log(e)
@@ -101,7 +98,7 @@ onMounted(async () => {
               aria-label="Выберите зону"
               class="form-select"
               data-bs-theme="dark"
-              @change="handleZoneClick(selectedPackingZone)"
+              @change="handleZoneChange(selectedPackingZone)"
       >
         <option :value="null" disabled>Выберите зону</option>
         <option v-for="zone in warehouseStore.zonesByZoneType"

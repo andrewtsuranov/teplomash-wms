@@ -1,6 +1,6 @@
 <script setup>
 import {useWarehouseStore} from "@/stores/WMSStores/WarehouseStore.js";
-import {computed, onMounted} from "vue";
+import {computed, onMounted, onUnmounted} from "vue";
 import {useWebSocketStore} from "@/stores/WebSocketStore.js";
 import {useRoute, useRouter} from "vue-router";
 import {useErrorStore} from "@/stores/Error/ErrorStore.js";
@@ -27,11 +27,15 @@ const getRouteName = (process) => {
 const handleClickWarehouseProcess = async (zone) => {
   try {
     if (zone) {
-      await warehouseStore.setSelectedZone(zone)
-      await router.push({
-        name: getRouteName(zone.name),
-        params: {zone_type: zone.code.toLowerCase()}
-      })
+      await warehouseStore.setSelectedZone(zone);
+      if (warehouseStore.selectedZone?.code) { // Проверка на null
+        await router.push({
+          name: getRouteName(warehouseStore.selectedZone.name),
+          params: { zone_type: warehouseStore.selectedZone.code.toLowerCase() }
+        });
+      } else {
+        console.warn("selectedZone или его свойство code не определены");
+      }
     }
   } catch (e) {
     errorStore.setError({
@@ -43,16 +47,17 @@ const handleClickWarehouseProcess = async (zone) => {
   }
 }
 onMounted(async () => {
-    try {
-      if (warehouseStore.selectedWarehouse) {
+  try {
+    if (webSocketStore.isConnected) {
       await webSocketStore.GET_WAREHOUSE_ZONE_STATISTICS(warehouseStore.selectedWarehouse.id)
-        // await handleClickWarehouseProcess(warehouseStore.selectedZone)
-      }
-    }catch (e) {
-      console.log(e)
     }
+    if (warehouseStore.selectedZone) {
+      await handleClickWarehouseProcess(warehouseStore.selectedZone)
+    }
+  } catch (e) {
+    console.log(e)
+  }
 })
-
 </script>
 <template>
   <div class="storage-id-container">

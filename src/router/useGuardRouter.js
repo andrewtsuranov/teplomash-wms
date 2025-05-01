@@ -1,4 +1,5 @@
 import {useUserStore} from "@/stores/WMSStores/UserStore.js"
+import {useWarehouseStore} from "@/stores/WMSStores/WarehouseStore.js";
 
 export function useGuardRouter(router) {
     router.beforeEach(async (to, from, next) => {
@@ -25,11 +26,18 @@ export function useGuardRouter(router) {
                 return next({name: "Login"})
             }
         }
-        // if (to.name === 'WMS') {
-        //   warehouseStore.warehouseData = null
-        //   warehouseStore.warehouseAliasMap = {}
-        //   localStorage.removeItem('warehouseData')
-        // }
+        if (to.name === 'WMS') {
+            const warehouseStore = useWarehouseStore()
+            if (warehouseStore.selectedWarehouse) {
+              await  warehouseStore.clearAllWarehouseData()
+            }
+        }
+        if (to.name === 'WMSProcess') {
+            const warehouseStore = useWarehouseStore()
+            if (warehouseStore.selectedZone) {
+             await warehouseStore.clearAllZonesData()
+            }
+        }
         next()
     })
 }

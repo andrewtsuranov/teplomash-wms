@@ -1,7 +1,11 @@
 <script setup>
 import {useWarehouseStore} from "@/stores/WMSStores/WarehouseStore.js";
+import {computed} from "vue";
 
-const warehouseStore = useWarehouseStore()
+const warehouseStore= useWarehouseStore()
+const palletZonePackingStatistic = computed(() =>
+warehouseStore.detailedZoneStatistics?.zones[0].pallets
+)
 </script>
 <template>
   <div class="in-table-container table-responsive">
@@ -9,7 +13,7 @@ const warehouseStore = useWarehouseStore()
       <colgroup>
         <col style="width: 1%"/>
         <!-- № -->
-        <col style="width: 15%"/>
+        <col style="width: 10%"/>
         <!-- Изделие -->
         <col style="width: 5%"/>
         <!-- Изделие -->
@@ -30,29 +34,26 @@ const warehouseStore = useWarehouseStore()
         <th scope="col">Комплектность</th>
       </tr>
       </thead>
-      <tbody v-if="true">
-      <template v-for="(item, index) in warehouseStore.detailedZoneStatistics?.zones"
-                :key="index"
-      >
+      <tbody v-if="palletZonePackingStatistic">
+
         <tr
-            v-for="(item, index) in item.pallets"
+            v-for="(item, index) in palletZonePackingStatistic"
             :key="index"
             style="cursor: pointer"
         >
           <th scope="row">{{ index + 1 }}</th>
           <th scope="row">{{ item.pallet_type.name }}</th>
-          <td>
-            #{{ item.id }}
-          </td>
+          <td>#{{item.id}}</td>
           <td>
             {{ item.barcode }}
           </td>
+
           <td>{{ item.items_count }}</td>
           <td>
             {{ item.is_complete }}
           </td>
         </tr>
-      </template>
+
       </tbody>
       <!-- Показываем сообщение об отсутствии данных в противном случае -->
       <tbody v-else class="in-table-empty">
@@ -64,10 +65,5 @@ const warehouseStore = useWarehouseStore()
   </div>
 </template>
 <style scoped>
-.in-table-container {
-  display: grid;
-  grid-template-columns: minmax(auto, 1fr);
-  grid-template-rows: 1fr;
-  overflow-x: auto;
-}
+
 </style>

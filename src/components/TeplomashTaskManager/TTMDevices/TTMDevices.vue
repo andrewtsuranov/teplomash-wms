@@ -120,7 +120,7 @@ onMounted(async () => {
               class="ttm-devices-item-name-online"
               @click="handleSelectedDevices(device)"
           >
-            <span class="item-title">{{ device.name }} (ID={{ device.id }})</span>
+            <span class="item-title">{{ device.name }}</span>
             <span
                 :class="{
                 'no-task': !device.is_busy,

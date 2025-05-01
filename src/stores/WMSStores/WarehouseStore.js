@@ -18,14 +18,18 @@ export const useWarehouseStore = defineStore("warehouseStore", () => {
     //state
     const loading = ref(false);
     const allWarehouses = ref(JSON.parse(localStorage.getItem("warehouses")) || null)
-    const selectedWarehouse = ref(JSON.parse(localStorage.getItem("selectedWarehouse")) || null)
     const zoneStatisticsByWarehouseID = ref(JSON.parse(localStorage.getItem("zoneStatisticsByWarehouseID")) || null)
     const detailedZoneStatistics = ref(JSON.parse(localStorage.getItem("detailedZoneStatistics")) || null)
+    const selectedWarehouse = ref(JSON.parse(localStorage.getItem("selectedWarehouse")) || null)
     const selectedZone = ref(JSON.parse(localStorage.getItem("selectedZone")) || null)
     const selectedZonesByZoneType = ref(JSON.parse(localStorage.getItem("selectedZonesByZoneType")) || null)
     //getters
-    const zonesByZoneType = computed(() =>
-        zoneStatisticsByWarehouseID.value?.zones.filter(item => item.type.code === selectedZone.value.code) || [])
+    const zonesByZoneType = computed(() => {
+        if (zoneStatisticsByWarehouseID.value) {
+            return zoneStatisticsByWarehouseID.value?.zones.filter(item => item.type.code === selectedZone.value?.code)
+        }
+        return []
+    })
     //actions
     const GET_ALL_WAREHOUSES = async () => {
         loading.value = true;
@@ -64,6 +68,26 @@ export const useWarehouseStore = defineStore("warehouseStore", () => {
         selectedZonesByZoneType.value = payload;
         localStorage.setItem("selectedZonesByZoneType", JSON.stringify(payload));
     }
+    const clearAllWarehouseData = () => {
+        selectedWarehouse.value = null
+        zoneStatisticsByWarehouseID.value = null
+        selectedZone.value = null
+        selectedZonesByZoneType.value = []
+        detailedZoneStatistics.value = null
+        localStorage.removeItem('selectedWarehouse')
+        localStorage.removeItem('zoneStatisticsByWarehouseID')
+        localStorage.removeItem('selectedZone')
+        localStorage.removeItem('selectedZonesByZoneType')
+        localStorage.removeItem('detailedZoneStatistics')
+    }
+    const clearAllZonesData = async () => {
+        selectedZone.value = null
+        selectedZonesByZoneType.value = []
+        detailedZoneStatistics.value = null
+        localStorage.removeItem('selectedZone')
+        localStorage.removeItem('selectedZonesByZoneType')
+        localStorage.removeItem('detailedZoneStatistics')
+    }
     return {
         //state
         errorStore,
@@ -83,5 +107,7 @@ export const useWarehouseStore = defineStore("warehouseStore", () => {
         setSelectedWarehouse,
         setSelectedZone,
         setSelectedZonesByZoneType,
+        clearAllWarehouseData,
+        clearAllZonesData,
     }
 });

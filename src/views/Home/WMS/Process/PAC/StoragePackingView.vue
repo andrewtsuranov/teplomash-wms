@@ -4,6 +4,7 @@ import PalletTypeData from "@/components/WMS/Process/PAC/PalletTypeData.vue";
 import TeplomashTaskManager from "@/components/TeplomashTaskManager/TeplomashTaskManager.vue";
 import ModalPrint from "@/components/Modals/ModalPrint.vue";
 import PalletPackingData from "@/components/WMS/Process/PAC/PalletPackingData.vue";
+import PalletPackingTEST from "@/components/WMS/Process/PAC/PalletPackingTEST.vue";
 </script>
 <template>
   <div class="wms-packing-container">
@@ -11,6 +12,7 @@ import PalletPackingData from "@/components/WMS/Process/PAC/PalletPackingData.vu
     <PalletTypeData/>
     <TeplomashTaskManager/>
     <PalletPackingData/>
+    <PalletPackingTEST/>
     <ModalPrint/>
   </div>
 </template>
