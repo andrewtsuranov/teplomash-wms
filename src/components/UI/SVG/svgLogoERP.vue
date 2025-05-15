@@ -1,3 +1,5 @@
+<script setup>
+</script>
 <template>
   <div class="svg-container">
     <svg
@@ -44,7 +46,6 @@
     </svg>
   </div>
 </template>
-<script setup></script>
 <style scoped>
 .svg-container {
   aspect-ratio: auto;

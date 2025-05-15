@@ -13,6 +13,7 @@ const router = createRouter({
     notFoundRoute
   ],
   linkExactActiveClass: "teplomash-active-exact-link",
+  linkActiveClass: "teplomash-active-exact-link",
 
 })
 

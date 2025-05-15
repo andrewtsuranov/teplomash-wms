@@ -103,6 +103,10 @@ const getTransactionsByTypeADD_PALLET = computed(() =>
       loading.value = false;
     }
   };
+  const clearPalletData = () => {
+    palletTypeByID.value = null
+    basePalletTypeById.value = null
+  }
   return {
     //state
     errorStore,
@@ -120,5 +124,6 @@ const getTransactionsByTypeADD_PALLET = computed(() =>
     GET_BASE_PALLET_TYPE_LIST,
     GET_BASE_PALLET_TYPE_BY_ID,
     GET_PALLET_ITEM_TYPE_LIST,
+    clearPalletData,
   };
 });

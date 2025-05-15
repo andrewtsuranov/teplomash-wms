@@ -88,6 +88,12 @@ export const useWarehouseStore = defineStore("warehouseStore", () => {
         localStorage.removeItem('selectedZonesByZoneType')
         localStorage.removeItem('detailedZoneStatistics')
     }
+    const clearZoneDetailedData = async () => {
+      selectedZonesByZoneType.value = []
+      detailedZoneStatistics.value = null
+      localStorage.removeItem('selectedZonesByZoneType')
+      localStorage.removeItem('detailedZoneStatistics')
+    }
     return {
         //state
         errorStore,
@@ -109,5 +115,6 @@ export const useWarehouseStore = defineStore("warehouseStore", () => {
         setSelectedZonesByZoneType,
         clearAllWarehouseData,
         clearAllZonesData,
+      clearZoneDetailedData,
     }
 });

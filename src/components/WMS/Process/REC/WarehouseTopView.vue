@@ -1,99 +1,3 @@
-<template>
-  <div class="warehouse-top-view">
-    <div class="racks-container">
-      <!-- First Rack (always single) -->
-      <div
-        v-if="storageStore.racks.length > 0"
-        :key="storageStore.racks[0].id"
-        class="rack single-rack first-rack"
-        :class="[
-          { selected: storageStore.selectedRack === storageStore.racks[0].id },
-          getOccupancyClass(storageStore.racks[0]),
-        ]"
-        @click="storageStore.selectRack(storageStore.racks[0].id)"
-      >
-        <div class="rack-content">
-          <div class="rack-number">Ряд {{ storageStore.racks[0].id }}</div>
-          <div class="rack-status">
-            <small>{{ getRackStatus(storageStore.racks[0]) }}</small>
-          </div>
-        </div>
-      </div>
-      <!-- Aisle after first rack -->
-      <div class="aisle">
-        <div class="aisle-road">
-          <div class="aisle-number">Проход 1</div>
-          <div class="markings"></div>
-          <div class="aisle-number">Проход 1</div>
-        </div>
-      </div>
-      <!-- Middle Racks (in pairs) with Aisles -->
-      <div v-if="storageStore.racks.length > 2" class="middle-racks-container">
-        <template
-          v-for="(rackPair, index) in middleRackPairs"
-          :key="`pair-${rackPair[0]?.id}-${rackPair[1]?.id}`"
-        >
-          <div class="rack-pair">
-            <div
-              v-for="rack in rackPair"
-              :key="rack.id"
-              class="rack paired-rack"
-              :class="[
-                { selected: storageStore.selectedRack === rack.id },
-                getOccupancyClass(rack),
-              ]"
-              @click="storageStore.selectRack(rack.id)"
-            >
-              <div class="rack-content">
-                <div class="rack-number">Ряд {{ rack.id }}</div>
-                <div class="rack-status">
-                  <small>{{ getRackStatus(rack) }}</small>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="aisle">
-            <div class="aisle-road">
-              <div class="aisle-number">Проход {{ index + 2 }}</div>
-              <div class="markings"></div>
-              <div class="aisle-number">Проход {{ index + 2 }}</div>
-            </div>
-          </div>
-        </template>
-      </div>
-      <!-- Last Rack (always single) -->
-      <div
-        v-if="storageStore.racks.length > 1"
-        :key="storageStore.racks[storageStore.racks.length - 1].id"
-        class="rack single-rack last-rack"
-        :class="[
-          {
-            selected:
-              storageStore.selectedRack ===
-              storageStore.racks[storageStore.racks.length - 1].id,
-          },
-          getOccupancyClass(storageStore.racks[storageStore.racks.length - 1]),
-        ]"
-        @click="
-          storageStore.selectRack(
-            storageStore.racks[storageStore.racks.length - 1].id,
-          )
-        "
-      >
-        <div class="rack-content">
-          <div class="rack-number">
-            Ряд {{ storageStore.racks[storageStore.racks.length - 1].id }}
-          </div>
-          <div class="rack-status">
-            <small>{{
-              getRackStatus(storageStore.racks[storageStore.racks.length - 1])
-            }}</small>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</template>
 <script setup>
 import { useStorageStore } from "@/stores/WMSStores/StorageStore.js";
 import { computed } from "vue";
@@ -143,6 +47,111 @@ const middleRackPairs = computed(() => {
   return pairs;
 });
 </script>
+<template>
+  <div class="warehouse-top-view">
+    <div class="racks-container">
+<!--      <div v-for="row in storageStore.getTotalStorageRowsByZone">-->
+<!--        <div  class="rack single-rack first-rack"-->
+<!--              :class="[-->
+<!--          { selected: storageStore.selectedRack === storageStore.racks[0].id },-->
+<!--          getOccupancyClass(storageStore.racks[0]),-->
+<!--        ]"-->
+<!--              @click="storageStore.selectRack(storageStore.racks[0].id)"-->
+<!--        >{{row}}</div>-->
+<!--      </div>-->
+      <!-- First Rack (always single) -->
+      <div
+          v-if="storageStore.racks?.length > 0"
+          :key="storageStore.racks[0]?.id"
+          class="rack single-rack first-rack"
+          :class="[
+          { selected: storageStore.selectedRack === storageStore.racks[0].id },
+          getOccupancyClass(storageStore.racks[0]),
+        ]"
+          @click="storageStore.selectRack(storageStore.racks[0].id)"
+      >
+        <div class="rack-content">
+          <div class="rack-number">Ряд {{ storageStore.racks[0].id }}</div>
+          <div class="rack-status">
+            <small>{{ getRackStatus(storageStore.racks[0]) }}</small>
+          </div>
+        </div>
+      </div>
+      <!-- Aisle after first rack -->
+      <div class="aisle">
+        <div class="aisle-road">
+          <div class="aisle-number">Проход 1</div>
+          <div class="markings"></div>
+          <div class="aisle-number">Проход 1</div>
+        </div>
+      </div>
+      <!-- Middle Racks (in pairs) with Aisles -->
+      <div v-if="storageStore.racks.length > 2" class="middle-racks-container">
+        <template
+            v-for="(rackPair, index) in middleRackPairs"
+            :key="`pair-${rackPair[0]?.id}-${rackPair[1]?.id}`"
+        >
+          <div class="rack-pair">
+            <div
+                v-for="rack in rackPair"
+                :key="rack.id"
+                class="rack paired-rack"
+                :class="[
+                { selected: storageStore.selectedRack === rack.id },
+                getOccupancyClass(rack),
+              ]"
+                @click="storageStore.selectRack(rack.id)"
+            >
+              <div class="rack-content">
+                <div class="rack-number">Ряд {{ rack.id }}</div>
+                <div class="rack-status">
+                  <small>{{ getRackStatus(rack) }}</small>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="aisle">
+            <div class="aisle-road">
+              <div class="aisle-number">Проход {{ index + 2 }}</div>
+              <div class="markings"></div>
+              <div class="aisle-number">Проход {{ index + 2 }}</div>
+            </div>
+          </div>
+        </template>
+      </div>
+      <!-- Last Rack (always single) -->
+      <div
+          v-if="storageStore.racks.length > 1"
+          :key="storageStore.racks[storageStore.racks.length - 1].id"
+          class="rack single-rack last-rack"
+          :class="[
+          {
+            selected:
+              storageStore.selectedRack ===
+              storageStore.racks[storageStore.racks.length - 1].id,
+          },
+          getOccupancyClass(storageStore.racks[storageStore.racks.length - 1]),
+        ]"
+          @click="
+          storageStore.selectRack(
+            storageStore.racks[storageStore.racks.length - 1].id,
+          )
+        "
+      >
+        <div class="rack-content">
+          <div class="rack-number">
+            Ряд {{ storageStore.racks[storageStore.racks.length - 1].id }}
+          </div>
+          <div class="rack-status">
+            <small>{{
+                getRackStatus(storageStore.racks[storageStore.racks.length - 1])
+                   }}</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
 <style scoped>
 .warehouse-top-view {
   display: grid;
@@ -160,22 +169,22 @@ const middleRackPairs = computed(() => {
 }
 
 .rack {
-  background-color: #0280b0bd;
+  background-color: rgba(213, 211, 207, 0.18);
   padding: 8px 15px;
   cursor: pointer;
-  border: 1px solid #dee2e6;
+  border: 1px solid rgba(222, 226, 230, 0.44);
   border-radius: 4px;
   transition: all 0.2s ease;
   border-left: 4px solid transparent;
 }
 
 .rack:hover {
-  background-color: #311617;
+  background-color: #8a703e7d;
   transform: translateX(5px);
 }
 
 .rack.selected {
-  background-color: #0d6efd;
+  background-color: #8a703e7d;
   color: white;
   transform: translateX(10px);
 }

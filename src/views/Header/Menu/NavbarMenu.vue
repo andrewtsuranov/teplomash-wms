@@ -1,13 +1,40 @@
 <template>
   <nav class="menu-container">
-    <router-link :to="{ name: 'Home' }"
-      ><span>Управление складом</span></router-link
+    <router-link
+        :to="{ name: 'Home' }"
+        :class="{ 'teplomash-active-exact-link': isHomeOrWms }"
     >
-    <router-link to="/info"><span>Справка</span></router-link>
-    <router-link to="/support"><span>Поддержка</span></router-link>
+      <span>Управление складом</span>
+    </router-link>
+    <router-link to="/info">
+      <span>Справка</span>
+    </router-link>
+    <router-link to="/support">
+      <span>Поддержка</span>
+    </router-link>
   </nav>
 </template>
-<script setup></script>
+
+<script setup>
+import { computed } from 'vue'
+import { useRoute } from 'vue-router'
+
+const route = useRoute()
+
+// Вычисляемое свойство, которое проверяет, находимся ли мы в Home или в WMS
+const isHomeOrWms = computed(() => {
+  // Находимся на Home
+  if (route.name === 'Home') return true
+
+  // Проверяем, находимся ли мы в части маршрута WMS
+  // Проверка по всей иерархии маршрутов
+  return route.matched.some(record => {
+    return record.name === 'WMS' ||
+        record.name === 'WMSProcess' ||
+        record.name?.startsWith('wms')
+  })
+})
+</script>
 <style scoped>
 .menu-container {
   display: grid;

@@ -4,7 +4,8 @@ import {useWarehouseStore} from "@/stores/WMSStores/WarehouseStore.js";
 const warehouseStore = useWarehouseStore()
 </script>
 <template>
-  <div class="in-table-container table-responsive">
+  <div v-if="warehouseStore.detailedZoneStatistics?.zones[0].pallets.length > 0"
+       class="in-table-container table-responsive">
     <table class="table-content table table-dark align-middle table-hover">
       <colgroup>
         <col style="width: 1%"/>

@@ -23,7 +23,7 @@ const handlerClickWarehouse = async (warehouse) => {
       await router.push({
         name: "WMSProcess",
         params: {
-          idWarehouse: useTransliterate(warehouse.name).replace(/[\s_]+/g, "-"),
+          idWarehouse: useTransliterate(warehouse.name).replace(/[\s_]+/g, "-")
         },
       });
     }
@@ -38,7 +38,9 @@ const handlerClickWarehouse = async (warehouse) => {
 };
 onMounted(async () => {
   try {
+    if (warehouseStore) {
       await warehouseStore.GET_ALL_WAREHOUSES();
+    }
   } catch (e) {
     errorStore.setError({
       error: e,

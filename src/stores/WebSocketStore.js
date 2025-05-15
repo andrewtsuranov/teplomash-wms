@@ -7,8 +7,10 @@ export const useWebSocketStore = defineStore("webSocketStore", () => {
     const getTransactionStore = () => import('@/stores/WMSStores/TransactionStore.js').then(m => m.useTransactionStore());
     const getTSDStore = () => import('@/stores/WMSStores/TSDStore.js').then(m => m.useTSDStore());
     const getWarehouseStore = () => import('@/stores/WMSStores/WarehouseStore.js').then(m => m.useWarehouseStore());
+    const getStorageStore = () => import('@/stores/WMSStores/StorageStore.js').then(m => m.useStorageStore())
     //State
     const isConnected = ref(false);
+    const connectionPromise = ref(null);
     const onlineDevices = ref([]);
     const socket = ref(null);
     const message = ref(null);
@@ -28,14 +30,62 @@ export const useWebSocketStore = defineStore("webSocketStore", () => {
     const getUnregisteredProducts = computed(() => wsUnregisteredProducts.value);
     //Actions
     const initWebSocket = async () => {
-        const userStore = await getUserStore();
-        // const wsUrl = `ws://lab:8081/ws/inventory/?token=${userStore.getTokenAccess}`;
-        const wsUrl = `ws://192.168.1.144/ws/inventory/?token=${userStore.getTokenAccess}`
-        socket.value = new WebSocket(wsUrl);
-        socket.value.onopen = onOpen.bind(this);
-        socket.value.onclose = onClose.bind(this);
-        socket.value.onmessage = onMessage.bind(this);
-        socket.value.onerror = onError.bind(this);
+        // Если промис уже существует, возвращаем его
+        if (connectionPromise.value) {
+            return connectionPromise.value;
+        }
+
+        // Создаем новый промис для отслеживания подключения
+        connectionPromise.value = new Promise(async (resolve, reject) => {
+            const userStore = await getUserStore();
+            const wsUrl = `ws://lab:8081/ws/inventory/?token=${userStore.getTokenAccess}`;
+            // const wsUrl = `ws://192.168.1.144/ws/inventory/?token=${userStore.getTokenAccess}`
+
+            socket.value = new WebSocket(wsUrl);
+
+            // Оригинальные обработчики заменяем на промис-ориентированные
+            socket.value.onopen = () => {
+                isConnected.value = true;
+                reconnectError.value = false;
+                error.value = null;
+                reconnectAttempts.value = 0;
+                console.log("WebSocket connected");
+                resolve(); // Резолвим промис при успешном подключении
+            };
+
+            socket.value.onclose = (event) => {
+                isConnected.value = false;
+                console.log(`WebSocket disconnected. Code: ${event.code}, reason: ${event.reason}`);
+
+                // Сбрасываем промис при закрытии соединения
+                connectionPromise.value = null;
+
+                if (!event.wasClean) {
+                    error.value = "Соединение было разорвано";
+                    reject(new Error("WebSocket connection closed unexpectedly"));
+                    reconnect();
+                }
+            };
+
+            socket.value.onmessage = onMessage.bind(this);
+
+            socket.value.onerror = (err) => {
+                console.error("WebSocket Error:", err);
+                error.value = "WebSocket Error occurred";
+                reconnectError.value = true;
+                reject(err); // Реджектим промис при ошибке
+                connectionPromise.value = null;
+            };
+        });
+
+        return connectionPromise.value;
+    };
+    // Обертка-утилита для проверки и ожидания соединения
+    const ensureConnected = async () => {
+        if (isConnected.value && socket.value?.readyState === WebSocket.OPEN) {
+            return Promise.resolve();
+        }
+        return initWebSocket();
     };
     const onOpen = () => {
         isConnected.value = true;
@@ -90,6 +140,7 @@ export const useWebSocketStore = defineStore("webSocketStore", () => {
             const transactionStore = await getTransactionStore();
             const TSDStore = await getTSDStore();
             const warehouseStore = await getWarehouseStore();
+            const storageStore = await getStorageStore()
             // Проверяем, является ли сообщение бинарным (ping frame)
             if (event.data instanceof Blob) {
                 event.data.arrayBuffer().then((buffer) => {
@@ -135,6 +186,10 @@ export const useWebSocketStore = defineStore("webSocketStore", () => {
                 } else {
                     warehouseStore.setZoneStatisticsByWarehouseID(data.data)
                 }
+            }
+            if (data.type === "storage_locations" && data.status === "success") {
+                storageStore.setStorageLocations(data.locations)
+                storageStore.setStorageLocationsMeta(data.meta)
             }
             if (data.type === "error") {
                 error.value = data.message;
@@ -227,12 +282,25 @@ export const useWebSocketStore = defineStore("webSocketStore", () => {
             error.value = "Cannot send message: WebSocket is not connected";
         }
     };
-    const GET_WAREHOUSE_ZONE_STATISTICS = (warehouse_id, zone_id = null, include_details = false) => {
+    const GET_WAREHOUSE_ZONE_STATISTICS = async (warehouse_id, zone_id = null, include_details = false) => {
+        await ensureConnected();
         const data = {
             action: "warehouse_zone_statistics",
             warehouse_id: warehouse_id,
             zone_id: zone_id,
             include_details: include_details
+        };
+        socket.value.send(JSON.stringify(data));
+    };
+    //Обработка запроса на получение списка ячеек
+    const GET_LOCATIONS_BASE = (warehouse_id, zone_id = null, abc_class = null, has_pallets = null, filters = null) => {
+        const data = {
+            action: "get_locations",
+            warehouse_id: warehouse_id,
+            zone_id: zone_id,
+            abc_class: abc_class,
+            has_pallets: has_pallets,
+            filters: filters
         };
         if (isConnected.value && socket.value && socket.value.readyState === WebSocket.OPEN) {
             socket.value.send(JSON.stringify(data));
@@ -295,12 +363,14 @@ export const useWebSocketStore = defineStore("webSocketStore", () => {
         onlineDevices,
         wsUnregisteredProducts,
         lastPongTime,
+        connectionPromise,
         //getters
         lastMessage,
         connectionStatus,
         getUnregisteredProducts,
         //actions
         initWebSocket,
+        ensureConnected,
         onOpen,
         onClose,
         onError,
@@ -316,5 +386,6 @@ export const useWebSocketStore = defineStore("webSocketStore", () => {
         GET_TRANSACTION_DATA,
         LINK_PALLET,
         GET_WAREHOUSE_ZONE_STATISTICS,
+        GET_LOCATIONS_BASE,
     };
 });

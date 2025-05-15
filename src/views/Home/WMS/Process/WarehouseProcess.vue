@@ -1,6 +1,6 @@
 <script setup>
 import {useWarehouseStore} from "@/stores/WMSStores/WarehouseStore.js";
-import {computed, onMounted, onUnmounted} from "vue";
+import { onMounted } from "vue";
 import {useWebSocketStore} from "@/stores/WebSocketStore.js";
 import {useRoute, useRouter} from "vue-router";
 import {useErrorStore} from "@/stores/Error/ErrorStore.js";
@@ -21,20 +21,21 @@ const getRouteName = (process) => {
     case "Отгрузка":
       return "wmsShippingZone";
     default:
-      return "wmsPackingZone"; // Или какой-то дефолтный маршрут
+      return null; // Или какой-то дефолтный маршрут
   }
+}
+const isActiveZone = (zoneName) => {
+  const routeName = getRouteName(zoneName);
+  return route.name === routeName;
 }
 const handleClickWarehouseProcess = async (zone) => {
   try {
     if (zone) {
       await warehouseStore.setSelectedZone(zone);
-      if (warehouseStore.selectedZone?.code) { // Проверка на null
+      if (warehouseStore.selectedZone.code && route.name !== getRouteName(warehouseStore.selectedZone.name)) {
         await router.push({
-          name: getRouteName(warehouseStore.selectedZone.name),
-          params: { zone_type: warehouseStore.selectedZone.code.toLowerCase() }
+          name: getRouteName(warehouseStore.selectedZone.name)
         });
-      } else {
-        console.warn("selectedZone или его свойство code не определены");
       }
     }
   } catch (e) {
@@ -48,9 +49,9 @@ const handleClickWarehouseProcess = async (zone) => {
 }
 onMounted(async () => {
   try {
-    if (webSocketStore.isConnected) {
-      await webSocketStore.GET_WAREHOUSE_ZONE_STATISTICS(warehouseStore.selectedWarehouse.id)
-    }
+    // Инициализируем соединение только если оно еще не инициализировано
+    await webSocketStore.ensureConnected()
+    await webSocketStore.GET_WAREHOUSE_ZONE_STATISTICS(warehouseStore.selectedWarehouse.id)
     if (warehouseStore.selectedZone) {
       await handleClickWarehouseProcess(warehouseStore.selectedZone)
     }
@@ -58,6 +59,7 @@ onMounted(async () => {
     console.log(e)
   }
 })
+
 </script>
 <template>
   <div class="storage-id-container">
@@ -78,6 +80,7 @@ onMounted(async () => {
           v-for="(zone, index) in warehouseStore.zoneStatisticsByWarehouseID?.zone_types"
           :key="index"
           class="storage-id-actions-items"
+          :class="{ 'teplomash-active-exact-link': isActiveZone(zone.name) }"
           @click="handleClickWarehouseProcess(zone)"
       >
         {{ zone.name }}
@@ -85,7 +88,7 @@ onMounted(async () => {
     </div>
     <div class="storage-id-terminal">
       <!-- Основное представление (ProcessZones.vue) -->
-      <router-view :key="route.params.zone_type"></router-view>
+      <router-view :key="route.name"></router-view>
       <!-- Представление для зон  -->
       <router-view name="packing"></router-view>
       <router-view name="receiving"></router-view>
@@ -144,8 +147,8 @@ onMounted(async () => {
 }
 
 .teplomash-active-exact-link {
-  background-color: #4a383882;
-  border: 1px solid #486693;
+  background-color: #5151519c;;
+  border: 1px solid rgba(254, 238, 238, 0.63);
 }
 
 @media (max-width: 800px) {

@@ -21,28 +21,24 @@ export const useERPStore = defineStore("ERPStore", () => {
   const productTypeId = ref(null);
   const searchComponents = ref(null);
   const getBarcodeFromComponent = ref(null);
-  const activeTab = ref("products");
   //Getters
   const getNameAndBarcodeProductList = computed(
     () =>
       minItemsByIdUnreg.value?.map((item) => ({
         barcode: item.barcode || "N/A",
-        name: item.name || productTypeId.value.name || "N/A",
+        name: item.name || productTypeId.value?.name || "N/A",
       })) || [],
   );
   const getPalletType = computed(() => productTypeId.value?.pallet_types[0]);
-  const searchResultsComponents = computed(
-    () => searchComponents.value?.results || [],
-  );
-  const isProductsActive = computed(() => activeTab.value === "products");
-  const isComponentsActive = computed(() => activeTab.value === "components");
+
+
   //Actions
-  const GET_MIN_ITEMS_BY_ID_UNREG = async (item, unregistered = true) => {
+  const GET_MIN_ITEMS_BY_ID_UNREG = async (item, zone_id = 38) => {
     loading.value = true;
     errorStore.clearError();
     try {
       minItemsByIdUnreg.value = await kyStd(
-        `min-items-list/?product_type_id=${item.id}&unreg=${unregistered}`,
+        `min-items-list/?product_type_id=${item.id}&zone=${zone_id}`,
       ).json();
       return true;
     } catch (e) {
@@ -110,9 +106,13 @@ export const useERPStore = defineStore("ERPStore", () => {
       loading.value = false;
     }
   };
-  const setActiveTabs = (tabId) => {
-    activeTab.value = tabId;
-  };
+  const clearERPData = () => {
+    minItemsByIdUnreg.value = null
+    productTypeId.value = null
+  }
+  const clearSearchComponent = () => {
+    searchComponents.value = null
+  }
   return {
     errorStore,
     loading,
@@ -121,15 +121,12 @@ export const useERPStore = defineStore("ERPStore", () => {
     productTypeId,
     getPalletType,
     searchComponents,
-    searchResultsComponents,
     getBarcodeFromComponent,
-    activeTab,
-    isProductsActive,
-    isComponentsActive,
     GET_MIN_ITEMS_BY_ID_UNREG,
     GET_PRODUCT_TYPE_BY_ID,
     SEARCH_COMPONENTS_BY_NAME,
     GET_BARCODE_COMPONENT_BY_ID,
-    setActiveTabs,
+    clearERPData,
+    clearSearchComponent,
   };
 });

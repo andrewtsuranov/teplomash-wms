@@ -67,7 +67,7 @@ const schedulePalletRemoval = (palletId) => {
 // Фильтрация паллет, исключая те, что уже должны быть удалены
 const filteredPallets = computed(() =>
     palletStore.getTransactionsByTypeADD_PALLET.filter(
-        (pallet) => !canceledPalletIds.value.includes(pallet.id)
+        pallet => !canceledPalletIds.value.includes(pallet.id)
     )
 );
 
@@ -100,9 +100,9 @@ watch(
         if (pallet.pallet?.barcode && !pallet.qrCode) {
           pallet.qrCode = await generateQR(pallet.pallet.barcode);
           await webSocketStore.GET_UNREGISTERED_ITEMS();
-          if (packingStore.isShownTableItemUnregProduct) {
-            await packingStore.closeTableItemUnregProduct();
-          }
+          // if (packingStore.isShownTableItemUnregProduct) {
+          //   await packingStore.closeTableItemUnregProduct();
+          // }
         }
         // Проверяем, изменился ли статус на CANCELED
         const oldPallet = oldPallets?.find((p) => p.id === pallet.id);
@@ -142,7 +142,7 @@ watch(
         </div>
         <div class="pallet-item-row-two">
           <div style="font-size: 1.2rem; font-weight: bold">{{ pallet.pallet?.barcode || 'Ожидание данных...' }}</div>
-          <div v-if="pallet.pallet">Зона: {{ pallet.zone_info.to_zone.name.replace(/_/g, ' ') }}</div>
+          <div v-if="pallet.pallet">Зона: {{ pallet.zone_info.to_zone?.name.replace(/_/g, ' ') }}</div>
         </div>
         <div class="pallet-item-row-three">
           <div>Статус: {{ getStatusText(pallet.status) }}</div>

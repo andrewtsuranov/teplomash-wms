@@ -1,16 +1,15 @@
 import { defineStore } from "pinia";
 import { ref, computed } from "vue";
-import ky from "ky";
-import {
-  parseCellNumber,
-  formatCellNumber,
-} from "@/composables/Utils/cellUtils";
+import {parseCellNumber, formatCellNumber} from "@/composables/Utils/cellUtils";
+import {useWarehouseStore} from "@/stores/WMSStores/WarehouseStore.js";
 
-const api = ky.create({
-  prefixUrl: "your-api-url",
-});
+
+
 export const useStorageStore = defineStore("storageStore", () => {
+const warehouseStore = useWarehouseStore()
   // State
+const storageLocations = ref(JSON.parse(localStorage.getItem("storageLocations")) || null);
+const storageLocationsMeta = ref(JSON.parse(localStorage.getItem("storageLocationsMeta")) || null);
   const selectedRack = ref(null);
   const selectedPallet = ref(null);
   const isLoading = ref(false);
@@ -21,8 +20,15 @@ export const useStorageStore = defineStore("storageStore", () => {
     query: "",
     status: "",
   });
-  const currentWarehouse = ref(2); // Номер склада
-  const currentZone = ref("STR-01"); // Зона склада
+//getters
+  const getTotalStorageRowsByZone = computed(() => {
+    const zoneData = storageLocationsMeta.value.statistics.zone_dimensions[warehouseStore.selectedZonesByZoneType.id];
+    const totalItems = zoneData.dimensions.total_items || 0;
+    const levels = zoneData.dimensions.levels || 1; // Используем 1 как значение по умолчанию, чтобы избежать деления на 0
+    const positions = zoneData.dimensions.positions || 1; // Используем 1 как значение по умолчанию
+
+    return totalItems / (levels * positions);
+  });
   // Инициализация с учетом формата номеров ячеек
   const racks = ref(
     Array(32)
@@ -36,8 +42,8 @@ export const useStorageStore = defineStore("storageStore", () => {
               row: rowIndex + 1,
               cell: cellIndex + 1,
               level: 1,
-              warehouse: currentWarehouse.value,
-              zone: currentZone.value,
+              warehouse: warehouseStore.selectedWarehouse?.number,
+              zone: warehouseStore.selectedZonesByZoneType?.code,
             }),
             levels: Array(7)
               .fill()
@@ -46,8 +52,8 @@ export const useStorageStore = defineStore("storageStore", () => {
                   row: rowIndex + 1,
                   cell: cellIndex + 1,
                   level: levelIndex + 1,
-                  warehouse: currentWarehouse.value,
-                  zone: currentZone.value,
+                  warehouse: warehouseStore.selectedWarehouse?.numberselectedWarehouseselectedWarehouse,
+                  zone: warehouseStore.selectedZonesByZoneTypeselectedZoneByZoneType,
                 }),
                 pallets: Array(4)
                   .fill()
@@ -56,8 +62,8 @@ export const useStorageStore = defineStore("storageStore", () => {
                       row: rowIndex + 1,
                       cell: cellIndex + 1,
                       level: levelIndex + 1,
-                      warehouse: currentWarehouse.value,
-                      zone: currentZone.value,
+                      warehouse: warehouseStore.selectedWarehouse?.number,
+                      zone: warehouseStore.selectedZonesByZoneType?.code,
                     })}-P${palletIndex + 1}`,
                     occupied: Math.random() > 0.5,
                     content: {
@@ -96,8 +102,8 @@ export const useStorageStore = defineStore("storageStore", () => {
       const response = await api
         .get(`racks/${rackId}`, {
           searchParams: {
-            warehouse: currentWarehouse.value,
-            zone: currentZone.value,
+            warehouse: warehouseStore.selectedWarehouse?.number,
+            zone: warehouseStore.selectedZonesByZoneType?.code,
           },
         })
         .json();
@@ -121,8 +127,8 @@ export const useStorageStore = defineStore("storageStore", () => {
           json: {
             cellNumber,
             ...palletData,
-            warehouse: currentWarehouse.value,
-            zone: currentZone.value,
+            warehouse: warehouseStore.selectedWarehouse?.number,
+            zone: warehouseStore.selectedZonesByZoneType?.code,
           },
         })
         .json();
@@ -162,15 +168,15 @@ export const useStorageStore = defineStore("storageStore", () => {
   };
   const updatePallet = async (palletData) => {
     const { rackId, cell, level, palletNumber, ...data } = palletData;
-    const cellNumber = `${rackId}.${cell}.${level}.${currentWarehouse.value}.${currentZone.value}`;
+    const cellNumber = `${rackId}.${cell}.${level}.${warehouseStore.selectedWarehouse.number}.${warehouseStore.selectedZonesByZoneType.code}`;
     try {
       isLoading.value = true;
       await api
         .put(`pallets/${cellNumber}/${palletNumber}`, {
           json: {
             ...data,
-            warehouse: currentWarehouse.value,
-            zone: currentZone.value,
+            warehouse: warehouseStore.selectedWarehouse?.number,
+            zone: warehouseStore.selectedZonesByZoneType?.code,
           },
         })
         .json();
@@ -187,10 +193,10 @@ export const useStorageStore = defineStore("storageStore", () => {
     selectedPallet.value = palletInfo;
   };
   const setWarehouse = (warehouse) => {
-    currentWarehouse.value = warehouse;
+    warehouseStore.selectedWarehouse.number = warehouse;
   };
   const setZone = (zone) => {
-    currentZone.value = zone;
+    warehouseStore.selectedZonesByZoneType.code = zone;
   };
   const searchPallets = async ({ query, status }) => {
     try {
@@ -202,8 +208,8 @@ export const useStorageStore = defineStore("storageStore", () => {
             searchParams: {
               query,
               status,
-              warehouse: currentWarehouse.value,
-              zone: currentZone.value,
+              warehouse: warehouseStore.selectedWarehouse?.number,
+              zone: warehouseStore.selectedZonesByZoneType?.code,
             },
           })
           .json();
@@ -217,20 +223,30 @@ export const useStorageStore = defineStore("storageStore", () => {
       searchLoading.value = false;
     }
   };
+  const setStorageLocations = (payload) => {
+    storageLocations.value = payload
+    localStorage.setItem("storageLocations", JSON.stringify(payload));
+
+  }
+  const setStorageLocationsMeta = (payload) => {
+    storageLocationsMeta.value = payload
+    localStorage.setItem("storageLocationsMeta", JSON.stringify(payload));
+  }
   return {
     // State
     selectedRack,
     selectedPallet,
     isLoading,
     error,
+    storageLocations,
     racks,
-    currentWarehouse,
-    currentZone,
     searchResults, // Добавляем в возвращаемый объект
     searchLoading, // Добавляем в возвращаемый объект
     filters, // Добавляем в возвращаемый объект
     // Getters
     currentRack,
+    storageLocationsMeta,
+    getTotalStorageRowsByZone,
     // Actions
     selectRack,
     findCellByNumber,
@@ -243,5 +259,7 @@ export const useStorageStore = defineStore("storageStore", () => {
     searchPallets,
     searchProduct,
     updatePallet,
+    setStorageLocations,
+    setStorageLocationsMeta,
   };
 });

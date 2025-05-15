@@ -1,8 +1,18 @@
 {
   "compilerOptions": {
+    "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
-    }
+    },
+    "allowJs": true,
+    "checkJs": true,
+    "module": "esnext",
+    "moduleResolution": "node",
+    "target": "esnext",
+    "jsx": "preserve",
+    "strict": true,
+    "types": ["vite/client"]
   },
+  "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]
 }

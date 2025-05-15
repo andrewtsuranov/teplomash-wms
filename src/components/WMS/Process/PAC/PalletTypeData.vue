@@ -1,39 +1,41 @@
 <script setup>
-import {usePackingStore} from "@/stores/WMSStores/PackingStore.js";
-import {usePrintingStore} from "@/stores/WMSStores/PrintingStore.js";
-import {useWarehouseStore} from "@/stores/WMSStores/WarehouseStore.js";
-import {useERPStore} from "@/stores/WMSStores/ERPStore.js";
+import { usePackingStore } from "@/stores/WMSStores/PackingStore.js";
+import { usePrintingStore } from "@/stores/WMSStores/PrintingStore.js";
+import { useWarehouseStore } from "@/stores/WMSStores/WarehouseStore.js";
+import { useERPStore } from "@/stores/WMSStores/ERPStore.js";
 import PalletConfigurator from "@/components/UI/SVG/Pallet/PalletConfigurator.vue";
 import TableItemUnregisteredProduct from "@/components/Tables/ERP/TableItemUnregisteredProduct.vue";
-import {computed, nextTick} from "vue";
-import {useErrorCodeDictionary} from "@/composables/Dictionary/useErrorCodeDictionary.js";
-import {usePalletStore} from "@/stores/WMSStores/PalletStore.js";
+import { computed, nextTick } from "vue";
+import { useErrorCodeDictionary } from "@/composables/Dictionary/useErrorCodeDictionary.js";
+import { usePalletStore } from "@/stores/WMSStores/PalletStore.js";
 import FormCreatePalletType from "@/components/Forms/FormCreatePalletType.vue";
+import { useRoute } from "vue-router";
 
 const ERPStore = useERPStore();
+const warehouseStore = useWarehouseStore();
 const packingStore = usePackingStore();
 const palletStore = usePalletStore();
 const printingStore = usePrintingStore();
-const warehouseStore = useWarehouseStore();
+const route = useRoute();
 const totalCountProductPallet = computed(() => {
   return (
-      palletStore.palletTypeByID.rows_length *
-      palletStore.palletTypeByID.rows_width *
-      palletStore.palletTypeByID.rows_height
+    palletStore.palletTypeByID.rows_length *
+    palletStore.palletTypeByID.rows_width *
+    palletStore.palletTypeByID.rows_height
   );
 });
 const totalWeightPallet = computed(() => {
   return (
-      Number(palletStore.basePalletTypeById.weight) +
-      Math.round(
-          Number(ERPStore.productTypeId.max_weight) * totalCountProductPallet.value,
-      )
+    Number(palletStore.basePalletTypeById.weight) +
+    Math.round(
+      Number(ERPStore.productTypeId.max_weight) * totalCountProductPallet.value
+    )
   );
 });
 const errorMessages = computed(() => {
   if (!packingStore.detailInfoPackingProduct?.error) return [];
   return packingStore.detailInfoPackingProduct.error.map(
-      (err) => useErrorCodeDictionary[err] || `Неизвестная ошибка (${err})`,
+    (err) => useErrorCodeDictionary[err] || `Неизвестная ошибка (${err})`
   );
 });
 const handlerPrint = async () => {
@@ -54,26 +56,19 @@ const handlerPrint = async () => {
     await printingStore.GET_LABEL_TEMPLATE();
     if (warehouseStore.selectedZone) {
       const printerInZone = printingStore.printersList.printers.find(
-          (printer) => printer.zone === warehouseStore.selectedZonesByZoneType.id,
+        printer => printer.zones.find(
+          zone => zone.id === warehouseStore.selectedZonesByZoneType.id
+        )
       );
       if (printerInZone) {
         await printingStore.setSelectedPrinter(printerInZone);
       }
-      if (ERPStore.isProductsActive) {
+      if (route.params.idWarehouse === "spb-revolyutsii-proizvodstvo") {
         if (printingStore.selectedPrinter.name !== "BIXOLON_SPP-L410 WiFi") {
           await printingStore.setSelectedLabelTemplate(
-              printingStore.labelTemplatesList.find(
-                  (label) => label.code === "300_этикетка_58*40_Продукция",
-              ),
-          );
-        }
-      }
-      if (ERPStore.isComponentsActive) {
-        if (printingStore.selectedPrinter.name !== "BIXOLON_SPP-L410 WiFi") {
-          await printingStore.setSelectedLabelTemplate(
-              printingStore.labelTemplatesList.find(
-                  (label) => label.code === "300_этикетка_58*40_Комплектующая",
-              ),
+            printingStore.labelTemplatesList.find(
+              (label) => label.code === "300_этикетка_58*40_Продукция"
+            )
           );
         }
       }
@@ -85,17 +80,14 @@ const handlerPrint = async () => {
 };
 </script>
 <template>
-  <div
-      v-if="packingStore.isShownTableItemUnregProduct"
-      class="packing-product-data-container"
+  <div v-if="packingStore.isShownTableItemUnregProduct"
+       class="packing-product-data-container"
   >
     <label class="packing-product-data-title">
-      Информация об упаковке продукции
-      {{ packingStore.detailInfoPackingProduct?.name }}:
+      Информация об упаковке продукции {{ packingStore.detailInfoPackingProduct?.name }}:
     </label>
-    <div
-        v-if="packingStore.detailInfoPackingProduct?.error"
-        class="modal-grid-msg"
+    <div v-if="packingStore.detailInfoPackingProduct?.error"
+         class="modal-grid-msg"
     >
       <div class="alert alert-warning" data-bs-theme="dark" role="alert">
         Ошибка:
@@ -105,12 +97,11 @@ const handlerPrint = async () => {
           </li>
         </ol>
       </div>
-      <FormCreatePalletType class="packing-product-form"/>
+      <FormCreatePalletType class="packing-product-form" />
     </div>
     <div v-else class="packing-product-data">
-      <PalletConfigurator class="packing-product-data-pallet"/>
-      <div class="packing-product-data-table">
-        <TableItemUnregisteredProduct/>
+      <div class="packing-product-data-pallet">
+        <PalletConfigurator />
       </div>
       <div class="packing-product-data-detail">
         <label>Тип паллеты:</label>
@@ -131,6 +122,9 @@ const handlerPrint = async () => {
         <label>Масса паллеты:</label>
         <div>{{ totalWeightPallet }} &#177; 1 кг.</div>
       </div>
+      <div class="packing-product-data-table">
+        <TableItemUnregisteredProduct />
+      </div>
       <div class="grp-btn">
         <button class="btn btn-outline-primary" @click="handlerPrint">
           Печать этикеток
@@ -141,7 +135,6 @@ const handlerPrint = async () => {
 </template>
 <style scoped>
 .packing-product-data-container {
-
   display: grid;
   grid-template-columns: minmax(auto, 1fr);
   grid-template-rows: min-content minmax(auto, 1fr);
@@ -158,8 +151,8 @@ const handlerPrint = async () => {
 
 .packing-product-data {
   display: grid;
-  grid-template-columns: minmax(auto, 1fr) minmax(auto, 1fr);
-  grid-template-rows: min-content min-content;
+  grid-template-columns: repeat(2, minmax(auto, 1fr));
+  grid-auto-rows: min-content;
   overflow: auto;
   gap: 2rem;
 }
@@ -179,7 +172,6 @@ const handlerPrint = async () => {
   border-radius: .5rem;
 }
 
-
 .packing-product-data-detail {
   display: grid;
   grid-template-columns: auto auto;
@@ -193,7 +185,7 @@ const handlerPrint = async () => {
 
 .packing-product-data-table {
   display: grid;
-  /*min-width: 500px;*/
+  min-width: 500px;
   padding: 1rem;
   background-color: #2e2e2e;
   border: 1px solid #605039e0;

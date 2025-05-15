@@ -16,7 +16,11 @@ export default defineConfig({
   server: {
     host: "0.0.0.0",
     port: 5173,
-    strictPort: true
+    strictPort: true,
+    allowedHosts: [
+      "sgi1",           // Allow requests to sgi1
+      "sgi1.TEPLOMASH"  // Allow requests to sgi1.TEPLOMASH
+    ]
   },
   resolve: {
     alias: {

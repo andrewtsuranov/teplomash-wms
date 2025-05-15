@@ -38,6 +38,7 @@ export function useGuardRouter(router) {
              await warehouseStore.clearAllZonesData()
             }
         }
+
         next()
     })
 }
