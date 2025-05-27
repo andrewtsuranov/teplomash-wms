@@ -63,7 +63,7 @@ const handlerPrint = async () => {
       if (printerInZone) {
         await printingStore.setSelectedPrinter(printerInZone);
       }
-      if (route.params.idWarehouse === "spb-revolyutsii-proizvodstvo") {
+      if (route.params.idWarehouse !== "spb-revolyutsii-sklad-komplektuyuschih") {
         if (printingStore.selectedPrinter.name !== "BIXOLON_SPP-L410 WiFi") {
           await printingStore.setSelectedLabelTemplate(
             printingStore.labelTemplatesList.find(

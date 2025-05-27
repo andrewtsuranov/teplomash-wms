@@ -59,20 +59,22 @@ const handlePrint = async () => {
 // Функция для выбора данных в зависимости от ID склада
 const getPreviewData = async () => {
   let data = [];
+
   switch (warehouseStore.selectedWarehouse.id) {
     case 6:
-      // Предполагаю, что getBarcodeFromComponent возвращает массив или значение
       data = Array.isArray(ERPStore.getBarcodeFromComponent)
         ? ERPStore.getBarcodeFromComponent.filter(Boolean)
         : [ERPStore.getBarcodeFromComponent].filter(Boolean);
       break;
     case 1:
+    case 2:
       data = ERPStore.getNameAndBarcodeProductList || [];
       break;
     default:
       data = [];
       break;
   }
+
   return printingStore.setDataToPreview(data);
 };
 // Обработчик предпросмотра
