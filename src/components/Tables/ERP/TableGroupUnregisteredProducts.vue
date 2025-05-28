@@ -19,12 +19,16 @@ const erpUnregItemsPAC = computed(() => {
   }
   return webSocketStore.getUnregisteredProducts;
 });
+
+const getReceivingZoneIDFromManufacture = computed(() =>
+  warehouseStore.zoneStatisticsByWarehouseID.zones.find(code => code.code === 'RCV-01')
+)
 const toggleDetailUnregProduct = async (item) => {
   try {
     if (packingStore.detailInfoPackingProduct?.id === item.id) {
       packingStore.closeTableItemUnregProduct();
     } else {
-      await ERPStore.GET_MIN_ITEMS_BY_ID_UNREG(item);
+      await ERPStore.GET_MIN_ITEMS_BY_ID_UNREG(item, getReceivingZoneIDFromManufacture.value.id);
       await ERPStore.GET_PRODUCT_TYPE_BY_ID(item);
       if (ERPStore.getPalletType !== undefined) {
         await palletStore.GET_PALLET_TYPE_BY_ID(ERPStore.getPalletType);

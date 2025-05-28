@@ -38,8 +38,8 @@ export const useWebSocketStore = defineStore("webSocketStore", () => {
         // Создаем новый промис для отслеживания подключения
         connectionPromise.value = new Promise(async (resolve, reject) => {
             const userStore = await getUserStore();
-            // const wsUrl = `ws://lab:8081/ws/inventory/?token=${userStore.getTokenAccess}`;
-            const wsUrl = `ws://192.168.1.144/ws/inventory/?token=${userStore.getTokenAccess}`
+            const wsUrl = `ws://lab:8081/ws/inventory/?token=${userStore.getTokenAccess}`;
+            // const wsUrl = `ws://192.168.1.144/ws/inventory/?token=${userStore.getTokenAccess}`
 
             socket.value = new WebSocket(wsUrl);
 

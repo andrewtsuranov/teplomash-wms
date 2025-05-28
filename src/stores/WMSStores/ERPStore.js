@@ -33,7 +33,7 @@ export const useERPStore = defineStore("ERPStore", () => {
 
 
   //Actions
-  const GET_MIN_ITEMS_BY_ID_UNREG = async (item, zone_id = 38) => {
+  const GET_MIN_ITEMS_BY_ID_UNREG = async (item, zone_id) => {
     loading.value = true;
     errorStore.clearError();
     try {
