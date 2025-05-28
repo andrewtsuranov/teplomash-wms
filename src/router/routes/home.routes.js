@@ -34,7 +34,7 @@ export default {
         {
           path: "info",
           name: "Info",
-          component: () => import("@/views/Home/About/AboutView.vue"),
+          component: () => import("@/views/Home/Reference/ReferenceView.vue"),
           meta: { breadcrumb: "Справка" },
         },
         {

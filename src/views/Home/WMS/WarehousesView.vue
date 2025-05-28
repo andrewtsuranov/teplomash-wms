@@ -1,5 +1,5 @@
 <script setup>
-import {onMounted} from "vue";
+import {onMounted, computed} from "vue";
 import {useRouter, useRoute} from "vue-router";
 import {useWarehouseStore} from "@/stores/WMSStores/WarehouseStore.js";
 import {useErrorStore} from "@/stores/Error/ErrorStore.js";
@@ -10,12 +10,19 @@ const warehouseStore = useWarehouseStore();
 const router = useRouter();
 const route = useRoute()
 // Фильтрация складов по адресу
-const revolutsiiWarehouses = () =>
-    warehouseStore?.allWarehouses?.filter((warehouse) =>
-        ['195279, Санкт-Петербург, шоссе Революции, д.90, литера А'].includes(warehouse.address)) || [];
-const himikovWarehouses = () =>
-    warehouseStore?.allWarehouses?.filter((warehouse) =>
-        ['195030, Санкт-Петербург, улица Химиков, д.14'].includes(warehouse.address)) || [];
+const revolutsiiWarehouses = computed(() =>
+  warehouseStore?.allWarehouses
+    ?.filter((warehouse) =>
+      ['195279, Санкт-Петербург, шоссе Революции, д.90, литера А'].includes(warehouse.address))
+    ?.sort((a, b) => a.number - b.number) || []
+);
+
+const himikovWarehouses = computed(() =>
+  warehouseStore?.allWarehouses
+    ?.filter((warehouse) =>
+      ['195030, Санкт-Петербург, улица Химиков, д.14'].includes(warehouse.address))
+    ?.sort((a, b) => a.number - b.number) || []
+);
 const handlerClickWarehouse = async (warehouse) => {
   try {
     if (warehouse) {
@@ -59,7 +66,7 @@ onMounted(async () => {
       <h2>СПБ-Революции</h2>
       <div class="wms-revolutsii-warehouses">
         <div
-            v-for="warehouse in revolutsiiWarehouses()"
+            v-for="warehouse in revolutsiiWarehouses"
             :key="warehouse.id"
             class="wms-revolutsii-warehouses-items"
             @click="handlerClickWarehouse(warehouse)"
@@ -73,7 +80,7 @@ onMounted(async () => {
       <h2>СПБ-Химиков</h2>
       <div class="wms-himikov-warehouses">
         <div
-            v-for="warehouse in himikovWarehouses()"
+            v-for="warehouse in himikovWarehouses"
             :key="warehouse.id"
             class="wms-himikov-warehouses-items"
             @click="handlerClickWarehouse(warehouse)"

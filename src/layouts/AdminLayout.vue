@@ -1,7 +1,14 @@
 <template>
-  <div>
-    <h1>HERE IS GONNA BE ADMIN DASHBOARD</h1>
+  <div class="dashboard-container">
+    <h2>Страница "Администрирование" находится в разработке...</h2>
   </div>
 </template>
-<script setup></script>
-<style scoped></style>
+<script setup>
+</script>
+<style scoped>
+.dashboard-container {
+  display: grid;
+  grid-template-columns: minmax(auto, 1fr);
+  padding: 2rem;
+}
+</style>

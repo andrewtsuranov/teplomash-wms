@@ -64,8 +64,9 @@ onMounted(async () => {
       <div class="erp-product-alert alert m-0" role="alert">
         <i class="bi bi-info-circle erp-update-alert-logo"></i>
         <span class="erp-update-alert-text">
-              Табличные данные формируются на заключительном этапе сборки и синхронизируются в автоматическом режиме.
-              При необходимости используйте кнопку ручного обновления.
+              Табличные данные синхронизируются в автоматическом режиме на этапе формирования
+              ежедневного задания в
+              1С:ERP. При необходимости используйте кнопку ручного обновления.
             </span>
       </div>
       <button
@@ -143,7 +144,7 @@ onMounted(async () => {
 .erp-product-data {
   display: grid;
   grid-template-columns: minmax(auto, 1fr);
-  row-gap: 2rem;
+  row-gap: 1rem;
 }
 
 .in-table-container {
@@ -193,8 +194,8 @@ table thead {
   display: grid;
   grid-template-columns: min-content auto;
   align-items: center;
-  column-gap: 1rem;
-  padding: 0.4rem 1rem;
+  column-gap: .8rem;
+  padding: .4rem .6rem;
   background-color: rgba(0, 0, 0, 0.62);
   border-color: #605039e0;
 }
