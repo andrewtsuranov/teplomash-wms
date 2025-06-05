@@ -30,8 +30,8 @@ onMounted(async () => {
       <div v-if="storageStore.error" class="alert alert-danger">{{ storageStore.error }}</div>
       <!--      <SearchResults />-->
       <h3>Интерактивная карта склада</h3>
-<!--      <StorageMap />-->
-<!--      <StorageMapDetail />-->
+      <StorageMap />
+      <StorageMapDetail />
     </div>
     <TeplomashTaskManager />
   </div>
