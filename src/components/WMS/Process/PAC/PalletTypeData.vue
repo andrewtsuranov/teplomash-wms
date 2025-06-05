@@ -124,11 +124,11 @@ const handlerPrint = async () => {
       </div>
       <div class="packing-product-data-table">
         <TableItemUnregisteredProduct />
-      </div>
-      <div class="grp-btn">
-        <button class="btn btn-outline-primary" @click="handlerPrint">
-          Печать этикеток
-        </button>
+        <div class="grp-btn">
+          <button class="btn btn-outline-primary" @click="handlerPrint">
+            Печать этикеток
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -152,7 +152,11 @@ const handlerPrint = async () => {
 .packing-product-data {
   display: grid;
   grid-template-columns: repeat(2, minmax(auto, 1fr));
-  grid-auto-rows: min-content;
+  grid-template-rows: min-content min-content min-content;
+  grid-template-areas:
+    "pallet pallet"
+    "detail table"
+    "buttons buttons";
   overflow: auto;
   gap: 2rem;
 }
@@ -164,6 +168,7 @@ const handlerPrint = async () => {
 }
 
 .packing-product-data-pallet {
+  grid-area: pallet;
   display: grid;
   grid-template-columns: minmax(auto, 1fr);
   padding: 1rem;
@@ -173,6 +178,7 @@ const handlerPrint = async () => {
 }
 
 .packing-product-data-detail {
+  grid-area: detail;
   display: grid;
   grid-template-columns: auto auto;
   color: silver;
@@ -184,7 +190,10 @@ const handlerPrint = async () => {
 }
 
 .packing-product-data-table {
+  grid-area: table;
   display: grid;
+  grid-template-columns: minmax(auto, 1fr);
+  row-gap: 1rem;
   min-width: 500px;
   padding: 1rem;
   background-color: #2e2e2e;
@@ -194,9 +203,21 @@ const handlerPrint = async () => {
 
 .grp-btn {
   display: grid;
-  border: 1px solid #605039e0;
+  /*border: 1px solid #605039e0;*/
   border-radius: .5rem;
   place-items: center;
+}
+@media (max-width: 768px) {
+  .packing-product-data {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "pallet"
+      "detail"
+      "table"
+  }
 
+  .packing-product-data-table {
+    min-width: unset;
+  }
 }
 </style>

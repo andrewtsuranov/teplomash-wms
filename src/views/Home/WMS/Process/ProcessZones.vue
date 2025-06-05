@@ -14,7 +14,7 @@ const selectedPackingZone = ref(null);
 const animatedTotalArea = ref(0);
 const animatedOccupiedArea = ref(0);
 const animatedCapacityPercentage = ref(0);
-
+const isLoading = ref(false);
 // Анимация total_area
 const animateTotalArea = (newValue) => {
   gsap.killTweensOf(animatedTotalArea); // Очищаем предыдущие анимации
@@ -44,18 +44,21 @@ const animateCapacityPercentage = (newValue) => {
 };
 //Обработка select выбранной зоны
 const handleZoneChange = async (zone) => {
+  if (!zone || !zone.id) {
+    console.warn("Зона не выбрана или отсутствует ID зоны");
+    return; // Прерываем выполнение, если zone отсутствует или не имеет id
+  }
   // Инициализируем соединение только если оно еще не инициализировано
   await webSocketStore.ensureConnected();
   await webSocketStore.GET_WAREHOUSE_ZONE_STATISTICS(warehouseStore.selectedWarehouse.id, zone.id, true);
-  if (route.name === 'wmsStorageZone') {
-  console.log(route.name);
-    webSocketStore.GET_LOCATIONS_BASE(
+  if (route.name === "wmsStorageZone") {
+    await webSocketStore.GET_LOCATIONS_BASE(
       warehouseStore.selectedWarehouse.id,
       zone.id,
       null,
       true,
       null
-    )
+    );
   }
   await warehouseStore.setSelectedZonesByZoneType(zone);
   await router.push({
@@ -67,37 +70,42 @@ const handleZoneChange = async (zone) => {
 };
 // Отслеживание изменений selectedPackingZone
 watch(selectedPackingZone, (newValue) => {
-    //Очищаем данные
-  warehouseStore.clearZoneDetailedData();
-    if (newValue && newValue.total_area !== undefined && newValue.occupied_area !== undefined) {
-      animateTotalArea(newValue);
-      animateOccupiedArea(newValue);
-      animateCapacityPercentage(newValue);
-    } else {
-      animatedTotalArea.value = 0;
-      animatedOccupiedArea.value = 0;
-      animatedCapacityPercentage.value = 0;
-    }
-  }, { immediate: true });
-onMounted(async () => {
   //Очищаем данные
+  warehouseStore.clearZoneDetailedData();
+  if (newValue && newValue.total_area !== undefined && newValue.occupied_area !== undefined) {
+    animateTotalArea(newValue);
+    animateOccupiedArea(newValue);
+    animateCapacityPercentage(newValue);
+  } else {
+    animatedTotalArea.value = 0;
+    animatedOccupiedArea.value = 0;
+    animatedCapacityPercentage.value = 0;
+  }
+}, { immediate: true });
+onMounted(async () => {
+  isLoading.value = true;
   await warehouseStore.clearZoneDetailedData();
   try {
-    if (warehouseStore.zonesByZoneType) {
+    if (warehouseStore.zonesByZoneType?.length) {
       selectedPackingZone.value = warehouseStore.zonesByZoneType[0];
       await handleZoneChange(selectedPackingZone.value);
+    } else {
+      console.warn("Список зон пуст");
     }
   } catch (e) {
-    console.log(e);
+    console.error("Ошибка при инициализации зон:", e);
+  } finally {
+    isLoading.value = false;
   }
 });
-onUnmounted(async () => {
+onUnmounted(() => {
   selectedPackingZone.value = null;
 });
 </script>
 <template>
   <div class="wms-zone-container">
-    <div class="wms-zone-select">
+    <div v-if="warehouseStore.zonesByZoneType?.length && warehouseStore.selectedZonesByZoneType"
+         class="wms-zone-select">
       <select id="selectZone"
               v-model="selectedPackingZone"
               aria-label="Выберите зону"
@@ -113,6 +121,9 @@ onUnmounted(async () => {
           {{ zone.name.replace(/_/g, " ").toUpperCase() }}
         </option>
       </select>
+    </div>
+    <div v-else>
+      Загрузка зон...
     </div>
     <div class="wms-zone-info">
       <div class="wms-zone-name"

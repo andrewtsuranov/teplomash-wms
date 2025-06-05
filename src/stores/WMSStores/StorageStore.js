@@ -1,37 +1,37 @@
 import { defineStore } from "pinia";
 import { ref, computed } from "vue";
-import {parseCellNumber, formatCellNumber} from "@/composables/Utils/cellUtils";
-import {useWarehouseStore} from "@/stores/WMSStores/WarehouseStore.js";
-
-
+import { parseCellNumber, formatCellNumber } from "@/composables/Utils/cellUtils";
+import { useWarehouseStore } from "@/stores/WMSStores/WarehouseStore.js";
 
 export const useStorageStore = defineStore("storageStore", () => {
-const warehouseStore = useWarehouseStore()
+  const warehouseStore = useWarehouseStore();
   // State
-const storageLocations = ref(JSON.parse(localStorage.getItem("storageLocations")) || null);
-const storageLocationsMeta = ref(JSON.parse(localStorage.getItem("storageLocationsMeta")) || null);
+  const storageLocations = ref(JSON.parse(localStorage.getItem("storageLocations")) || null);
+  const storageLocationsMeta = ref(JSON.parse(localStorage.getItem("storageLocationsMeta")) || null);
   const selectedRack = ref(null);
   const selectedPallet = ref(null);
   const isLoading = ref(false);
   const error = ref(null);
+  const racks = ref([])
   const searchResults = ref([]); // Добавляем searchResults
   const searchLoading = ref(false);
   const filters = ref({
     query: "",
-    status: "",
+    status: ""
   });
-//getters
-  const getTotalStorageRowsByZone = computed(() => {
-    const zoneData = storageLocationsMeta.value.statistics.zone_dimensions[warehouseStore.selectedZonesByZoneType.id];
-    const totalItems = zoneData.dimensions.total_items || 0;
-    const levels = zoneData.dimensions.levels || 1; // Используем 1 как значение по умолчанию, чтобы избежать деления на 0
-    const positions = zoneData.dimensions.positions || 1; // Используем 1 как значение по умолчанию
 
-    return totalItems / (levels * positions);
-  });
+//getters
+  const getDataStorageRowsByZone = computed(() =>
+    storageLocationsMeta.value.statistics.zone_dimensions[warehouseStore.selectedZonesByZoneType.id])
+  const getTotalStorageRowsByZone = computed(() => {
+    const zoneData = storageLocationsMeta.value.statistics.zone_dimensions[warehouseStore.selectedZonesByZoneType.id]
+    const totalItems = zoneData?.dims.total_items || 0;
+    const levels = zoneData?.dims.levels || 1;
+    const positions = zoneData?.dims.positions || 1;
+    return Math.ceil(totalItems / (levels * positions));
+  })
   // Инициализация с учетом формата номеров ячеек
-  const racks = ref(
-    Array(32)
+ racks.value = Array(32)
       .fill()
       .map((_, rowIndex) => ({
         id: rowIndex + 1,
@@ -43,7 +43,7 @@ const storageLocationsMeta = ref(JSON.parse(localStorage.getItem("storageLocatio
               cell: cellIndex + 1,
               level: 1,
               warehouse: warehouseStore.selectedWarehouse?.number,
-              zone: warehouseStore.selectedZonesByZoneType?.code,
+              zone: warehouseStore.selectedZonesByZoneType?.code
             }),
             levels: Array(7)
               .fill()
@@ -52,8 +52,8 @@ const storageLocationsMeta = ref(JSON.parse(localStorage.getItem("storageLocatio
                   row: rowIndex + 1,
                   cell: cellIndex + 1,
                   level: levelIndex + 1,
-                  warehouse: warehouseStore.selectedWarehouse?.numberselectedWarehouseselectedWarehouse,
-                  zone: warehouseStore.selectedZonesByZoneTypeselectedZoneByZoneType,
+                  warehouse: warehouseStore.selectedWarehouse?.number,
+                  zone: warehouseStore.selectedZonesByZoneType?.code
                 }),
                 pallets: Array(4)
                   .fill()
@@ -63,7 +63,7 @@ const storageLocationsMeta = ref(JSON.parse(localStorage.getItem("storageLocatio
                       cell: cellIndex + 1,
                       level: levelIndex + 1,
                       warehouse: warehouseStore.selectedWarehouse?.number,
-                      zone: warehouseStore.selectedZonesByZoneType?.code,
+                      zone: warehouseStore.selectedZonesByZoneType?.code
                     })}-P${palletIndex + 1}`,
                     occupied: Math.random() > 0.5,
                     content: {
@@ -71,13 +71,13 @@ const storageLocationsMeta = ref(JSON.parse(localStorage.getItem("storageLocatio
                       quantity: 0,
                       dateAdded: null,
                       weight: 0,
-                      description: "",
-                    },
-                  })),
-              })),
-          })),
-      })),
-  );
+                      description: ""
+                    }
+                  }))
+              }))
+          }))
+      }))
+
   // Getters
   const currentRack = computed(() => {
     return racks.value.find((rack) => rack.id === selectedRack.value);
@@ -103,8 +103,8 @@ const storageLocationsMeta = ref(JSON.parse(localStorage.getItem("storageLocatio
         .get(`racks/${rackId}`, {
           searchParams: {
             warehouse: warehouseStore.selectedWarehouse?.number,
-            zone: warehouseStore.selectedZonesByZoneType?.code,
-          },
+            zone: warehouseStore.selectedZonesByZoneType?.code
+          }
         })
         .json();
       // Обновляем данные с сервера
@@ -128,8 +128,8 @@ const storageLocationsMeta = ref(JSON.parse(localStorage.getItem("storageLocatio
             cellNumber,
             ...palletData,
             warehouse: warehouseStore.selectedWarehouse?.number,
-            zone: warehouseStore.selectedZonesByZoneType?.code,
-          },
+            zone: warehouseStore.selectedZonesByZoneType?.code
+          }
         })
         .json();
       await fetchRackData(row);
@@ -176,8 +176,8 @@ const storageLocationsMeta = ref(JSON.parse(localStorage.getItem("storageLocatio
           json: {
             ...data,
             warehouse: warehouseStore.selectedWarehouse?.number,
-            zone: warehouseStore.selectedZonesByZoneType?.code,
-          },
+            zone: warehouseStore.selectedZonesByZoneType?.code
+          }
         })
         .json();
       // Обновляем данные в store
@@ -209,8 +209,8 @@ const storageLocationsMeta = ref(JSON.parse(localStorage.getItem("storageLocatio
               query,
               status,
               warehouse: warehouseStore.selectedWarehouse?.number,
-              zone: warehouseStore.selectedZonesByZoneType?.code,
-            },
+              zone: warehouseStore.selectedZonesByZoneType?.code
+            }
           })
           .json();
         searchResults.value = response;
@@ -224,14 +224,13 @@ const storageLocationsMeta = ref(JSON.parse(localStorage.getItem("storageLocatio
     }
   };
   const setStorageLocations = (payload) => {
-    storageLocations.value = payload
+    storageLocations.value = payload;
     localStorage.setItem("storageLocations", JSON.stringify(payload));
-
-  }
+  };
   const setStorageLocationsMeta = (payload) => {
-    storageLocationsMeta.value = payload
+    storageLocationsMeta.value = payload;
     localStorage.setItem("storageLocationsMeta", JSON.stringify(payload));
-  }
+  };
   return {
     // State
     selectedRack,
@@ -246,6 +245,7 @@ const storageLocationsMeta = ref(JSON.parse(localStorage.getItem("storageLocatio
     // Getters
     currentRack,
     storageLocationsMeta,
+    getDataStorageRowsByZone,
     getTotalStorageRowsByZone,
     // Actions
     selectRack,
@@ -260,6 +260,6 @@ const storageLocationsMeta = ref(JSON.parse(localStorage.getItem("storageLocatio
     searchProduct,
     updatePallet,
     setStorageLocations,
-    setStorageLocationsMeta,
+    setStorageLocationsMeta
   };
 });

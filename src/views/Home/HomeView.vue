@@ -1,3 +1,28 @@
+<script setup>
+import { useUserStore } from "@/stores/WMSStores/UserStore.js";
+import { useWebSocketStore } from "@/stores/WebSocketStore.js";
+import { useErrorStore } from "@/stores/Error/ErrorStore.js";
+import { onMounted } from "vue";
+import { useRouter, useRoute } from "vue-router";
+
+const userStore = useUserStore();
+const webSocketStore = useWebSocketStore();
+const errorStore = useErrorStore();
+const router = useRouter();
+const route = useRoute()
+onMounted(async () => {
+  try {
+    await webSocketStore.initWebSocket();
+  } catch (e) {
+    console.log(e);
+    errorStore.setError({
+      status: e.response?.status || 500,
+      message: "Ошибка соединения WebSocket",
+    });
+    throw e;
+  }
+});
+</script>
 <template>
   <div v-if="route.name === 'Home'" class="home-view">
     <div class="welcome-text">
@@ -37,31 +62,6 @@
   </div>
   <RouterView />
 </template>
-<script setup>
-import { useUserStore } from "@/stores/WMSStores/UserStore.js";
-import { useWebSocketStore } from "@/stores/WebSocketStore.js";
-import { useErrorStore } from "@/stores/Error/ErrorStore.js";
-import { onMounted } from "vue";
-import { useRouter, useRoute } from "vue-router";
-
-const userStore = useUserStore();
-const webSocketStore = useWebSocketStore();
-const errorStore = useErrorStore();
-const router = useRouter();
-const route = useRoute()
-onMounted(async () => {
-  try {
-    await webSocketStore.initWebSocket();
-  } catch (e) {
-    console.log(e);
-    errorStore.setError({
-      status: e.response?.status || 500,
-      message: "Ошибка соединения WebSocket",
-    });
-    throw e;
-  }
-});
-</script>
 <style scoped>
 .home-view {
   display: grid;
@@ -185,7 +185,7 @@ ul li {
   .home-view {
     display: grid;
     grid-template-columns: 1fr;
-    padding: 0;
+    padding: 1rem;
     row-gap: 2rem;
   }
 
@@ -223,8 +223,8 @@ ul li {
 
 @media (max-width: 1100px) {
   .welcome-image {
-    grid-template-rows: 300px;
-    margin: 1rem;
+    /*grid-template-rows: 300px;*/
+    /*margin: 1rem;*/
   }
 }
 </style>

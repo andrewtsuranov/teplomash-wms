@@ -24,7 +24,7 @@ const generateBarcodes = () => {
       try {
         JsBarcode(element, item.barcode, {
           format: "CODE128",
-          width: 3,
+          width: 2.5,
           height: 100,
           displayValue: true,
           marginTop: 0,

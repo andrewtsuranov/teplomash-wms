@@ -293,7 +293,8 @@ export const useWebSocketStore = defineStore("webSocketStore", () => {
         socket.value.send(JSON.stringify(data));
     };
     //Обработка запроса на получение списка ячеек
-    const GET_LOCATIONS_BASE = (warehouse_id, zone_id = null, abc_class = null, has_pallets = null, filters = null) => {
+    const GET_LOCATIONS_BASE = async (warehouse_id, zone_id = null, abc_class = null, has_pallets = null, filters = null) => {
+      await ensureConnected()
         const data = {
             action: "get_locations",
             warehouse_id: warehouse_id,

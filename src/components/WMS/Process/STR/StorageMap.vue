@@ -1,8 +1,10 @@
 <script setup>
 import { useStorageStore } from "@/stores/WMSStores/StorageStore.js";
 import { computed } from "vue";
+import { useWarehouseStore } from "@/stores/WMSStores/WarehouseStore.js";
 
 const storageStore = useStorageStore();
+const warehouseStore = useWarehouseStore()
 const getRackStatus = (rack) => {
   const totalPallets = rack.cells.reduce((acc, cell) => {
     return (
@@ -38,7 +40,7 @@ const middleRackPairs = computed(() => {
   }
   const middleRacks = storageStore.racks.slice(
     1,
-    storageStore.racks.length - 1,
+    storageStore.racks.length - 1
   );
   const pairs = [];
   for (let i = 0; i < middleRacks.length; i += 2) {
@@ -48,82 +50,84 @@ const middleRackPairs = computed(() => {
 });
 </script>
 <template>
-  <div class="warehouse-top-view">
-    <div class="racks-container">
-<!--      <div v-for="row in storageStore.getTotalStorageRowsByZone">-->
-<!--        <div  class="rack single-rack first-rack"-->
-<!--              :class="[-->
-<!--          { selected: storageStore.selectedRack === storageStore.racks[0].id },-->
-<!--          getOccupancyClass(storageStore.racks[0]),-->
-<!--        ]"-->
-<!--              @click="storageStore.selectRack(storageStore.racks[0].id)"-->
-<!--        >{{row}}</div>-->
-<!--      </div>-->
-      <!-- First Rack (always single) -->
-      <div
+  <div class="storage-map-container" v-if="storageStore.getTotalStorageRowsByZone !==0">
+    <div class="storage-map-one">
+      <div class="workers-zone-container">
+        <div>Диспетчерская</div>
+      </div>
+      <div class="REC-SHP-zone-container">
+        <div>Погрузка</div>
+      </div>
+      <div class="STR-02-container">
+        <div>Ряд 33</div>
+      </div>
+    </div>
+    <div class="storage-map-two">
+      <div class="STR-01-container">
+        <!-- First Rack (always single) -->
+        <div
           v-if="storageStore.racks?.length > 0"
           :key="storageStore.racks[0]?.id"
-          class="rack single-rack first-rack"
           :class="[
           { selected: storageStore.selectedRack === storageStore.racks[0].id },
           getOccupancyClass(storageStore.racks[0]),
         ]"
+          class="rack single-rack first-rack"
           @click="storageStore.selectRack(storageStore.racks[0].id)"
-      >
-        <div class="rack-content">
-          <div class="rack-number">Ряд {{ storageStore.racks[0].id }}</div>
-          <div class="rack-status">
-            <small>{{ getRackStatus(storageStore.racks[0]) }}</small>
+        >
+          <div class="rack-content">
+            <div class="rack-number">Ряд {{ storageStore.racks[0].id }}</div>
+            <div class="rack-status">
+              <small>{{ getRackStatus(storageStore.racks[0]) }}</small>
+            </div>
           </div>
         </div>
-      </div>
-      <!-- Aisle after first rack -->
-      <div class="aisle">
-        <div class="aisle-road">
-          <div class="aisle-number">Проход 1</div>
-          <div class="markings"></div>
-          <div class="aisle-number">Проход 1</div>
+        <!-- Aisle after first rack -->
+        <div class="aisle">
+          <div class="aisle-road">
+            <div class="aisle-number">Проход 1</div>
+            <div class="markings"></div>
+            <div class="aisle-number">Проход 1</div>
+          </div>
         </div>
-      </div>
-      <!-- Middle Racks (in pairs) with Aisles -->
-      <div v-if="storageStore.racks.length > 2" class="middle-racks-container">
-        <template
+        <!-- Middle Racks (in pairs) with Aisles -->
+        <div v-if="storageStore.racks.length > 2" class="middle-racks-container">
+          <template
             v-for="(rackPair, index) in middleRackPairs"
             :key="`pair-${rackPair[0]?.id}-${rackPair[1]?.id}`"
-        >
-          <div class="rack-pair">
-            <div
+          >
+            <div class="rack-pair">
+              <div
                 v-for="rack in rackPair"
                 :key="rack.id"
-                class="rack paired-rack"
                 :class="[
                 { selected: storageStore.selectedRack === rack.id },
                 getOccupancyClass(rack),
               ]"
+                class="rack paired-rack"
                 @click="storageStore.selectRack(rack.id)"
-            >
-              <div class="rack-content">
-                <div class="rack-number">Ряд {{ rack.id }}</div>
-                <div class="rack-status">
-                  <small>{{ getRackStatus(rack) }}</small>
+              >
+                <div class="rack-content">
+                  <div class="rack-number">Ряд {{ rack.id }}</div>
+                  <div class="rack-status">
+                    <small>{{ getRackStatus(rack) }}</small>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-          <div class="aisle">
-            <div class="aisle-road">
-              <div class="aisle-number">Проход {{ index + 2 }}</div>
-              <div class="markings"></div>
-              <div class="aisle-number">Проход {{ index + 2 }}</div>
+            <div class="aisle">
+              <div class="aisle-road">
+                <div class="aisle-number">Проход {{ index + 2 }}</div>
+                <div class="markings"></div>
+                <div class="aisle-number">Проход {{ index + 2 }}</div>
+              </div>
             </div>
-          </div>
-        </template>
-      </div>
-      <!-- Last Rack (always single) -->
-      <div
+          </template>
+        </div>
+        <!-- Last Rack (always single) -->
+        <div
           v-if="storageStore.racks.length > 1"
           :key="storageStore.racks[storageStore.racks.length - 1].id"
-          class="rack single-rack last-rack"
           :class="[
           {
             selected:
@@ -132,40 +136,87 @@ const middleRackPairs = computed(() => {
           },
           getOccupancyClass(storageStore.racks[storageStore.racks.length - 1]),
         ]"
+          class="rack single-rack last-rack"
           @click="
           storageStore.selectRack(
             storageStore.racks[storageStore.racks.length - 1].id,
           )
         "
-      >
-        <div class="rack-content">
-          <div class="rack-number">
-            Ряд {{ storageStore.racks[storageStore.racks.length - 1].id }}
-          </div>
-          <div class="rack-status">
-            <small>{{
-                getRackStatus(storageStore.racks[storageStore.racks.length - 1])
-                   }}</small>
+        >
+          <div class="rack-content">
+            <div class="rack-number">
+              Ряд {{ storageStore.racks[storageStore.racks.length - 1].id }}
+            </div>
+            <div class="rack-status">
+              <small>{{
+                  getRackStatus(storageStore.racks[storageStore.racks.length - 1])
+                     }}</small>
+            </div>
           </div>
         </div>
       </div>
+<!--      <div class="rack-group" v-if="storageStore.getTotalStorageRowsByZone !==0">-->
+<!--        <div v-for="row in storageStore.getTotalStorageRowsByZone">-->
+<!--          <div class="rack single-rack first-rack"-->
+<!--               @click="storageStore.selectRack(storageStore.racks[0].id)"-->
+<!--          >{{ row }}-->
+<!--          </div>-->
+<!--        </div>-->
+<!--      </div>-->
     </div>
   </div>
 </template>
 <style scoped>
-.warehouse-top-view {
+.rack-group {
   display: grid;
-  grid-template-columns: 1fr;
-  max-width: 1280px;
+  grid-template-columns: minmax(auto, 1fr);
+  row-gap: .5rem;
+  padding: 1rem;
+  /*grid-template-rows: repeat(auto-fit, 30px);*/
 }
 
-.racks-container {
+.storage-map-container {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: auto 1fr;
   background-color: #2623238f;
   border: 1px solid #605039e0;
   border-radius: 1rem;
-  padding: 2rem 5rem 2rem 15rem;
+}
+
+.storage-map-one {
+  display: grid;
+  grid-template-columns: minmax(200px, 1fr);
+  grid-template-rows: 300px auto 600px;
+  row-gap: .5rem;
+  padding: 2rem;
+}
+
+.storage-map-two {
+  display: grid;
+  grid-template-columns: minmax(auto, 1fr);
+}
+
+.STR-01-container {
+  display: grid;
+  padding: 2rem 3rem 2rem 7rem;
+}
+
+.workers-zone-container {
+  display: grid;
+  border: 1px solid #4CAF50;
+  place-items: center;
+}
+
+.REC-SHP-zone-container {
+  display: grid;
+  border: 1px solid #0d6efd;
+  place-items: center;
+}
+
+.STR-02-container {
+  display: grid;
+  border: 1px solid #6c757d;
+  place-items: center;
 }
 
 .rack {

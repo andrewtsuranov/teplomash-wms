@@ -45,7 +45,7 @@
 <script setup>
 import { useStorageStore } from "@/stores/WMSStores/StorageStore.js";
 import { computed, onMounted, watch } from "vue";
-import PalletDetails from "./map/PalletDetails.vue";
+import PalletDetails from "../REC/map/PalletDetails.vue";
 
 const storageStore = useStorageStore();
 const selectedRack = computed(() => {

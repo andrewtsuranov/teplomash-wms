@@ -87,17 +87,8 @@ const router = useRouter();
   display: none;
 }
 
-@media (max-width: 1140px) {
-  .navbar-content {
-    grid:
-      "logo navigation profile"
-      "search search search";
-    grid-template-columns: minmax(max-content, 250px) minmax(400px, auto) auto;
-    grid-template-rows: minmax(80px, auto);
-  }
-}
 
-@media (max-width: 800px) {
+@media (max-width: 1100px) {
   /* Стили для мобильного navbar */
   .navbar-content {
     padding: 0;
