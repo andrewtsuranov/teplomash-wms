@@ -30,7 +30,7 @@ export const useWebSocketStore = defineStore("webSocketStore", () => {
     const getUnregisteredProducts = computed(() => wsUnregisteredProducts.value);
     //Actions
     const initWebSocket = async () => {
-        // Если промис уже существует, возвращаем его
+        // Если промис уже существует, возвращаем его обратно
         if (connectionPromise.value) {
             return connectionPromise.value;
         }
