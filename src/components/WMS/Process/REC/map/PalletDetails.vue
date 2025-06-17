@@ -82,7 +82,7 @@ const palletData = ref({
   description: "",
 });
 const closePalletDetails = () => {
-  storageStore.selectPallet(null);
+  storageStore.setSelectedPallet(null);
 };
 const savePallet = async () => {
   try {

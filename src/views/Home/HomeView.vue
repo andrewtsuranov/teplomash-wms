@@ -54,9 +54,9 @@ onMounted(async () => {
     >
       <span
         class="welcome-btn"
-        style="font-size: 5rem; text-transform: uppercase"
+        style="font-size: 4rem; text-transform: uppercase"
       >
-        Начать работу!
+        Перейти к управлению
       </span>
     </div>
   </div>

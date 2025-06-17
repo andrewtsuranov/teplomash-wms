@@ -52,8 +52,8 @@ import { useStorageStore } from "@/stores/WMSStores/StorageStore.js";
 
 const storageStore = useStorageStore();
 const navigateToPallet = (result) => {
-  storageStore.selectRack(result.rackId);
-  storageStore.selectPallet({
+  storageStore.setSelectedRack(result.rackId);
+  storageStore.setSelectedPallet({
     rackId: result.rackId,
     level: result.levelId,
     cell: result.cellId,

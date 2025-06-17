@@ -12,27 +12,13 @@ import { useWarehouseStore } from "@/stores/WMSStores/WarehouseStore.js";
 const storageStore = useStorageStore();
 const webSocketStore = useWebSocketStore();
 const warehouseStore = useWarehouseStore();
-onMounted(async () => {
-  await webSocketStore.ensureConnected()
-  await webSocketStore.GET_LOCATIONS_BASE(
-    warehouseStore.selectedWarehouse.id,
-    warehouseStore.selectedZonesByZoneType.id,
-    null,
-    true,
-    null
-  );
-});
 </script>
 <template>
   <div class="storage-view-container">
-    <div class="storage-view-map">
-      <!--      <WarehouseSearch />-->
-      <div v-if="storageStore.error" class="alert alert-danger">{{ storageStore.error }}</div>
-      <!--      <SearchResults />-->
-      <h3>Интерактивная карта склада</h3>
-      <StorageMap />
-      <StorageMapDetail />
-    </div>
+    <WarehouseSearch />
+    <SearchResults />
+    <StorageMap />
+    <StorageMapDetail />
     <TeplomashTaskManager />
   </div>
 </template>
@@ -41,10 +27,5 @@ onMounted(async () => {
   display: grid;
   grid-template-columns: minmax(auto, 1fr);
   row-gap: 2rem;
-}
-
-.storage-view-map {
-  display: grid;
-  grid-template-columns: minmax(auto, 1fr);
 }
 </style>

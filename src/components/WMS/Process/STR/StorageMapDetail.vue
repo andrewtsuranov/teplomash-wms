@@ -1,61 +1,29 @@
-<template>
-  <div v-if="selectedRack" class="rack-profile">
-    <div v-if="storageStore.isLoading" class="loading-overlay">
-      <div class="spinner-border text-primary" role="status">
-        <span class="visually-hidden">Loading...</span>
-      </div>
-    </div>
-    <div class="rack-grid">
-      <div v-for="level in 7" :key="level" class="level">
-        <div v-for="cell in 11" :key="cell" class="cell">
-          <div
-            v-for="pallet in 4"
-            :key="pallet"
-            class="pallet"
-            :class="{
-              occupied: isPalletOccupied(level - 1, cell - 1, pallet - 1),
-              selected: isSelectedPallet(level - 1, cell - 1, pallet - 1),
-            }"
-            @click="handlePalletClick(level - 1, cell - 1, pallet - 1)"
-          >
-            <div
-              class="pallet-content"
-              v-if="getPalletContent(level - 1, cell - 1, pallet - 1)"
-            >
-              {{ getPalletContent(level - 1, cell - 1, pallet - 1).productId }}
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="rack-info">
-      <div class="alert alert-info">
-        Стеллаж #{{ storageStore.selectedRack }}
-        <br />
-        Занято паллетомест: {{ occupiedPalletsCount }}
-        <br />
-        Свободно паллетомест: {{ freePalletsCount }}
-      </div>
-    </div>
-    <Transition name="fade">
-      <PalletDetails v-if="storageStore.selectedPallet" />
-    </Transition>
-  </div>
-</template>
 <script setup>
 import { useStorageStore } from "@/stores/WMSStores/StorageStore.js";
 import { computed, onMounted, watch } from "vue";
 import PalletDetails from "../REC/map/PalletDetails.vue";
 
 const storageStore = useStorageStore();
-const selectedRack = computed(() => {
-  return storageStore.racks.find(
-    (rack) => rack.id === storageStore.selectedRack,
-  );
-});
+
+
+// CSS стили для динамической сетки
+const rackGridStyles = computed(() => ({
+  gridTemplateRows: `repeat(${storageStore.getZoneDimensions.levels}, 1fr)`
+}));
+
+const levelStyles = computed(() => ({
+  gridTemplateColumns: `repeat(${storageStore.getZoneDimensions.positions}, 1fr)`
+}));
+
+
+// const selectedRack = computed(() => {
+//   return storageStore.racks.find(
+//     (rack) => rack.id === storageStore.selectedRack,
+//   );
+// });
 const occupiedPalletsCount = computed(() => {
-  if (!selectedRack.value) return 0;
-  return selectedRack.value.cells.reduce((acc, cell) => {
+  if (!storageStore.selectedRack) return 0;
+  return storageStore.selectedRack?.cells.reduce((acc, cell) => {
     return (
       acc +
       cell.levels.reduce((levelAcc, level) => {
@@ -68,7 +36,7 @@ const freePalletsCount = computed(() => {
   return 11 * 7 * 4 - occupiedPalletsCount.value;
 });
 const isPalletOccupied = (level, cell, pallet) => {
-  return selectedRack.value?.cells[cell]?.levels[level]?.pallets[pallet]
+  return storageStore.selectedRack?.cells[cell]?.levels[level]?.pallets[pallet]
     ?.occupied;
 };
 const isSelectedPallet = (level, cell, pallet) => {
@@ -81,7 +49,7 @@ const isSelectedPallet = (level, cell, pallet) => {
   );
 };
 const getPalletContent = (level, cell, pallet) => {
-  return selectedRack.value?.cells[cell]?.levels[level]?.pallets[pallet]
+  return storageStore.selectedRack?.cells[cell]?.levels[level]?.pallets[pallet]
     ?.content;
 };
 const handlePalletClick = (level, cell, pallet) => {
@@ -92,7 +60,7 @@ const handlePalletClick = (level, cell, pallet) => {
     pallet,
     content: getPalletContent(level, cell, pallet),
   };
-  storageStore.selectPallet(palletInfo);
+  storageStore.setSelectedPallet(palletInfo);
 };
 // Загружаем данные при монтировании и при изменении выбранного стеллажа
 watch(
@@ -109,16 +77,59 @@ onMounted(async () => {
   }
 });
 </script>
+<template>
+  <div v-if="storageStore.selectedRack" class="rack-profile">
+    <div v-if="storageStore.isLoading" class="loading-overlay">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
+    <div class="rack-grid" :style="rackGridStyles">
+      <div v-for="level in storageStore.getZoneDimensions.levels" :key="level" class="level" :style="levelStyles">
+        <div v-for="cell in storageStore.getZoneDimensions.positions" :key="cell" class="cell">
+<!--          <div-->
+<!--            v-for="pallet in storageStore.getZoneDimensions.pallets_per_position"-->
+<!--            :key="pallet"-->
+<!--            class="pallet"-->
+<!--            :class="{-->
+<!--              occupied: isPalletOccupied(level - 1, cell - 1, pallet - 1),-->
+<!--              selected: isSelectedPallet(level - 1, cell - 1, pallet - 1),-->
+<!--            }"-->
+<!--            @click="handlePalletClick(level - 1, cell - 1, pallet - 1)"-->
+<!--          >-->
+<!--            <div-->
+<!--              class="pallet-content"-->
+<!--              v-if="getPalletContent(level - 1, cell - 1, pallet - 1)"-->
+<!--            >-->
+<!--              {{ getPalletContent(level - 1, cell - 1, pallet - 1).productId }}-->
+<!--            </div>-->
+<!--          </div>-->
+        </div>
+      </div>
+    </div>
+    <div class="rack-info">
+      <div class="alert alert-info">
+        Стеллаж: #{{ storageStore.selectedRack.id.split('.')[0] }}
+        <br />
+        Занято паллетомест: {{ occupiedPalletsCount }}
+        <br />
+        Свободно паллетомест: {{ freePalletsCount }}
+      </div>
+    </div>
+    <Transition name="fade">
+      <PalletDetails v-if="storageStore.selectedPallet" />
+    </Transition>
+  </div>
+</template>
 <style scoped>
 .rack-profile {
   display: grid;
   grid-template-columns: 1fr;
   overflow-x: auto;
-  /*position: relative;*/
-  /*max-width: 1280px;*/
-  /*margin-top: 20px;*/
-  padding: 20px;
-  /*background-color: #1b2040;*/
+  background-color: #2623238f;
+  border: 1px solid #605039e0;
+  border-radius: 1rem;
+  padding: 1rem 2rem;
   transition: all 0.3s ease;
 }
 
@@ -137,41 +148,39 @@ onMounted(async () => {
 
 .rack-grid {
   display: grid;
-  grid-template-columns: 1fr;
-  grid-template-rows: repeat(7, 1fr);
-  gap: 10px;
+  grid-template-columns: minmax(auto, 1fr);
+  row-gap: .7rem;
+  justify-items: center;
 }
 
 .level {
-  display: flex;
-  gap: 10px;
+  display: grid;
+  gap: .8rem;
   transition: all 0.3s ease;
 }
 
 .cell {
-  display: flex;
-  gap: 2px;
-  padding: 2px;
-  background-color: #e9ecef;
-  border: 1px solid #dee2e6;
+  display: grid;
+  grid-template-columns: minmax(88px, auto);
+  grid-template-rows: minmax(auto, 20px);
+  /*grid-template-columns: repeat(4, 1fr);*/
+  column-gap: .2rem;
   transition: all 0.2s ease;
+  border: 1px solid #ced4da;
 }
 
 .cell:hover {
-  background-color: #dee2e6;
+  background-color: #3487da;
 }
 
 .pallet {
-  width: 30px;
-  height: 30px;
-  background-color: #fff;
   border: 1px solid #ced4da;
   cursor: pointer;
   transition: all 0.2s ease;
   display: grid;
-  justify-content: center;
-  align-items: center;
-  font-size: 0.7rem;
+  grid-template-columns: minmax(auto, 20px);
+  grid-template-rows: minmax(auto, 20px);
+  font-size: .7rem;
 }
 
 .pallet:hover {
